@@ -5,13 +5,14 @@ module Bosh::Cli::Command
     usage "cf deploy"
     desc  "deploy cloudfoundry"
     def deploy
-      p ["deploy"]
+      p ["deploy", options]
     end
 
-    usage "cf new system NAME"
+    usage "cf new system"
     desc  "create a new Cloud Foundry system"
+    option "--ip ip", Array, "Static IP for CloudController/router"
     def new_system(name)
-      p ["new_system", name]
+      p ["new_system", name, options]
     end
   end
 end
