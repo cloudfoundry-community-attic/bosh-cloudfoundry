@@ -8,6 +8,12 @@ module Bosh::Cli::Command
       p ["deploy", options]
     end
 
+    usage "cf system"
+    desc "get/set current system"
+    def set_system(name=nil)
+      p ["system", name, options]
+    end
+
     usage "cf new system"
     desc  "create a new Cloud Foundry system"
     option "--ip ip", Array, "Static IP for CloudController/router"
