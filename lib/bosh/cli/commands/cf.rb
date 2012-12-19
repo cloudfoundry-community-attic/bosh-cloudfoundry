@@ -7,6 +7,7 @@ module Bosh::Cli::Command
     include Bosh::Cli::DeploymentHelper
 
     DEFAULT_CONFIG_PATH = File.expand_path("~/.bosh_cf_config")
+    DEFAULT_BASE_SYSTEM_PATH = "/var/vcap/store/systems"
 
     def initialize(runner)
       super(runner)
@@ -54,12 +55,37 @@ module Bosh::Cli::Command
     end
 
     def set_system(name)
-      cf_config.cf_system = name
+      base_systems_dir = find_base_systems_dir
+
+      system_dir = File.join(base_systems_dir, name)
+      unless File.directory?(system_dir)
+        err "CloudFoundry system path '#{system_dir.red}` does not exist"
+      end
+      
+      say "CloudFoundry system set to '#{system_dir.green}'"
+      cf_config.cf_system = system_dir
       cf_config.save
     end
 
     def show_system
       say(system ? "Current CloudFoundry system is '#{system.green}'" : "CloudFoundry system not set")
+    end
+
+    def find_base_systems_dir
+      @base_systems_dir ||= options[:base_systems_dir] || cf_config.base_systems_dir || begin
+        if non_interactive?
+          err "Please set base_systems_dir configuration for non-interactive mode"
+        end
+        
+        cf_config.base_systems_dir = ask("Path for to store all systems: ") {
+          |q| q.default = DEFAULT_BASE_SYSTEM_PATH }
+        unless File.directory?(cf_config.base_systems_dir)
+          say "Creating systems path #{cf_config.base_systems_dir}"
+          FileUtils.mkdir_p(cf_config.base_systems_dir)
+        end
+        cf_config.save
+        cf_config.base_systems_dir
+      end
     end
 
     usage "cf new system"
