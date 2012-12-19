@@ -21,6 +21,21 @@ $ bosh-bootstrap ssh
 # bosh cf deploy
 ```
 
+### All available commands
+
+```
+$ bosh help cf
+cf deploy 
+    deploy cloudfoundry 
+
+cf new system <name> [--ip ip] 
+    create a new Cloud Foundry system 
+    --ip ip Static IP for CloudController/router 
+
+cf system [<name>] 
+    get/set current system 
+```
+
 ## Contributing
 
 1. Fork it
