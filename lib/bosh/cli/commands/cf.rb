@@ -77,8 +77,9 @@ module Bosh::Cli::Command
           err "Please set base_systems_dir configuration for non-interactive mode"
         end
         
-        cf_config.base_systems_dir = ask("Path for to store all systems: ") {
+        base_systems_dir = ask("Path for to store all CloudFoundry systems: ") {
           |q| q.default = DEFAULT_BASE_SYSTEM_PATH }
+        cf_config.base_systems_dir = File.expand_path(base_systems_dir)
         unless File.directory?(cf_config.base_systems_dir)
           say "Creating systems path #{cf_config.base_systems_dir}"
           FileUtils.mkdir_p(cf_config.base_systems_dir)
