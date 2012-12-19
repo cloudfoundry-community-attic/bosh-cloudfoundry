@@ -12,11 +12,10 @@ describe Bosh::CloudFoundry::Config do
   end
 
   it "should default base_systems_dir and create it" do
-    base_systems_dir = File.join(@dir, "systems")
-    Bosh::CloudFoundry::Config.configure({"base_systems_dir" => base_systems_dir})
+    config_file = File.join(@dir, "config.yml")
+    config = Bosh::CloudFoundry::Config.new(config_file)
 
-    base_systems_dir = Bosh::CloudFoundry::Config.base_systems_dir
-    base_systems_dir.should == base_systems_dir
-    File.exists?(base_systems_dir).should == true
+    base_systems_dir = config.base_systems_dir
+    base_systems_dir.should == nil
   end
 end
