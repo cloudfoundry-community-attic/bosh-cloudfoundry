@@ -39,7 +39,7 @@ describe Bosh::Cli::Command::Base do
       @cmd.should_receive(:sh).with("git pull origin master")
       @cmd.should_receive(:sh).with("bosh create release")
       @cmd.should_receive(:sh).with("bosh upload release")
-      @cmd.public_cloudfoundry
+      @cmd.upload_release
     end
 
     it "generates new system folder/manifests, using all options" do

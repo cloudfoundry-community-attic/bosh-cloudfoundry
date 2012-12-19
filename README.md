@@ -25,15 +25,17 @@ $ bosh-bootstrap ssh
 
 ```
 $ bosh help cf
-cf deploy 
-    deploy cloudfoundry 
-
-cf new system <name> [--ip ip] 
+cf new system <name> [--ip ip] [--dns dns] [--cf-release name] 
     create a new Cloud Foundry system 
-    --ip ip Static IP for CloudController/router 
+    --ip ip           Static IP for CloudController/router, e.g. 1.2.3.4 
+    --dns dns         Base DNS for CloudFoundry applications, e.g. vcap.me 
+    --cf-release name Name of BOSH release uploaded to target BOSH 
 
 cf system [<name>] 
     get/set current system 
+
+cf upload release [<release_name>] 
+    fetch & upload public cloudfoundry release to BOSH 
 ```
 
 ## Contributing

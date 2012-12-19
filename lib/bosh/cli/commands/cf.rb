@@ -72,9 +72,9 @@ module Bosh::Cli::Command
       end
     end
 
-    usage "cf public cloudfoundry"
+    usage "cf upload release"
     desc "fetch & upload public cloudfoundry release to BOSH"
-    def public_cloudfoundry(release_name="cf-dev")
+    def upload_release(release_name="cf-dev")
       cf_config.cf_release_name = release_name
       cf_config.save
       clone_or_update_cf_release
