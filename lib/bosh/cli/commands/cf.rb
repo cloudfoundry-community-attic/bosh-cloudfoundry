@@ -54,6 +54,18 @@ module Bosh::Cli::Command
       end
     end
 
+    usage "cf new system"
+    desc  "create a new Cloud Foundry system"
+    option "--ip ip", Array, "Static IP for CloudController/router, e.g. 1.2.3.4"
+    option "--dns dns", String, "Base DNS for CloudFoundry applications, e.g. vcap.me"
+    def new_system(name)
+      base_systems_dir = find_base_systems_dir
+
+      system_dir = File.join(base_systems_dir, name)
+      FileUtils.mkdir_p(system_dir)
+      set_system(name)
+    end
+
     def set_system(name)
       base_systems_dir = find_base_systems_dir
 
@@ -89,11 +101,5 @@ module Bosh::Cli::Command
       end
     end
 
-    usage "cf new system"
-    desc  "create a new Cloud Foundry system"
-    option "--ip ip", Array, "Static IP for CloudController/router"
-    def new_system(name)
-      p ["new_system", name, options]
-    end
   end
 end

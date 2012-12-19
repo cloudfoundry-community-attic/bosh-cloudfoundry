@@ -29,7 +29,9 @@ describe Bosh::Cli::Command::Base do
     end
 
     it "generates new system folder/manifests" do
-      
+      @cmd.system.should be_nil
+      @cmd.new_system("production")
+      File.basename(@cmd.system).should == "production"
     end
   end
 end
