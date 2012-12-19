@@ -6,6 +6,13 @@ module Bosh::Cli::Command
   class CloudFoundry < Base
     include Bosh::Cli::DeploymentHelper
 
+    DEFAULT_CONFIG_PATH = File.expand_path("~/.bosh_cf_config")
+
+    def initialize(runner)
+      super(runner)
+      options[:config] ||= DEFAULT_CONFIG_PATH # Hijack Cli::Config
+    end
+
     usage "cf deploy"
     desc  "deploy cloudfoundry"
     def deploy
