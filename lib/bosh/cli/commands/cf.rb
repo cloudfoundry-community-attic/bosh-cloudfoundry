@@ -3,7 +3,7 @@
 require 'bosh-cloudfoundry'
 
 module Bosh::Cli::Command
-  class Cf < Base
+  class CloudFoundry < Base
     include Bosh::Cli::DeploymentHelper
 
     usage "cf deploy"

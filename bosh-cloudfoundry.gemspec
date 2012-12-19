@@ -20,4 +20,6 @@ Gem::Specification.new do |gem|
 
   gem.add_dependency "bosh_cli", ">=1.0.3"
   gem.add_development_dependency "rake"
+  gem.add_development_dependency "rspec"
+  gem.add_development_dependency "ci_reporter"
 end

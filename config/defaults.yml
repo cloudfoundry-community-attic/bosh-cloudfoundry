@@ -1,0 +1,6 @@
+---
+
+logging:
+  level: INFO
+
+base_systems_dir: /var/vcap/store/systems
