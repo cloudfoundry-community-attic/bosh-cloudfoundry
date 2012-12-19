@@ -9,15 +9,10 @@ module Bosh::Cli::Command
     DEFAULT_CONFIG_PATH = File.expand_path("~/.bosh_cf_config")
     DEFAULT_BASE_SYSTEM_PATH = "/var/vcap/store/systems"
 
-    def initialize(runner)
-      super(runner)
-      options[:config] ||= DEFAULT_CONFIG_PATH #hijack Cli::Config
-    end
-
     # @return [Bosh::CloudFoundry::Config] Current CF configuration
     def cf_config
-      @config ||= begin
-        config_file = options[:config] || Bosh::Cli::DEFAULT_CONFIG_PATH
+      @cf_config ||= begin
+        config_file = options[:cf_config] || DEFAULT_CONFIG_PATH
         Bosh::CloudFoundry::Config.new(config_file)
       end
     end
@@ -41,7 +36,6 @@ module Bosh::Cli::Command
     usage "cf deploy"
     desc  "deploy cloudfoundry"
     def deploy
-      p ["deploy", options]
     end
 
     usage "cf system"
@@ -56,10 +50,18 @@ module Bosh::Cli::Command
 
     usage "cf new system"
     desc  "create a new Cloud Foundry system"
-    option "--ip ip", Array, "Static IP for CloudController/router, e.g. 1.2.3.4"
+    option "--ip ip", String, "Static IP for CloudController/router, e.g. 1.2.3.4"
     option "--dns dns", String, "Base DNS for CloudFoundry applications, e.g. vcap.me"
+    option "--cf-release name", String, "Name of BOSH release uploaded to target BOSH"
     def new_system(name)
       base_systems_dir = find_base_systems_dir
+
+      confirm_bosh_target # fails if CLI is not targeting a BOSH
+      cf_release_name = confirm_cf_release_name # returns false if not set or no-longer available
+      cf_release_name ||= choose_cf_release_name # options[:"cf-release"] # choose or upload
+
+      main_ip = choose_main_ip # options[:ip]
+      root_dns = choose_root_dns # options[:dns]
 
       system_dir = File.join(base_systems_dir, name)
       FileUtils.mkdir_p(system_dir)
@@ -101,5 +103,43 @@ module Bosh::Cli::Command
       end
     end
 
+    def confirm_bosh_target
+      unless config.target
+        err("BOSH target not set")
+      end
+    end
+
+    def confirm_cf_release_name
+      if release_name = options[:cf_release] || cf_config.cf_release_name
+        unless bosh_releases.include?(release_name)
+          err("BOSH target #{config.target} does not have a release '#{release_name.red}'")
+        end
+        release_name
+      else
+        false
+      end
+    end
+
+    # TODO IMPLEMENT ME
+    # @return [Array] BOSH releases available in target BOSH
+    def bosh_releases
+      @bosh_releases ||= begin
+        []
+      end
+    end
+
+    # @return [String] Primary static IP for CloudController & Router
+    def choose_main_ip
+      @main_ip = options[:ip] || begin
+        err("Currently, please provide static IP via --ip flag")
+      end
+    end
+
+    # @return [String] Root DNS for applications & CloudController API
+    def choose_root_dns
+      @root_dns = options[:dns] || begin
+        err("Currently, please provide root DNS via --dns flag")
+      end
+    end
   end
 end

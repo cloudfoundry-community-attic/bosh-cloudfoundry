@@ -6,6 +6,7 @@ describe Bosh::Cli::Command::Base do
 
   before :each do
     @config = File.join(Dir.mktmpdir, "bosh_config")
+    @cf_config = File.join(Dir.mktmpdir, "bosh_cf_config")
     @cache = File.join(Dir.mktmpdir, "bosh_cache")
     @systems_dir = File.join(Dir.mktmpdir, "systems")
   end
@@ -16,6 +17,7 @@ describe Bosh::Cli::Command::Base do
       @cmd = Bosh::Cli::Command::CloudFoundry.new(nil)
       @cmd.add_option(:non_interactive, true)
       @cmd.add_option(:config, @config)
+      @cmd.add_option(:cf_config, @cf_config)
       @cmd.add_option(:cache_dir, @cache)
       @cmd.add_option(:base_systems_dir, @systems_dir)
     end
@@ -28,7 +30,14 @@ describe Bosh::Cli::Command::Base do
       File.should be_directory(@cmd.system)
     end
 
-    it "generates new system folder/manifests" do
+    it "generates new system folder/manifests, using all options" do
+      @cmd.stub!(:confirm_bosh_target).and_return(true)
+      @cmd.stub!(:bosh_releases).and_return(['cf-dev', 'cf-production'])
+
+      @cmd.add_option(:ip, ['1.2.3.4'])
+      @cmd.add_option(:dns, 'mycompany.com')
+      @cmd.add_option(:cf_release, 'cf-dev')
+
       @cmd.system.should be_nil
       @cmd.new_system("production")
       File.basename(@cmd.system).should == "production"
