@@ -38,6 +38,14 @@ cf upload release [<release_name>]
     fetch & upload public cloudfoundry release to BOSH 
 ```
 
+## Development
+
+```
+bundle
+rake spec
+rake install
+```
+
 ## Contributing
 
 1. Fork it

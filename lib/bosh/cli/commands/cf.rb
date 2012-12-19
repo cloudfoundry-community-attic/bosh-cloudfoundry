@@ -194,22 +194,20 @@ module Bosh::Cli::Command
     end
 
     def choose_releases_dir
-      releases_dir || begin
-        if non_interactive?
-          err "Please set releases_dir configuration for non-interactive mode"
-        end
-        
-        releases_dir = ask("Path to store all BOSH releases: ") {
-          |q| q.default = DEFAULT_RELEASES_PATH }
-
-        cf_config.releases_dir = File.expand_path(releases_dir)
-        unless File.directory?(cf_config.releases_dir)
-          say "Creating releases path #{cf_config.releases_dir}"
-          FileUtils.mkdir_p(cf_config.releases_dir)
-        end
-        cf_config.save
-        cf_config.releases_dir
+      if non_interactive?
+        err "Please set releases_dir configuration for non-interactive mode"
       end
+      
+      releases_dir = ask("Path to store all BOSH releases: ") {
+        |q| q.default = DEFAULT_RELEASES_PATH }
+
+      cf_config.releases_dir = File.expand_path(releases_dir)
+      unless File.directory?(cf_config.releases_dir)
+        say "Creating releases path #{cf_config.releases_dir}"
+        FileUtils.mkdir_p(cf_config.releases_dir)
+      end
+      cf_config.save
+      cf_config.releases_dir
     end
 
     def create_dev_release(name)
