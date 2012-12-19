@@ -1,3 +1,7 @@
+# Copyright (c) 2012-2013 Stark & Wayne, LLC
+
+require 'bosh-cloudfoundry'
+
 module Bosh::Cli::Command
   class Cf < Base
     include Bosh::Cli::DeploymentHelper
