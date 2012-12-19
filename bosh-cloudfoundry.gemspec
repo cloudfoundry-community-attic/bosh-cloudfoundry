@@ -22,4 +22,5 @@ Gem::Specification.new do |gem|
   gem.add_dependency "rake" # file_utils sh helper
   gem.add_development_dependency "rspec"
   gem.add_development_dependency "ci_reporter"
+  gem.add_development_dependency "debugger"
 end

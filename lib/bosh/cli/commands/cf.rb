@@ -16,7 +16,7 @@ module Bosh::Cli::Command
       @cf_config ||= begin
         config_file = options[:cf_config] || DEFAULT_CONFIG_PATH
         cf_config = Bosh::CloudFoundry::Config.new(config_file)
-        cf_config.cf_release_git_repo ||= "git@github.com/cloudfoundry/cf-release.git"
+        cf_config.cf_release_git_repo ||= "git://github.com/cloudfoundry/cf-release.git"
         cf_config.save
         cf_config
       end
@@ -40,8 +40,7 @@ module Bosh::Cli::Command
     # @return [String] Path to cf-release BOSH release
     def cf_release_dir
       options[:cf_release_dir] || cf_config.cf_release_dir || begin
-        cf_release_dirname = "cf-release"
-        cf_config.cf_release_dir = File.join(releases_dir, cf_release_dirname)
+        cf_config.cf_release_dir = File.join(releases_dir, "cf-release")
         cf_config.save
         cf_config.cf_release_dir
       end

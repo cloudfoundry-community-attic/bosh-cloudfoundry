@@ -9,6 +9,7 @@ describe Bosh::Cli::Command::Base do
     @cf_config = File.join(Dir.mktmpdir, "bosh_cf_config")
     @cache = File.join(Dir.mktmpdir, "bosh_cache")
     @systems_dir = File.join(Dir.mktmpdir, "systems")
+    @releases_dir = File.join(Dir.mktmpdir, "releases")
   end
 
   describe Bosh::Cli::Command::CloudFoundry do
@@ -28,6 +29,17 @@ describe Bosh::Cli::Command::Base do
       @cmd.set_system("production")
       File.basename(@cmd.system).should == "production"
       File.should be_directory(@cmd.system)
+    end
+
+    it "updates/creates/uploads cf-release" do
+      cf_releases_dir = File.join(@releases_dir, "cf-release")
+      FileUtils.mkdir_p(cf_releases_dir)
+      @cmd.add_option(:cf_release_dir, @releases_dir)
+
+      @cmd.should_receive(:sh).with("git pull origin master")
+      @cmd.should_receive(:sh).with("bosh create release")
+      @cmd.should_receive(:sh).with("bosh upload release")
+      @cmd.public_cloudfoundry
     end
 
     it "generates new system folder/manifests, using all options" do
