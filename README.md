@@ -8,6 +8,7 @@ You can run the following from your local laptop or a server, such as an `bosh-b
 
 ```
 gem install bosh-cloudfoundry
+bosh cf upload release
 bosh cf new system production
 bosh cf deploy
 ```
@@ -17,9 +18,12 @@ As the Cloud Foundry BOSH release (`cf-release`) is 1.5 Gb, it may be preferable
 ```
 $ bosh-bootstrap ssh
 # gem install bosh-cloudfoundry
+# TMPDIR=/var/vcap/store/tmp bosh cf upload release
 # bosh cf new system production
 # bosh cf deploy
 ```
+
+NOTE: `TMPDIR=/var/vcap/store/tmp` tells the upload process to use the larger mounted volume at `/var/vcap/store`. 
 
 ### All available commands
 
