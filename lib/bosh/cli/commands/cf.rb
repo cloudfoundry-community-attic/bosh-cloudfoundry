@@ -238,7 +238,7 @@ module Bosh::Cli::Command
 
     def upload_dev_release
       chdir(cf_release_dir) do
-        sh "bosh upload release"
+        sh "bosh -n --color upload release"
       end
     end
   end
