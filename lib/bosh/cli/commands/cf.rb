@@ -210,10 +210,22 @@ module Bosh::Cli::Command
       cf_config.releases_dir
     end
 
-    def create_dev_release(name)
+    def create_dev_release(release_name)
       chdir(cf_release_dir) do
-        sh "bosh create release"
+        write_dev_config_file(release_name)
+        sh "bosh create release --force"
       end
+    end
+
+    def write_dev_config_file(release_name)
+      dev_config_file = "config/dev.yml"
+      if File.exist?(dev_config_file)
+        dev_config = YAML.load_file(dev_config_file)
+      else
+        dev_config = {}
+      end
+      dev_config["dev_name"] = release_name
+      File.open(dev_config_file, "w") { |file| file << dev_config.to_yaml }
     end
 
     def upload_dev_release
