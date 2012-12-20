@@ -46,6 +46,25 @@ module Bosh::Cli::Command
       end
     end
 
+    # @return [String] Path to store BOSH systems (collections of deployments)
+    def base_systems_dir
+      @base_systems_dir ||= options[:base_systems_dir] || cf_config.base_systems_dir || begin
+        if non_interactive?
+          err "Please set base_systems_dir configuration for non-interactive mode"
+        end
+        
+        base_systems_dir = ask("Path for to store all CloudFoundry systems: ") {
+          |q| q.default = DEFAULT_BASE_SYSTEM_PATH }
+        cf_config.base_systems_dir = File.expand_path(base_systems_dir)
+        unless File.directory?(cf_config.base_systems_dir)
+          say "Creating systems path #{cf_config.base_systems_dir}"
+          FileUtils.mkdir_p(cf_config.base_systems_dir)
+        end
+        cf_config.save
+        cf_config.base_systems_dir
+      end
+    end
+
     usage "cf"
     desc  "show cf bosh sub-commands"
     def cf_help
@@ -88,8 +107,6 @@ module Bosh::Cli::Command
     option "--dns dns", String, "Base DNS for CloudFoundry applications, e.g. vcap.me"
     option "--cf-release name", String, "Name of BOSH release uploaded to target BOSH"
     def new_system(name)
-      base_systems_dir = find_base_systems_dir
-
       confirm_bosh_target # fails if CLI is not targeting a BOSH
       cf_release_name = confirm_cf_release_name # returns false if not set or no-longer available
       cf_release_name ||= choose_cf_release_name # options[:cf_release] # choose or upload
@@ -100,14 +117,11 @@ module Bosh::Cli::Command
       validate_dns_a_record("api.#{root_dns}", main_ip)
       validate_dns_a_record("demoapp.#{root_dns}", main_ip)
 
-      system_dir = File.join(base_systems_dir, name)
-      FileUtils.mkdir_p(system_dir)
+      generate_system(name, main_ip, root_dns)
       set_system(name)
     end
 
     def set_system(name)
-      base_systems_dir = find_base_systems_dir
-
       system_dir = File.join(base_systems_dir, name)
       unless File.directory?(system_dir)
         err "CloudFoundry system path '#{system_dir.red}` does not exist"
@@ -120,24 +134,6 @@ module Bosh::Cli::Command
 
     def show_system
       say(system ? "Current CloudFoundry system is '#{system.green}'" : "CloudFoundry system not set")
-    end
-
-    def find_base_systems_dir
-      @base_systems_dir ||= options[:base_systems_dir] || cf_config.base_systems_dir || begin
-        if non_interactive?
-          err "Please set base_systems_dir configuration for non-interactive mode"
-        end
-        
-        base_systems_dir = ask("Path for to store all CloudFoundry systems: ") {
-          |q| q.default = DEFAULT_BASE_SYSTEM_PATH }
-        cf_config.base_systems_dir = File.expand_path(base_systems_dir)
-        unless File.directory?(cf_config.base_systems_dir)
-          say "Creating systems path #{cf_config.base_systems_dir}"
-          FileUtils.mkdir_p(cf_config.base_systems_dir)
-        end
-        cf_config.save
-        cf_config.base_systems_dir
-      end
     end
 
     def confirm_bosh_target
@@ -268,6 +264,15 @@ module Bosh::Cli::Command
       else
         say "ok".green
         true
+      end
+    end
+
+    def generate_system(system_name, main_ip, root_dns)
+      system_dir = File.join(base_systems_dir, system_name)
+      mkdir_p(system_dir)
+      chdir system_dir do
+        require 'bosh-cloudfoundry/generators/system_generator'
+        Bosh::CloudFoundry::Generators::SystemGenerator.start([system_name, main_ip, root_dns])
       end
     end
   end

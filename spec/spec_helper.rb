@@ -16,6 +16,12 @@ def spec_asset(filename)
   File.expand_path("../assets/#{filename}", __FILE__)
 end
 
+def files_match(filename, expected_filename)
+  file = File.read(filename)
+  expected_file = File.read(expected_filename)
+  file.should == expected_file
+end
+
 RSpec.configure do |c|
   c.before(:each) do
     Bosh::Cli::Config.interactive = false

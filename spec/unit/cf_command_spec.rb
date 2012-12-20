@@ -10,6 +10,8 @@ describe Bosh::Cli::Command::Base do
     @cache = File.join(Dir.mktmpdir, "bosh_cache")
     @systems_dir = File.join(Dir.mktmpdir, "systems")
     @releases_dir = File.join(Dir.mktmpdir, "releases")
+    FileUtils.mkdir_p(@systems_dir)
+    FileUtils.mkdir_p(@releases_dir)
   end
 
   describe Bosh::Cli::Command::CloudFoundry do
@@ -67,6 +69,15 @@ describe Bosh::Cli::Command::Base do
       @cmd.system.should be_nil
       @cmd.new_system("production")
       File.basename(@cmd.system).should == "production"
+
+      FileUtils.chdir(@cmd.system) do
+        File.should be_exist("deployments/production-main.yml")
+        files_match("deployments/production-main.yml", spec_asset("deployments/production-main.yml"))
+        File.should be_exist("deployments/production-postgresql.yml")
+        files_match("deployments/production-postgresql.yml", spec_asset("deployments/production-postgresql.yml"))
+        File.should be_exist("deployments/production-redis.yml")
+        files_match("deployments/production-redis.yml", spec_asset("deployments/production-redis.yml"))
+      end
     end
   end
 end
