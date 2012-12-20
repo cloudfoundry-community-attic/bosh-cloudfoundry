@@ -196,11 +196,11 @@ module Bosh::Cli::Command
         # Snippet written by Mike Reeves <swampfoxmr@gmail.com> on bosh-users mailing list
         # Date 2012-12-06
         script = <<-BASH.gsub(/^        /, '')
-        grep -rI "git[@:/]\{0,3\}github.com" * .gitmodules | awk 'BEGIN {FS=":"} { print($1) }' | while read file
+        grep -rI "github.com" * .gitmodules | awk 'BEGIN {FS=":"} { print($1) }' | uniq while read file
         do
           echo "changing - $file"
-          sed -i 's/git\:\/\/github.com/https:\/\/github.com/g' $file
-          sed -i 's/git@github.com:/https:\/\/github.com\//g' $file
+          sed -i 's#git://github.com#https://github.com#g' $file
+          sed -i 's#git@github.com:#https://github.com:#g' $file
         done
         BASH
         sh script
