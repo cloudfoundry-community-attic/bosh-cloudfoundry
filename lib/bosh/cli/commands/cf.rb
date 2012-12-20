@@ -191,6 +191,9 @@ module Bosh::Cli::Command
           end
         end
       end
+      chdir(cf_release_dir) do
+        sh "git submodule update --init"
+      end
     end
 
     def choose_releases_dir

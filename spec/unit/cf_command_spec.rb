@@ -37,6 +37,7 @@ describe Bosh::Cli::Command::Base do
       @cmd.add_option(:cf_release_dir, @releases_dir)
 
       @cmd.should_receive(:sh).with("git pull origin master")
+      @cmd.should_receive(:sh).with("git submodule update --init")
       @cmd.should_receive(:write_dev_config_file).with("cf-dev")
       @cmd.should_receive(:sh).with("bosh create release --force")
       @cmd.should_receive(:sh).with("bosh upload release")
