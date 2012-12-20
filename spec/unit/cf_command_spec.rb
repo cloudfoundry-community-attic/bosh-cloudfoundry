@@ -45,7 +45,8 @@ describe Bosh::Cli::Command::Base do
         sed -i 's#git@github.com:#https://github.com:#g' $file
       done
       BASH
-      @cmd.should_receive(:sh).with(script)
+      @cmd.should_receive(:sh).with("sed -i 's#git@github.com:#https://github.com/#g' .gitmodules")
+      @cmd.should_receive(:sh).with("sed -i 's#git://github.com#https://github.com#g' .gitmodules")
       @cmd.should_receive(:sh).with("git submodule update --init")
       @cmd.should_receive(:write_dev_config_file).with("cf-dev")
       @cmd.should_receive(:sh).with("bosh create release --force")
