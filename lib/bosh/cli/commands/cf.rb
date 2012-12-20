@@ -192,7 +192,7 @@ module Bosh::Cli::Command
         end
       end
       chdir(cf_release_dir) do
-        puts "Rewriting all git:// & git@ to https:// ..."
+        say "Rewriting all git:// & git@ to https:// ..."
         # Snippet written by Mike Reeves <swampfoxmr@gmail.com> on bosh-users mailing list
         # Date 2012-12-06
         sh "sed -i 's#git@github.com:#https://github.com/#g' .gitmodules"
