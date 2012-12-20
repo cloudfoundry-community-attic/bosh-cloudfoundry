@@ -55,10 +55,12 @@ describe Bosh::Cli::Command::Base do
     end
 
     it "generates new system folder/manifests, using all options" do
-      @cmd.stub!(:confirm_bosh_target).and_return(true)
-      @cmd.stub!(:bosh_releases).and_return(['cf-dev', 'cf-production'])
+      @cmd.should_receive(:confirm_bosh_target).and_return(true)
+      @cmd.should_receive(:bosh_release_names).and_return(['cf-dev', 'cf-production'])
+      @cmd.should_receive(:validate_dns_a_record).with("api.mycompany.com", '1.2.3.4').and_return(true)
+      @cmd.should_receive(:validate_dns_a_record).with("demoapp.mycompany.com", '1.2.3.4').and_return(true)
 
-      @cmd.add_option(:ip, ['1.2.3.4'])
+      @cmd.add_option(:ip, '1.2.3.4')
       @cmd.add_option(:dns, 'mycompany.com')
       @cmd.add_option(:cf_release, 'cf-dev')
 

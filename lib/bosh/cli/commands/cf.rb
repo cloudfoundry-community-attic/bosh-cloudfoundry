@@ -97,6 +97,9 @@ module Bosh::Cli::Command
       main_ip = choose_main_ip # options[:ip]
       root_dns = choose_root_dns # options[:dns]
 
+      validate_dns_a_record("api.#{root_dns}", main_ip)
+      validate_dns_a_record("demoapp.#{root_dns}", main_ip)
+
       system_dir = File.join(base_systems_dir, name)
       FileUtils.mkdir_p(system_dir)
       set_system(name)
@@ -145,7 +148,7 @@ module Bosh::Cli::Command
 
     def confirm_cf_release_name
       if release_name = options[:cf_release] || cf_config.cf_release_name
-        unless bosh_releases.include?(release_name)
+        unless bosh_release_names.include?(release_name)
           err("BOSH target #{config.target} does not have a release '#{release_name.red}'")
         end
         release_name
@@ -154,11 +157,12 @@ module Bosh::Cli::Command
       end
     end
 
-    # TODO IMPLEMENT ME
     # @return [Array] BOSH releases available in target BOSH
-    def bosh_releases
+    def bosh_release_names
       @bosh_releases ||= begin
-        []
+        # [{"name"=>"cf-dev", "versions"=>["126.1-dev"], "in_use"=>[]}]
+        releases = director.list_releases
+        releases.map { |rel| rel["name"] }
       end
     end
 
@@ -239,6 +243,31 @@ module Bosh::Cli::Command
     def upload_dev_release
       chdir(cf_release_dir) do
         sh "bosh -n --color upload release"
+      end
+    end
+
+    # Validates that +domain+ is an A record that resolves to +expected_ip_addresses+
+    # and no other IP addresses.
+    # * +expected_ip_addresses+ is a String (IPv4 address)
+    def validate_dns_a_record(domain, expected_ip_address)
+      say "Checking that DNS #{domain.green} resolves to IP address #{expected_ip_address.green}... ", " "
+      packet = Net::DNS::Resolver.start(domain, Net::DNS::A)
+      resolved_a_records = packet.answer.map(&:value)
+      if packet.answer.size == 0
+        error = "Domain '#{domain.green}' does not resolve to an IP address"
+      end
+      unless resolved_a_records == [expected_ip_address]
+        error = "Domain #{domain} should resolve to IP address #{expected_ip_address}"
+      end
+      if error
+        say "ooh no!".red
+        say "Please setup your DNS:"
+        say "Subdomain:  * " + "(wildcard)".yellow
+        say "IP address: #{expected_ip_address}"
+        err(error)
+      else
+        say "ok".green
+        true
       end
     end
   end
