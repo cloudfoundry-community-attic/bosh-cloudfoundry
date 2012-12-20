@@ -37,6 +37,15 @@ describe Bosh::Cli::Command::Base do
       @cmd.add_option(:cf_release_dir, @releases_dir)
 
       @cmd.should_receive(:sh).with("git pull origin master")
+      script = <<-BASH.gsub(/^      /, '')
+      grep -rI "git[@:/]\{0,3\}github.com" * .gitmodules | awk 'BEGIN {FS=":"} { print($1) }' | while read file
+      do
+        echo "changing - $file"
+        sed -i 's/git\:\/\/github.com/https:\/\/github.com/g' $file
+        sed -i 's/git@github.com:/https:\/\/github.com\//g' $file
+      done
+      BASH
+      @cmd.should_receive(:sh).with(script)
       @cmd.should_receive(:sh).with("git submodule update --init")
       @cmd.should_receive(:write_dev_config_file).with("cf-dev")
       @cmd.should_receive(:sh).with("bosh create release --force")

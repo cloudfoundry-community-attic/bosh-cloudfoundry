@@ -192,6 +192,18 @@ module Bosh::Cli::Command
         end
       end
       chdir(cf_release_dir) do
+        puts "Rewriting all git:// & git@ to https:// ..."
+        # Snippet written by Mike Reeves <swampfoxmr@gmail.com> on bosh-users mailing list
+        # Date 2012-12-06
+        script = <<-BASH.gsub(/^        /, '')
+        grep -rI "git[@:/]\{0,3\}github.com" * .gitmodules | awk 'BEGIN {FS=":"} { print($1) }' | while read file
+        do
+          echo "changing - $file"
+          sed -i 's/git\:\/\/github.com/https:\/\/github.com/g' $file
+          sed -i 's/git@github.com:/https:\/\/github.com\//g' $file
+        done
+        BASH
+        sh script
         sh "git submodule update --init"
       end
     end
