@@ -39,7 +39,18 @@ resource_pools:
   persistent_disk: 16192
 jobs:
 - name: main
-  template: micro
+  template:
+  - postgres
+  - nats
+  - router
+  - dea
+  - health_manager
+  - cloud_controller
+  - acm
+  - serialization_data_server
+  - stager
+  - uaa
+  - vcap_redis
   instances: 1
   resource_pool: common
   networks:
