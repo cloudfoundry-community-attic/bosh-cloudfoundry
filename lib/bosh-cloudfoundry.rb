@@ -14,4 +14,7 @@ require "rake/file_utils"
 # for validating DNS -> IP setups
 require 'net/dns'
 
+# for generators
+require 'thor/group'
+
 require "bosh-cloudfoundry/config"
