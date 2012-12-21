@@ -268,11 +268,27 @@ module Bosh::Cli::Command
     end
 
     def generate_system(system_name, main_ip, root_dns)
+      director_uuid = "DIRECTOR_UUID"
+      release_name = "cf-dev"
+      stemcell_version = "0.6.4"
+      resource_pool_cloud_properties = "instance_type: m1.small"
+      persistent_disk = 16192
+      dea_max_memory = 2048
+      admin_email = "drnic@starkandwayne.com"
+      router_password = "router1234"
+      nats_password = "mynats1234"
+      ccdb_password = "ccdbroot"
       system_dir = File.join(base_systems_dir, system_name)
       mkdir_p(system_dir)
       chdir system_dir do
         require 'bosh-cloudfoundry/generators/system_generator'
-        Bosh::CloudFoundry::Generators::SystemGenerator.start([system_name, main_ip, root_dns])
+        Bosh::CloudFoundry::Generators::SystemGenerator.start([
+          system_name, main_ip, root_dns,
+          director_uuid, release_name, stemcell_version,
+          resource_pool_cloud_properties, persistent_disk,
+          dea_max_memory,
+          admin_email,
+          router_password, nats_password, ccdb_password])
       end
     end
   end

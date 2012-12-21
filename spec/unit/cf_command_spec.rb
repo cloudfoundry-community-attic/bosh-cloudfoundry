@@ -72,7 +72,7 @@ describe Bosh::Cli::Command::Base do
 
       FileUtils.chdir(@cmd.system) do
         File.should be_exist("deployments/production-main.yml")
-        # files_match("deployments/production-main.yml", spec_asset("deployments/production-main.yml"))
+        files_match("deployments/production-main.yml", spec_asset("deployments/production-main.yml"))
         File.should be_exist("deployments/production-postgresql.yml")
         files_match("deployments/production-postgresql.yml", spec_asset("deployments/production-postgresql.yml"))
         File.should be_exist("deployments/production-redis.yml")
