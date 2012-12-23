@@ -1,0 +1,57 @@
+---
+name: 
+director_uuid: <%= director_uuid %>
+release:
+  name: <%= release_name %>
+  version: latest
+compilation:
+  workers: 10
+  network: default
+  reuse_compilation_vms: true
+  cloud_properties:
+    instance_type: m1.medium
+update:
+  canaries: 1
+  canary_watch_time: 30000-150000
+  update_watch_time: 30000-150000
+  max_in_flight: 4
+  max_errors: 1
+networks:
+- name: default
+  type: dynamic
+  cloud_properties:
+    security_groups:
+    - default
+- name: vip_network
+  type: vip
+  cloud_properties:
+    security_groups:
+    - default
+resource_pools:
+- name: common
+  network: default
+  size: 1
+  stemcell:
+    name: bosh-stemcell
+    version: <%= stemcell_version %>
+  cloud_properties:
+    <%= resource_pool_cloud_properties %>
+jobs:
+- name: dea
+  template:
+  - dea
+  instances: 1
+  resource_pool: common
+  networks:
+  - name: default
+    default:
+    - dns
+    - gateway
+properties:
+  dea:
+    max_memory: <%= dea_max_memory %>
+  nats:
+    user: nats
+    password: "<%= nats_password %>"
+    address: 127.0.0.1
+    port: 4222
