@@ -119,7 +119,6 @@ module Bosh::Cli::Command
     option "--count count", Integer, "Number of servers for running applications"
     option "--flavor flavor", String, "Flavor of server to use for all DEA servers, e.g. m1.large for AWS"
     def set_dea_servers
-      confirm_bosh_target # fails if CLI is not targeting a BOSH
       confirm_system
 
       server_count = options[:count]
@@ -147,7 +146,6 @@ module Bosh::Cli::Command
     option "--count count", Integer, "Number of servers for service"
     option "--flavor flavor", String, "Flavor of server to use for service"
     def set_service_servers(service_name)
-      confirm_bosh_target # fails if CLI is not targeting a BOSH
       confirm_system
 
       validate_service_name(service_name)
