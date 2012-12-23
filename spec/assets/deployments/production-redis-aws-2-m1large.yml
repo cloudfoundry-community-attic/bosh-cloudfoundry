@@ -1,0 +1,80 @@
+---
+name: 
+director_uuid: DIRECTOR_UUID
+release:
+  name: cf-dev
+  version: latest
+compilation:
+  workers: 10
+  network: default
+  reuse_compilation_vms: true
+  cloud_properties:
+    instance_type: m1.medium
+update:
+  canaries: 1
+  canary_watch_time: 30000-150000
+  update_watch_time: 30000-150000
+  max_in_flight: 4
+  max_errors: 1
+networks:
+- name: default
+  type: dynamic
+  cloud_properties:
+    security_groups:
+    - default
+- name: vip_network
+  type: vip
+  cloud_properties:
+    security_groups:
+    - default
+resource_pools:
+- name: common
+  network: default
+  size: 2
+  stemcell:
+    name: bosh-stemcell
+    version: 0.6.4
+  cloud_properties:
+    instance_type: m1.large
+  persistent_disk: 16192
+jobs:
+- name: redis_main
+  template:
+  - redis_node
+  - redis_gateway
+  instances: 1
+  resource_pool: common
+  networks:
+  - name: default
+    default:
+    - dns
+    - gateway
+  persistent_disk: 16192
+- name: redis_node
+  template:
+  - redis_node
+  instances: 1
+  resource_pool: common
+  networks:
+  - name: default
+    default:
+    - dns
+    - gateway
+  persistent_disk: 16192
+properties:
+  nats:
+    user: nats
+    password: "mynats1234"
+    address: 127.0.0.1
+    port: 4222
+  redis_gateway:
+    ip_route: 127.0.0.1
+    token:
+    supported_versions: ["2.2"]
+    version_aliases:
+      current: "2.2"
+  redis_node:
+    ip_route: 127.0.0.1
+    available_memory: 256
+    supported_versions: ["2.2"]
+    default_version: "2.2"

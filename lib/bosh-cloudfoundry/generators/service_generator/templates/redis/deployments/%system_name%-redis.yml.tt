@@ -1,0 +1,80 @@
+---
+name: 
+director_uuid: <%= director_uuid %>
+release:
+  name: <%= release_name %>
+  version: latest
+compilation:
+  workers: 10
+  network: default
+  reuse_compilation_vms: true
+  cloud_properties:
+    instance_type: m1.medium
+update:
+  canaries: 1
+  canary_watch_time: 30000-150000
+  update_watch_time: 30000-150000
+  max_in_flight: 4
+  max_errors: 1
+networks:
+- name: default
+  type: dynamic
+  cloud_properties:
+    security_groups:
+    - default
+- name: vip_network
+  type: vip
+  cloud_properties:
+    security_groups:
+    - default
+resource_pools:
+- name: common
+  network: default
+  size: <%= service_server_count %>
+  stemcell:
+    name: bosh-stemcell
+    version: <%= stemcell_version %>
+  cloud_properties:
+    <%= resource_pool_cloud_properties %>
+  persistent_disk: <%= persistent_disk %>
+jobs:
+- name: redis_main
+  template:
+  - redis_node
+  - redis_gateway
+  instances: 1
+  resource_pool: common
+  networks:
+  - name: default
+    default:
+    - dns
+    - gateway
+  persistent_disk: <%= persistent_disk %>
+- name: redis_node
+  template:
+  - redis_node
+  instances: <%= service_server_count.to_i - 1 %>
+  resource_pool: common
+  networks:
+  - name: default
+    default:
+    - dns
+    - gateway
+  persistent_disk: <%= persistent_disk %>
+properties:
+  nats:
+    user: nats
+    password: "<%= nats_password %>"
+    address: 127.0.0.1
+    port: 4222
+  redis_gateway:
+    ip_route: 127.0.0.1
+    token:
+    supported_versions: ["2.2"]
+    version_aliases:
+      current: "2.2"
+  redis_node:
+    ip_route: 127.0.0.1
+    available_memory: 256
+    supported_versions: ["2.2"]
+    default_version: "2.2"

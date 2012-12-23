@@ -1,0 +1,89 @@
+---
+name: 
+director_uuid: DIRECTOR_UUID
+release:
+  name: cf-dev
+  version: latest
+compilation:
+  workers: 10
+  network: default
+  reuse_compilation_vms: true
+  cloud_properties:
+    instance_type: m1.medium
+update:
+  canaries: 1
+  canary_watch_time: 30000-150000
+  update_watch_time: 30000-150000
+  max_in_flight: 4
+  max_errors: 1
+networks:
+- name: default
+  type: dynamic
+  cloud_properties:
+    security_groups:
+    - default
+- name: vip_network
+  type: vip
+  cloud_properties:
+    security_groups:
+    - default
+resource_pools:
+- name: common
+  network: default
+  size: 4
+  stemcell:
+    name: bosh-stemcell
+    version: 0.6.4
+  cloud_properties:
+    instance_type: m1.large
+  persistent_disk: 16192
+jobs:
+- name: postgresql_main
+  template:
+  - postgresql_node
+  - postgresql_gateway
+  instances: 1
+  resource_pool: common
+  networks:
+  - name: default
+    default:
+    - dns
+    - gateway
+  persistent_disk: 16192
+- name: postgresql_node
+  template:
+  - postgresql_node
+  instances: 3
+  resource_pool: common
+  networks:
+  - name: default
+    default:
+    - dns
+    - gateway
+  persistent_disk: 16192
+properties:
+  nats:
+    user: nats
+    password: "mynats1234"
+    address: 127.0.0.1
+    port: 4222
+  postgresql_gateway:
+    ip_route: 127.0.0.1
+    admin_user: psql_admin
+    admin_passwd_hash:
+    token:
+    supported_versions: ["9.0"]
+    version_aliases:
+      current: "9.0"
+  postgresql_node:
+    ip_route: 127.0.0.1
+    admin_user: psql_admin
+    admin_passwd_hash:
+    available_storage: 2048
+    max_db_size: 256
+    max_long_tx: 30
+    supported_versions: ["9.0"]
+    default_version: "9.0"
+  postgresql_server:
+    max_connections: 30
+    listen_address: 127.0.0.1

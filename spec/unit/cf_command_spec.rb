@@ -102,5 +102,39 @@ describe Bosh::Cli::Command::Base do
         files_match("deployments/production-dea.yml", spec_asset("deployments/production-dea-aws-3-m1large.yml"))
       end
     end
+
+    it "fails for unknown service" do
+      generate_new_system
+      @cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
+      expect {
+        @cmd.set_service_servers("UNKNOWN")
+      }.to raise_error(Bosh::Cli::CliError)
+    end
+
+    it "adds postgresql nodes" do
+      generate_new_system
+      @cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
+      @cmd.add_option(:count, '4')
+      @cmd.add_option(:flavor, 'm1.large')
+      @cmd.set_service_servers("postgresql")
+
+      FileUtils.chdir(@cmd.system) do
+        File.should be_exist("deployments/production-postgresql.yml")
+        files_match("deployments/production-postgresql.yml", spec_asset("deployments/production-postgresql-aws-4-m1large.yml"))
+      end
+    end
+
+    it "adds redis nodes" do
+      generate_new_system
+      @cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
+      @cmd.add_option(:count, '2')
+      @cmd.add_option(:flavor, 'm1.large')
+      @cmd.set_service_servers("redis")
+
+      FileUtils.chdir(@cmd.system) do
+        File.should be_exist("deployments/production-redis.yml")
+        files_match("deployments/production-redis.yml", spec_asset("deployments/production-redis-aws-2-m1large.yml"))
+      end
+    end
   end
 end

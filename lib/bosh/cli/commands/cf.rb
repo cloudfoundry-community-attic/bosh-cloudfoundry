@@ -132,7 +132,7 @@ module Bosh::Cli::Command
     end
 
     usage "cf dea"
-    desc  "Run more applications? Then change Droplet Execution Agent (DEA) server configuration"
+    desc  "Run more applications by changing Droplet Execution Agent (DEA) server configuration"
     option "--count count", Integer, "Number of servers for running applications"
     option "--flavor flavor", String, "Flavor of server to use for all DEA servers, e.g. m1.large for AWS"
     def set_dea_servers
@@ -144,6 +144,23 @@ module Bosh::Cli::Command
       validate_compute_flavor(dea_server_flavor)
 
       generate_dea_servers(dea_server_count, dea_server_flavor)
+    end
+
+    usage "cf service"
+    desc  "Support new/more services"
+    option "--count count", Integer, "Number of servers for service"
+    option "--flavor flavor", String, "Flavor of server to use for service"
+    def set_service_servers(service_name)
+      confirm_bosh_target # fails if CLI is not targeting a BOSH
+      confirm_system
+
+      validate_service_name(service_name)
+
+      service_server_count = options[:count]
+      service_server_flavor = options[:flavor]
+      validate_compute_flavor(service_server_flavor)
+
+      generate_service_servers(service_name, service_server_count, service_server_flavor)
     end
 
     def set_system(name)
@@ -374,6 +391,42 @@ module Bosh::Cli::Command
           director_uuid, release_name, stemcell_version,
           resource_pool_cloud_properties,
           dea_max_memory,
+          nats_password])
+      end
+    end
+
+    # Valdiate that +service_name+ is a known, supported service name
+    def validate_service_name(service_name)
+      unless supported_services.include?(service_name)
+        supported_services_list = supported_services.join(", ")
+        err("Service '#{service_name}' is not a supported service, such as #{supported_services_list}")
+      end
+    end
+
+    def supported_services
+      %w[postgresql redis]
+    end
+
+    def generate_service_servers(service_name, service_server_count, service_server_flavor)
+      director_uuid = "DIRECTOR_UUID"
+      release_name = "cf-dev"
+      stemcell_version = "0.6.4"
+      if aws?
+        resource_pool_cloud_properties = "instance_type: #{service_server_flavor}"
+      else
+        err("Please implemenet cf.rb's generate_service_servers for this IaaS")
+      end
+      persistent_disk = 16192
+      nats_password = "mynats1234"
+      system_dir = File.join(base_systems_dir, system_name)
+      mkdir_p(system_dir)
+      chdir system_dir do
+        require 'bosh-cloudfoundry/generators/service_generator'
+        Bosh::CloudFoundry::Generators::ServiceGenerator.start([
+          system_name,
+          service_name, service_server_count, service_server_flavor,
+          director_uuid, release_name, stemcell_version,
+          resource_pool_cloud_properties, persistent_disk,
           nats_password])
       end
     end
