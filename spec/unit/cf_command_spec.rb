@@ -56,23 +56,50 @@ describe Bosh::Cli::Command::Base do
       @cmd.upload_release
     end
 
+    def generate_new_system(cmd = nil)
+      cmd ||= begin
+        cmd = Bosh::Cli::Command::CloudFoundry.new(nil)
+        cmd.add_option(:non_interactive, true)
+        cmd.add_option(:config, @config)
+        cmd.add_option(:cf_config, @cf_config)
+        cmd.add_option(:cache_dir, @cache)
+        cmd.add_option(:base_systems_dir, @systems_dir)
+        cmd
+      end
+
+      cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
+      cmd.should_receive(:bosh_release_names).and_return(['cf-dev', 'cf-production'])
+      cmd.should_receive(:validate_dns_a_record).with("api.mycompany.com", '1.2.3.4').and_return(true)
+      cmd.should_receive(:validate_dns_a_record).with("demoapp.mycompany.com", '1.2.3.4').and_return(true)
+
+      cmd.add_option(:ip, '1.2.3.4')
+      cmd.add_option(:dns, 'mycompany.com')
+      cmd.add_option(:cf_release, 'cf-dev')
+
+      cmd.system.should be_nil
+      cmd.new_system("production")
+    end
+
     it "generates new system folder/manifests, using all options" do
-      @cmd.should_receive(:confirm_bosh_target).and_return(true)
-      @cmd.should_receive(:bosh_release_names).and_return(['cf-dev', 'cf-production'])
-      @cmd.should_receive(:validate_dns_a_record).with("api.mycompany.com", '1.2.3.4').and_return(true)
-      @cmd.should_receive(:validate_dns_a_record).with("demoapp.mycompany.com", '1.2.3.4').and_return(true)
-
-      @cmd.add_option(:ip, '1.2.3.4')
-      @cmd.add_option(:dns, 'mycompany.com')
-      @cmd.add_option(:cf_release, 'cf-dev')
-
-      @cmd.system.should be_nil
-      @cmd.new_system("production")
+      generate_new_system(@cmd)
       File.basename(@cmd.system).should == "production"
 
       FileUtils.chdir(@cmd.system) do
         File.should be_exist("deployments/production-main.yml")
         files_match("deployments/production-main.yml", spec_asset("deployments/production-main.yml"))
+      end
+    end
+
+    it "adds dea servers" do
+      generate_new_system
+      @cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
+      @cmd.add_option(:count, '3')
+      @cmd.add_option(:flavor, 'm1.large')
+      @cmd.set_dea_servers
+
+      FileUtils.chdir(@cmd.system) do
+        File.should be_exist("deployments/production-dea.yml")
+        files_match("deployments/production-dea.yml", spec_asset("deployments/production-dea-aws-3-m1large.yml"))
       end
     end
   end

@@ -22,9 +22,19 @@ module Bosh::Cli::Command
       end
     end
 
+    # @return [String] BOSH target to manage CloudFoundry
+    def bosh_target
+      options[:bosh_target] || config.target
+    end
+
     # @return [String] CloudFoundry system path
     def system
       options[:system] || cf_config.cf_system
+    end
+
+    # @return [String] CloudFoundry system name
+    def system_name
+      @system_name ||= File.basename(File.expand_path(system))
     end
 
     # @return [String] CloudFoundry BOSH release git URI
@@ -121,6 +131,21 @@ module Bosh::Cli::Command
       set_system(name)
     end
 
+    usage "cf dea"
+    desc  "Run more applications? Then change Droplet Execution Agent (DEA) server configuration"
+    option "--count count", Integer, "Number of servers for running applications"
+    option "--flavor flavor", String, "Flavor of server to use for all DEA servers, e.g. m1.large for AWS"
+    def set_dea_servers
+      confirm_bosh_target # fails if CLI is not targeting a BOSH
+      confirm_system
+
+      dea_server_count = options[:count]
+      dea_server_flavor = options[:flavor]
+      validate_compute_flavor(dea_server_flavor)
+
+      generate_dea_servers(dea_server_count, dea_server_flavor)
+    end
+
     def set_system(name)
       system_dir = File.join(base_systems_dir, name)
       unless File.directory?(system_dir)
@@ -137,15 +162,33 @@ module Bosh::Cli::Command
     end
 
     def confirm_bosh_target
-      unless config.target
+      if bosh_target
+        say("Current BOSH is '#{bosh_target.green}'")
+      else
         err("BOSH target not set")
       end
+    end
+
+    def confirm_system
+      if system
+        say("Current CloudFoundry system is '#{system.green}'")
+      else
+        err("CloudFoundry system not set")
+      end
+    end
+
+    # Deploying CloudFoundry to AWS?
+    # Is the target BOSH's IaaS using the AWS CPI?
+    # FIXME Currently only AWS is supported so its always AWS
+    def aws?
+      @fog = Fog::Compute['AWS'] # this is currently just to load fog/aws code
+      true
     end
 
     def confirm_cf_release_name
       if release_name = options[:cf_release] || cf_config.cf_release_name
         unless bosh_release_names.include?(release_name)
-          err("BOSH target #{config.target} does not have a release '#{release_name.red}'")
+          err("BOSH target #{bosh_target} does not have a release '#{release_name.red}'")
         end
         release_name
       else
@@ -271,7 +314,11 @@ module Bosh::Cli::Command
       director_uuid = "DIRECTOR_UUID"
       release_name = "cf-dev"
       stemcell_version = "0.6.4"
-      resource_pool_cloud_properties = "instance_type: m1.small"
+      if aws?
+        resource_pool_cloud_properties = "instance_type: m1.small"
+      else
+        err("Please implemenet cf.rb's generate_system for this IaaS")
+      end
       persistent_disk = 16192
       dea_max_memory = 2048
       admin_email = "drnic@starkandwayne.com"
@@ -290,6 +337,52 @@ module Bosh::Cli::Command
           admin_email,
           router_password, nats_password, ccdb_password])
       end
+    end
+
+    # Validates +server_size+ against the known list of instance types/server sizes
+    # for the target IaaS.
+    #
+    # For example, "m1.small" is a valid server size/instance type on all AWS regions
+    def validate_compute_flavor(flavor)
+      if aws?
+        unless aws_compute_flavors.select { |flavor| flavor[:id] == flavor }
+          err("Server flavor '#{flavor}' is not a valid AWS compute flavor")
+        end
+      else
+        err("Please implemenet cf.rb's validate_compute_flavor for this IaaS")
+      end
+    end
+
+    def generate_dea_servers(dea_server_count, dea_server_flavor)
+      director_uuid = "DIRECTOR_UUID"
+      release_name = "cf-dev"
+      stemcell_version = "0.6.4"
+      if aws?
+        resource_pool_cloud_properties = "instance_type: #{dea_server_flavor}"
+      else
+        err("Please implemenet cf.rb's generate_dea_servers for this IaaS")
+      end
+      dea_max_memory = 2048 # FIXME a value based on server flavor RAM?
+      nats_password = "mynats1234"
+      system_dir = File.join(base_systems_dir, system_name)
+      mkdir_p(system_dir)
+      chdir system_dir do
+        require 'bosh-cloudfoundry/generators/dea_generator'
+        Bosh::CloudFoundry::Generators::DeaGenerator.start([
+          system_name,
+          dea_server_count, dea_server_flavor,
+          director_uuid, release_name, stemcell_version,
+          resource_pool_cloud_properties,
+          dea_max_memory,
+          nats_password])
+      end
+    end
+
+    # @return [Array] of [Hash] for each supported compute flavor
+    # Example [Hash] { :bits => 0, :cores => 2, :disk => 0, 
+    #   :id => 't1.micro', :name => 'Micro Instance', :ram => 613}
+    def aws_compute_flavors
+      Fog::Compute::AWS::FLAVORS
     end
   end
 end

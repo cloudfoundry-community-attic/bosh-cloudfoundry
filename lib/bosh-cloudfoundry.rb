@@ -17,4 +17,9 @@ require 'net/dns'
 # for generators
 require 'thor/group'
 
+# for:
+# * validating compute flavors
+# * provisioning IP addresses
+require "fog"
+
 require "bosh-cloudfoundry/config"
