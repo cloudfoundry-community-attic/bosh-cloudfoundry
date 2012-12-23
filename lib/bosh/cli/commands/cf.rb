@@ -92,7 +92,10 @@ module Bosh::Cli::Command
     end
 
     usage "cf system"
-    desc "get/set current system"
+    desc "create/set/show current CloudFoundry system"
+    option "--ip ip", String, "Static IP for CloudController/router, e.g. 1.2.3.4"
+    option "--dns dns", String, "Base DNS for CloudFoundry applications, e.g. vcap.me"
+    option "--cf-release name", String, "Name of BOSH release uploaded to target BOSH"
     def cf_system(name=nil)
       if name
         new_or_set_system(name)
@@ -109,26 +112,6 @@ module Bosh::Cli::Command
       clone_or_update_cf_release
       create_dev_release(release_name)
       upload_dev_release
-    end
-
-    usage "cf new system"
-    desc  "create a new Cloud Foundry system"
-    option "--ip ip", String, "Static IP for CloudController/router, e.g. 1.2.3.4"
-    option "--dns dns", String, "Base DNS for CloudFoundry applications, e.g. vcap.me"
-    option "--cf-release name", String, "Name of BOSH release uploaded to target BOSH"
-    def new_system(name)
-      confirm_bosh_target # fails if CLI is not targeting a BOSH
-      cf_release_name = confirm_cf_release_name # returns false if not set or no-longer available
-      cf_release_name ||= choose_cf_release_name # options[:cf_release] # choose or upload
-
-      main_ip = choose_main_ip # options[:ip]
-      root_dns = choose_root_dns # options[:dns]
-
-      validate_dns_a_record("api.#{root_dns}", main_ip)
-      validate_dns_a_record("demoapp.#{root_dns}", main_ip)
-
-      generate_system(name, main_ip, root_dns)
-      set_system(name)
     end
 
     usage "cf dea"
@@ -183,6 +166,21 @@ module Bosh::Cli::Command
       say "CloudFoundry system set to '#{system_dir.green}'"
       cf_config.cf_system = system_dir
       cf_config.save
+    end
+
+    def new_system(name)
+      confirm_bosh_target # fails if CLI is not targeting a BOSH
+      cf_release_name = confirm_cf_release_name # returns false if not set or no-longer available
+      cf_release_name ||= choose_cf_release_name # options[:cf_release] # choose or upload
+
+      main_ip = choose_main_ip # options[:ip]
+      root_dns = choose_root_dns # options[:dns]
+
+      validate_dns_a_record("api.#{root_dns}", main_ip)
+      validate_dns_a_record("demoapp.#{root_dns}", main_ip)
+
+      generate_system(name, main_ip, root_dns)
+      set_system(name)
     end
 
     def show_system
