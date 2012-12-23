@@ -25,7 +25,7 @@ class Bosh::CloudFoundry::Generators::SystemGenerator < Thor::Group
   argument :ccdb_password
 
   def deployment_dir
-    directory "deployments"
+    directory "main/deployments", "deployments"
   end
 
 end
