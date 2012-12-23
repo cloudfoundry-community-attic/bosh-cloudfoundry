@@ -328,8 +328,8 @@ module Bosh::Cli::Command
       system_dir = File.join(base_systems_dir, system_name)
       mkdir_p(system_dir)
       chdir system_dir do
-        require 'bosh-cloudfoundry/generators/system_generator'
-        Bosh::CloudFoundry::Generators::SystemGenerator.start([
+        require 'bosh-cloudfoundry/generators/new_system_generator'
+        Bosh::CloudFoundry::Generators::NewSystemGenerator.start([
           system_name, main_ip, root_dns,
           director_uuid, release_name, stemcell_version,
           resource_pool_cloud_properties, persistent_disk,

@@ -2,7 +2,7 @@ require 'yaml'
 require 'common/properties/property_helper' # bosh_common
 
 module Bosh::CloudFoundry; module Generators; end; end
-class Bosh::CloudFoundry::Generators::SystemGenerator < Thor::Group
+class Bosh::CloudFoundry::Generators::NewSystemGenerator < Thor::Group
   include Thor::Actions
   include Bosh::Common::PropertyHelper
 
