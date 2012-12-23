@@ -56,6 +56,11 @@ module Bosh::Cli::Command
       end
     end
 
+    # @return [Boolean] true if skipping validations
+    def skip_validations?
+      options[:no_validate]
+    end
+
     # @return [String] Path to store BOSH systems (collections of deployments)
     def base_systems_dir
       @base_systems_dir ||= options[:base_systems_dir] || cf_config.base_systems_dir || begin
@@ -96,6 +101,7 @@ module Bosh::Cli::Command
     option "--ip ip", String, "Static IP for CloudController/router, e.g. 1.2.3.4"
     option "--dns dns", String, "Base DNS for CloudFoundry applications, e.g. vcap.me"
     option "--cf-release name", String, "Name of BOSH release uploaded to target BOSH"
+    option "--no-validate", "Skip all validations"
     def cf_system(name=nil)
       if name
         new_or_set_system(name)
@@ -212,6 +218,7 @@ module Bosh::Cli::Command
     end
 
     def confirm_bosh_target
+      return true if skip_validations?
       if bosh_target
         say("Current BOSH is '#{bosh_target.green}'")
       else
@@ -220,6 +227,7 @@ module Bosh::Cli::Command
     end
 
     def confirm_system
+      return true if skip_validations?
       if system
         say("Current CloudFoundry system is '#{system.green}'")
       else
@@ -236,6 +244,7 @@ module Bosh::Cli::Command
     end
 
     def confirm_cf_release_name
+      return true if skip_validations?
       if release_name = options[:cf_release] || cf_config.cf_release_name
         unless bosh_release_names.include?(release_name)
           err("BOSH target #{bosh_target} does not have a release '#{release_name.red}'")
@@ -339,6 +348,7 @@ module Bosh::Cli::Command
     # and no other IP addresses.
     # * +expected_ip_addresses+ is a String (IPv4 address)
     def validate_dns_a_record(domain, expected_ip_address)
+      return true if skip_validations?
       say "Checking that DNS #{domain.green} resolves to IP address #{expected_ip_address.green}... ", " "
       packet = Net::DNS::Resolver.start(domain, Net::DNS::A)
       resolved_a_records = packet.answer.map(&:value)
@@ -394,6 +404,7 @@ module Bosh::Cli::Command
     #
     # For example, "m1.small" is a valid server size/instance type on all AWS regions
     def validate_compute_flavor(flavor)
+      return true if skip_validations?
       if aws?
         unless aws_compute_flavors.select { |flavor| flavor[:id] == flavor }
           err("Server flavor '#{flavor}' is not a valid AWS compute flavor")
@@ -430,6 +441,7 @@ module Bosh::Cli::Command
 
     # Valdiate that +service_name+ is a known, supported service name
     def validate_service_name(service_name)
+      return true if skip_validations?
       unless supported_services.include?(service_name)
         supported_services_list = supported_services.join(", ")
         err("Service '#{service_name}' is not a supported service, such as #{supported_services_list}")
