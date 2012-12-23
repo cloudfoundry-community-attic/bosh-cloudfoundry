@@ -12,8 +12,8 @@ class Bosh::CloudFoundry::Generators::ServiceGenerator < Thor::Group
 
   argument :system_name
   argument :service_name
-  argument :service_server_count
-  argument :service_server_flavor
+  argument :server_count
+  argument :server_flavor
   argument :director_uuid
   argument :release_name
   argument :stemcell_version

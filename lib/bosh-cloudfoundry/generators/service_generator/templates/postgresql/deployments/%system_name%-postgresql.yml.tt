@@ -30,7 +30,7 @@ networks:
 resource_pools:
 - name: common
   network: default
-  size: <%= service_server_count %>
+  size: <%= server_count %>
   stemcell:
     name: bosh-stemcell
     version: <%= stemcell_version %>
@@ -53,7 +53,7 @@ jobs:
 - name: postgresql_node
   template:
   - postgresql_node
-  instances: <%= service_server_count.to_i - 1 %>
+  instances: <%= server_count.to_i - 1 %>
   resource_pool: common
   networks:
   - name: default

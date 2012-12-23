@@ -152,11 +152,24 @@ module Bosh::Cli::Command
 
       validate_service_name(service_name)
 
-      service_server_count = options[:count]
-      service_server_flavor = options[:flavor]
-      validate_compute_flavor(service_server_flavor)
+      server_count = options[:count]
+      server_flavor = options[:flavor]
+      unless non_interactive?
+        unless server_flavor
+          server_flavor = ask("Flavor of server for #{service_name} service nodes?") do |q|
+            q.default = default_service_server_flavor(service_name)
+          end
+        end
+        unless server_count
+          server_count = ask("Number of #{service_name} service nodes?", Integer) { |q| q.default = 1 }
+        end
+      end
+      unless server_flavor && server_flavor
+        err("Must provide server count and flavor values")
+      end
+      validate_compute_flavor(server_flavor)
 
-      generate_service_servers(service_name, service_server_count, service_server_flavor)
+      generate_service_servers(service_name, server_count, server_flavor)
     end
 
     # Create system if +name+ doesn't exist
@@ -429,12 +442,12 @@ module Bosh::Cli::Command
       %w[postgresql redis]
     end
 
-    def generate_service_servers(service_name, service_server_count, service_server_flavor)
+    def generate_service_servers(service_name, server_count, server_flavor)
       director_uuid = "DIRECTOR_UUID"
       release_name = "cf-dev"
       stemcell_version = "0.6.4"
       if aws?
-        resource_pool_cloud_properties = "instance_type: #{service_server_flavor}"
+        resource_pool_cloud_properties = "instance_type: #{server_flavor}"
       else
         err("Please implemenet cf.rb's generate_service_servers for this IaaS")
       end
@@ -446,7 +459,7 @@ module Bosh::Cli::Command
         require 'bosh-cloudfoundry/generators/service_generator'
         Bosh::CloudFoundry::Generators::ServiceGenerator.start([
           system_name,
-          service_name, service_server_count, service_server_flavor,
+          service_name, server_count, server_flavor,
           director_uuid, release_name, stemcell_version,
           resource_pool_cloud_properties, persistent_disk,
           nats_password])
@@ -458,6 +471,14 @@ module Bosh::Cli::Command
         "m1.large"
       else
         err("Please implement cf.rb's default_server_flavor for this IaaS")
+      end
+    end
+
+    def default_service_server_flavor(service_name)
+      if aws?
+        "m1.xlarge"
+      else
+        err("Please implement cf.rb's default_service_server_flavor for this IaaS")
       end
     end
 
