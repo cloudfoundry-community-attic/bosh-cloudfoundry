@@ -11,8 +11,8 @@ class Bosh::CloudFoundry::Generators::DeaGenerator < Thor::Group
   end
 
   argument :system_name
-  argument :dea_server_count
-  argument :dea_server_flavor
+  argument :server_count
+  argument :server_flavor
   argument :director_uuid
   argument :release_name
   argument :stemcell_version

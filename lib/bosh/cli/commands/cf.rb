@@ -122,11 +122,24 @@ module Bosh::Cli::Command
       confirm_bosh_target # fails if CLI is not targeting a BOSH
       confirm_system
 
-      dea_server_count = options[:count]
-      dea_server_flavor = options[:flavor]
-      validate_compute_flavor(dea_server_flavor)
+      server_count = options[:count]
+      server_flavor = options[:flavor]
+      unless non_interactive?
+        unless server_flavor
+          server_flavor = ask("Flavor of server for DEAs?") do |q|
+            q.default = default_dea_server_flavor
+          end
+        end
+        unless server_count
+          server_count = ask("Number of DEA servers?", Integer) { |q| q.default = 2 }
+        end
+      end
+      unless server_flavor && server_flavor
+        err("Must provide server count and flavor values")
+      end
+      validate_compute_flavor(server_flavor)
 
-      generate_dea_servers(dea_server_count, dea_server_flavor)
+      generate_dea_servers(server_count, server_flavor)
     end
 
     usage "cf service"
@@ -379,12 +392,12 @@ module Bosh::Cli::Command
       end
     end
 
-    def generate_dea_servers(dea_server_count, dea_server_flavor)
+    def generate_dea_servers(server_count, server_flavor)
       director_uuid = "DIRECTOR_UUID"
       release_name = "cf-dev"
       stemcell_version = "0.6.4"
       if aws?
-        resource_pool_cloud_properties = "instance_type: #{dea_server_flavor}"
+        resource_pool_cloud_properties = "instance_type: #{server_flavor}"
       else
         err("Please implemenet cf.rb's generate_dea_servers for this IaaS")
       end
@@ -396,7 +409,7 @@ module Bosh::Cli::Command
         require 'bosh-cloudfoundry/generators/dea_generator'
         Bosh::CloudFoundry::Generators::DeaGenerator.start([
           system_name,
-          dea_server_count, dea_server_flavor,
+          server_count, server_flavor,
           director_uuid, release_name, stemcell_version,
           resource_pool_cloud_properties,
           dea_max_memory,
@@ -437,6 +450,14 @@ module Bosh::Cli::Command
           director_uuid, release_name, stemcell_version,
           resource_pool_cloud_properties, persistent_disk,
           nats_password])
+      end
+    end
+
+    def default_dea_server_flavor
+      if aws?
+        "m1.large"
+      else
+        err("Please implement cf.rb's default_server_flavor for this IaaS")
       end
     end
 
