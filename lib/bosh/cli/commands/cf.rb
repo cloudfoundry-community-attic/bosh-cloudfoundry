@@ -58,7 +58,7 @@ module Bosh::Cli::Command
 
     # @return [Boolean] true if skipping validations
     def skip_validations?
-      options[:no_validate]
+      options[:no_validation] || options[:no_validations] || options[:skip_validations]
     end
 
     # @return [String] Path to store BOSH systems (collections of deployments)
@@ -101,7 +101,7 @@ module Bosh::Cli::Command
     option "--ip ip", String, "Static IP for CloudController/router, e.g. 1.2.3.4"
     option "--dns dns", String, "Base DNS for CloudFoundry applications, e.g. vcap.me"
     option "--cf-release name", String, "Name of BOSH release uploaded to target BOSH"
-    option "--no-validate", "Skip all validations"
+    option "--skip-validations", "Skip all validations"
     def cf_system(name=nil)
       if name
         new_or_set_system(name)
