@@ -77,7 +77,7 @@ describe Bosh::Cli::Command::Base do
       cmd.add_option(:cf_release, 'cf-dev')
 
       cmd.system.should be_nil
-      cmd.new_system("production")
+      cmd.cf_system("production")
     end
 
     it "generates new system folder/manifests, using all options" do

@@ -9,7 +9,9 @@ You can run the following from your local laptop or a server, such as an `bosh-b
 ```
 gem install bosh-cloudfoundry
 bosh cf upload release
-bosh cf new system production
+bosh cf system production
+bosh cf dea --count 2 --flavor m1.large
+bosh cf service postgresql --count 1 --flavor m1.xlarge
 bosh cf deploy
 ```
 
@@ -19,7 +21,9 @@ As the Cloud Foundry BOSH release (`cf-release`) is 1.5 Gb, it may be preferable
 $ bosh-bootstrap ssh
 # gem install bosh-cloudfoundry
 # TMPDIR=/var/vcap/store/tmp bosh cf upload release
-# bosh cf new system production
+# bosh cf system production
+# bosh cf dea --count 2 --flavor m1.large
+# bosh cf service postgresql --count 1 --flavor m1.xlarge
 # bosh cf deploy
 ```
 
@@ -29,14 +33,15 @@ NOTE: `TMPDIR=/var/vcap/store/tmp` tells the upload process to use the larger mo
 
 ```
 $ bosh help cf
-cf new system <name> [--ip ip] [--dns dns] [--cf-release name] 
+cf system <name> [--ip ip] [--dns dns] [--cf-release name] 
     create a new Cloud Foundry system 
     --ip ip           Static IP for CloudController/router, e.g. 1.2.3.4 
     --dns dns         Base DNS for CloudFoundry applications, e.g. vcap.me 
-    --cf-release name Name of BOSH release uploaded to target BOSH 
+    --cf-release name Name of BOSH release uploaded to target BOSH
 
-cf system [<name>] 
-    get/set current system 
+cf dea --count 2 --flavor m1.large
+
+cf service <name> --count 2 --flavor m1.large
 
 cf upload release [<release_name>] 
     fetch & upload public cloudfoundry release to BOSH 

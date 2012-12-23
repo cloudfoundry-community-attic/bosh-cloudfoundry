@@ -95,7 +95,7 @@ module Bosh::Cli::Command
     desc "get/set current system"
     def cf_system(name=nil)
       if name
-        set_system(name)
+        new_or_set_system(name)
       else
         show_system
       end
@@ -161,6 +161,17 @@ module Bosh::Cli::Command
       validate_compute_flavor(service_server_flavor)
 
       generate_service_servers(service_name, service_server_count, service_server_flavor)
+    end
+
+    # Create system if +name+ doesn't exist
+    # Set +system+ to specified name
+    def new_or_set_system(name)
+      system_dir = File.join(base_systems_dir, name)
+      if File.directory?(system_dir)
+        set_system(name)
+      else
+        new_system(name)
+      end
     end
 
     def set_system(name)
