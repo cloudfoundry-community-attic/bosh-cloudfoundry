@@ -33,18 +33,27 @@ NOTE: `TMPDIR=/var/vcap/store/tmp` tells the upload process to use the larger mo
 
 ```
 $ bosh help cf
-cf system <name> [--ip ip] [--dns dns] [--cf-release name] 
-    create a new Cloud Foundry system 
+cf dea [--count count] [--flavor flavor] 
+    Run more applications by changing Droplet Execution Agent (DEA) server configuration 
+    --count count   Number of servers for running applications 
+    --flavor flavor Flavor of server to use for all DEA servers, e.g. m1.large for AWS 
+
+cf deploy 
+    deploy cloudfoundry 
+
+cf service <service_name> [--count count] [--flavor flavor] 
+    Support new/more services 
+    --count count   Number of servers for service 
+    --flavor flavor Flavor of server to use for service 
+
+cf system [<name>] [--ip ip] [--dns dns] [--cf-release name] 
+    create/set/show current CloudFoundry system 
     --ip ip           Static IP for CloudController/router, e.g. 1.2.3.4 
     --dns dns         Base DNS for CloudFoundry applications, e.g. vcap.me 
-    --cf-release name Name of BOSH release uploaded to target BOSH
-
-cf dea --count 2 --flavor m1.large
-
-cf service <name> --count 2 --flavor m1.large
+    --cf-release name Name of BOSH release uploaded to target BOSH 
 
 cf upload release [<release_name>] 
-    fetch & upload public cloudfoundry release to BOSH 
+    fetch & upload public cloudfoundry release to BOSH
 ```
 
 ## Development
