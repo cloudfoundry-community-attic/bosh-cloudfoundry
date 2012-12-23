@@ -131,12 +131,12 @@ module Bosh::Cli::Command
       server_flavor = options[:flavor]
       unless non_interactive?
         unless server_flavor
-          server_flavor = ask("Flavor of server for DEAs?") do |q|
+          server_flavor = ask("Flavor of server for DEAs? ") do |q|
             q.default = default_dea_server_flavor
           end
         end
         unless server_count
-          server_count = ask("Number of DEA servers?", Integer) { |q| q.default = 2 }
+          server_count = ask("Number of DEA servers? ", Integer) { |q| q.default = 2 }
         end
       end
       unless server_flavor && server_flavor
@@ -160,12 +160,12 @@ module Bosh::Cli::Command
       server_flavor = options[:flavor]
       unless non_interactive?
         unless server_flavor
-          server_flavor = ask("Flavor of server for #{service_name} service nodes?") do |q|
+          server_flavor = ask("Flavor of server for #{service_name} service nodes? ") do |q|
             q.default = default_service_server_flavor(service_name)
           end
         end
         unless server_count
-          server_count = ask("Number of #{service_name} service nodes?", Integer) { |q| q.default = 1 }
+          server_count = ask("Number of #{service_name} service nodes? ", Integer) { |q| q.default = 1 }
         end
       end
       unless server_flavor && server_flavor
