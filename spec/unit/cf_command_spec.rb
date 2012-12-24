@@ -136,5 +136,7 @@ describe Bosh::Cli::Command::Base do
         files_match("deployments/production-redis.yml", spec_asset("deployments/production-redis-aws-2-m1large.yml"))
       end
     end
+
+    it "deploys all the manifests"
   end
 end
