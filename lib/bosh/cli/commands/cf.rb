@@ -56,6 +56,11 @@ module Bosh::Cli::Command
       end
     end
 
+    # @return [String] Path to store stemcells locally
+    def stemcells_dir
+      options[:stemcells_dir] || cf_config.stemcells_dir || "/var/vcap/store/stemcells"
+    end
+
     # @return [Boolean] true if skipping validations
     def skip_validations?
       options[:no_validation] || options[:no_validations] || options[:skip_validations]
@@ -108,6 +113,17 @@ module Bosh::Cli::Command
       else
         show_system
       end
+    end
+
+    usage "cf upload stemcell"
+    desc "download/create stemcell & upload to BOSH"
+    option "--latest", "Use latest stemcell; possibly not tagged stable"
+    option "--custom", "Create custom stemcell from BOSH git source"
+    def upload_stemcell
+      stemcell_type = "stable"
+      stemcell_type = "latest" if options[:latest]
+      stemcell_type = "custom" if options[:custom]
+      create_or_download_stemcell_then_upload(stemcell_type)
     end
 
     usage "cf upload release"
@@ -235,9 +251,26 @@ module Bosh::Cli::Command
       end
     end
 
+    # @return [String] label for the CPI being used by the target BOSH
+    # * "aws" - AWS
+    # 
+    # Yet to be supported by bosh-cloudfoundry:
+    # * "openstack" - VMWare vSphere
+    # * "vsphere" - VMWare vSphere
+    # * "vcloud" - VMWare vCloud
+    def bosh_provider
+      if aws?
+        "aws"
+      else
+        err("Please implement cf.rb's bosh_provider for this IaaS")
+      end
+    end
+
     # Deploying CloudFoundry to AWS?
     # Is the target BOSH's IaaS using the AWS CPI?
     # FIXME Currently only AWS is supported so its always AWS
+    #
+    # NOTE - calling aws? also loads the fog/compute/aws files
     def aws?
       @fog = Fog::Compute['AWS'] # this is currently just to load fog/aws code
       true
@@ -276,6 +309,48 @@ module Bosh::Cli::Command
       @root_dns = options[:dns] || begin
         err("Currently, please provide root DNS via --dns flag")
       end
+    end
+
+    # Creates/downloads a stemcell; then uploads it to target BOSH
+    # If +stemcell_type+ is "stable", then download the latest stemcell tagged "stable"
+    # If +stemcell_type+ is "latest", then download the latest stemcell, might not be "stable"
+    # If +stemcell_type+ is "custom", then create the stemcell from BOSH source
+    def create_or_download_stemcell_then_upload(stemcell_type)
+      if stemcell_type.to_s == "custom"
+        create_custom_stemcell
+      else
+        stemcell_name = micro_bosh_stemcell_name(stemcell_type)
+        stemcell_path = download_stemcell(stemcell_name)
+        upload_stemcell_to_bosh(stemcell_path)
+      end
+    end
+
+    # The latest relevant public stemcell name
+    # Runs 'bosh public stemcells' and parses the output. Currently expects the output
+    # to look like:
+    # +-----------------------------------------+------------------------+
+    # | Name                                    | Tags                   |
+    # +-----------------------------------------+------------------------+
+    # | bosh-stemcell-0.5.2.tgz                 | vsphere                |
+    # | bosh-stemcell-aws-0.6.4.tgz             | aws, stable            |
+    # | bosh-stemcell-aws-0.6.7.tgz             | aws                    |
+    def micro_bosh_stemcell_name(stemcell_type)
+      tags = [bosh_provider]
+      tags << "stable" if stemcell_type == "stable"
+      bosh_stemcells_cmd = "bosh public stemcells --tags #{tags.join(' ')}"
+      `#{bosh_stemcells_cmd} | grep ' bosh-stemcell-' | awk '{ print $2 }' | sort -r | head -n 1`.strip
+    end
+
+    def download_stemcell(stemcell_name)
+      mkdir_p(stemcells_dir)
+      chdir(stemcells_dir) do
+        bosh_cmd("download public stemcell #{stemcell_name}")
+      end
+      File.join(stemcells_dir, stemcell_name)
+    end
+
+    def upload_stemcell_to_bosh(stemcell_path)
+      bosh_cmd("upload stemcell #{stemcell_path}")
     end
 
     # assume unchanged config/final.yml
@@ -497,6 +572,11 @@ module Bosh::Cli::Command
     #   :id => 't1.micro', :name => 'Micro Instance', :ram => 613}
     def aws_compute_flavors
       Fog::Compute::AWS::FLAVORS
+    end
+
+    def bosh_cmd(command)
+      full_command = "COLUMNS=80 bosh -n #{command}"
+      sh full_command
     end
   end
 end

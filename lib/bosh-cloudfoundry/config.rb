@@ -12,6 +12,7 @@ module Bosh::CloudFoundry
       :cf_release_git_repo, # e.g. "git@github.com/cloudfoundry/cf-release.git"
       :releases_dir,     # e.g. /var/vcap/store/releases
       :cf_release_dir,   # e.g. /var/vcap/store/releases/cf-release
+      :stemcells_dir,    # e.g. /var/vcap/store/stemcells
     ].each do |attr|
       define_method attr do
         read(attr, false)

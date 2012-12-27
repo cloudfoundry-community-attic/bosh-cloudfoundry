@@ -10,8 +10,10 @@ describe Bosh::Cli::Command::Base do
     @cache = File.join(Dir.mktmpdir, "bosh_cache")
     @systems_dir = File.join(Dir.mktmpdir, "systems")
     @releases_dir = File.join(Dir.mktmpdir, "releases")
+    @stemcells_dir = File.join(Dir.mktmpdir, "stemcells")
     FileUtils.mkdir_p(@systems_dir)
     FileUtils.mkdir_p(@releases_dir)
+    FileUtils.mkdir_p(@stemcells_dir)
   end
 
   describe Bosh::Cli::Command::CloudFoundry do
@@ -32,6 +34,21 @@ describe Bosh::Cli::Command::Base do
       File.basename(@cmd.system).should == "production"
       File.should be_directory(@cmd.system)
     end
+
+    it "downloads stemcell and uploads it" do
+      @cmd.should_receive(:`).
+        with("bosh public stemcells --tags aws stable | grep ' bosh-stemcell-' | awk '{ print $2 }' | sort -r | head -n 1").
+        and_return("bosh-stemcell-aws-0.6.7.tgz")
+      @cmd.should_receive(:sh).
+        with("COLUMNS=80 bosh -n download public stemcell bosh-stemcell-aws-0.6.7.tgz")
+      @cmd.should_receive(:sh).
+        with("COLUMNS=80 bosh -n upload stemcell #{@stemcells_dir}/bosh-stemcell-aws-0.6.7.tgz")
+
+      @cmd.add_option(:stemcells_dir, @stemcells_dir)
+      @cmd.upload_stemcell
+    end
+
+    it "creates bosh stemcell and uploads it"
 
     it "updates/creates/uploads cf-release" do
       cf_releases_dir = File.join(@releases_dir, "cf-release")
