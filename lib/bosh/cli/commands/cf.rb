@@ -577,7 +577,7 @@ module Bosh::Cli::Command
     end
 
     def bosh_cmd(command)
-      full_command = "COLUMNS=80 bosh -n #{command}"
+      full_command = "bosh -n #{command}"
       sh full_command
     end
   end
