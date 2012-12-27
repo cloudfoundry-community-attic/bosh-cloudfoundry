@@ -336,7 +336,7 @@ module Bosh::Cli::Command
     def micro_bosh_stemcell_name(stemcell_type)
       tags = [bosh_provider]
       tags << "stable" if stemcell_type == "stable"
-      bosh_stemcells_cmd = "bosh public stemcells --tags #{tags.join(' ')}"
+      bosh_stemcells_cmd = "bosh public stemcells --tags #{tags.join(',')}"
       say "Locating bosh stemcell, running '#{bosh_stemcells_cmd}'..."
       `#{bosh_stemcells_cmd} | grep ' bosh-stemcell-' | awk '{ print $2 }' | sort -r | head -n 1`.strip
     end

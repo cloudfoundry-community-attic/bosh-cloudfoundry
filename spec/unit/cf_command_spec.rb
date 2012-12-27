@@ -37,7 +37,7 @@ describe Bosh::Cli::Command::Base do
 
     it "downloads stemcell and uploads it" do
       @cmd.should_receive(:`).
-        with("bosh public stemcells --tags aws stable | grep ' bosh-stemcell-' | awk '{ print $2 }' | sort -r | head -n 1").
+        with("bosh public stemcells --tags aws,stable | grep ' bosh-stemcell-' | awk '{ print $2 }' | sort -r | head -n 1").
         and_return("bosh-stemcell-aws-0.6.7.tgz")
       @cmd.should_receive(:sh).
         with("COLUMNS=80 bosh -n download public stemcell bosh-stemcell-aws-0.6.7.tgz")
