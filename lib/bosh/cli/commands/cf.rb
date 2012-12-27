@@ -270,10 +270,7 @@ module Bosh::Cli::Command
     # Deploying CloudFoundry to AWS?
     # Is the target BOSH's IaaS using the AWS CPI?
     # FIXME Currently only AWS is supported so its always AWS
-    #
-    # NOTE - calling aws? also loads the fog/compute/aws files
     def aws?
-      @fog = Fog::Compute['AWS'] # this is currently just to load fog/aws code
       true
     end
 

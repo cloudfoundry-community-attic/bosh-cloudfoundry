@@ -21,5 +21,6 @@ require 'thor/group'
 # * validating compute flavors
 # * provisioning IP addresses
 require "fog"
+require 'fog/aws/models/compute/flavors'
 
 require "bosh-cloudfoundry/config"
