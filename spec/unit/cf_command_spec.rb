@@ -36,6 +36,7 @@ describe Bosh::Cli::Command::Base do
     end
 
     it "downloads stemcell and uploads it" do
+      @cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
       @cmd.should_receive(:`).
         with("bosh public stemcells --tags aws,stable | grep ' bosh-stemcell-' | awk '{ print $2 }' | sort -r | head -n 1").
         and_return("bosh-stemcell-aws-0.6.7.tgz")
