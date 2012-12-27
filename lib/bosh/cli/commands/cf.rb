@@ -345,7 +345,7 @@ module Bosh::Cli::Command
       mkdir_p(stemcells_dir)
       chdir(stemcells_dir) do
         if File.exists?(stemcell_name)
-          say "Stemcell #{stemcell_name} already downloaded", :yellow
+          say "Stemcell #{stemcell_name} already downloaded".yellow
         else
           say "Downloading public stemcell #{stemcell_name}..."
           bosh_cmd("download public stemcell #{stemcell_name}")
