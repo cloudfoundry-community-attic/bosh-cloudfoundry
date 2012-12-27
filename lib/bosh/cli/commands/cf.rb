@@ -108,6 +108,7 @@ module Bosh::Cli::Command
     option "--cf-release name", String, "Name of BOSH release uploaded to target BOSH"
     option "--skip-validations", "Skip all validations"
     def cf_system(name=nil)
+      
       if name
         new_or_set_system(name)
       else
@@ -316,6 +317,7 @@ module Bosh::Cli::Command
     # If +stemcell_type+ is "latest", then download the latest stemcell, might not be "stable"
     # If +stemcell_type+ is "custom", then create the stemcell from BOSH source
     def create_or_download_stemcell_then_upload(stemcell_type)
+      confirm_bosh_target # fails if CLI is not targeting a BOSH
       if stemcell_type.to_s == "custom"
         create_custom_stemcell
       else
@@ -338,18 +340,21 @@ module Bosh::Cli::Command
       tags = [bosh_provider]
       tags << "stable" if stemcell_type == "stable"
       bosh_stemcells_cmd = "bosh public stemcells --tags #{tags.join(' ')}"
+      say "Locating bosh stemcell, running '#{bosh_stemcells_cmd}'..."
       `#{bosh_stemcells_cmd} | grep ' bosh-stemcell-' | awk '{ print $2 }' | sort -r | head -n 1`.strip
     end
 
     def download_stemcell(stemcell_name)
       mkdir_p(stemcells_dir)
       chdir(stemcells_dir) do
+        say "Downloading public stemcell #{stemcell_name}..."
         bosh_cmd("download public stemcell #{stemcell_name}")
       end
       File.join(stemcells_dir, stemcell_name)
     end
 
     def upload_stemcell_to_bosh(stemcell_path)
+      say "Uploading stemcell located at #{stemcell_path}..."
       bosh_cmd("upload stemcell #{stemcell_path}")
     end
 
