@@ -344,8 +344,12 @@ module Bosh::Cli::Command
     def download_stemcell(stemcell_name)
       mkdir_p(stemcells_dir)
       chdir(stemcells_dir) do
-        say "Downloading public stemcell #{stemcell_name}..."
-        bosh_cmd("download public stemcell #{stemcell_name}")
+        if File.exists?(stemcell_name)
+          say "Stemcell #{stemcell_name} already downloaded", :yellow
+        else
+          say "Downloading public stemcell #{stemcell_name}..."
+          bosh_cmd("download public stemcell #{stemcell_name}")
+        end
       end
       File.join(stemcells_dir, stemcell_name)
     end
