@@ -3,6 +3,7 @@
 require File.expand_path("../../spec_helper", __FILE__)
 
 describe Bosh::Cli::Command::Base do
+  include FileUtils
 
   before :each do
     @config = File.join(Dir.mktmpdir, "bosh_config")
@@ -11,9 +12,11 @@ describe Bosh::Cli::Command::Base do
     @systems_dir = File.join(Dir.mktmpdir, "systems")
     @releases_dir = File.join(Dir.mktmpdir, "releases")
     @stemcells_dir = File.join(Dir.mktmpdir, "stemcells")
+    @repos_dir = File.join(Dir.mktmpdir, "repos")
     FileUtils.mkdir_p(@systems_dir)
     FileUtils.mkdir_p(@releases_dir)
     FileUtils.mkdir_p(@stemcells_dir)
+    FileUtils.mkdir_p(@repos_dir)
   end
 
   describe Bosh::Cli::Command::CloudFoundry do
@@ -46,10 +49,24 @@ describe Bosh::Cli::Command::Base do
         with("bosh -n upload stemcell #{@stemcells_dir}/bosh-stemcell-aws-0.6.7.tgz")
 
       @cmd.add_option(:stemcells_dir, @stemcells_dir)
+      @cmd.add_option(:repos_dir, @repos_dir)
       @cmd.upload_stemcell
     end
 
-    it "creates bosh stemcell and uploads it"
+    it "creates bosh stemcell and uploads it" do
+      mkdir_p(File.join(@repos_dir, "bosh", "agent"))
+      @cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
+      @cmd.should_receive(:sh).with("git pull origin master")
+      @cmd.should_receive(:sh).with("bundle install --without development test")
+      @cmd.should_receive(:sh).with("rake stemcell2:basic['aws']")
+      @cmd.should_receive(:sh).
+        with("bosh -n upload stemcell #{@stemcells_dir}/bosh-stemcell-aws-0.8.0.tgz")
+
+      @cmd.add_option(:stemcells_dir, @stemcells_dir)
+      @cmd.add_option(:repos_dir, @repos_dir)
+      @cmd.add_option(:custom, true)
+      @cmd.upload_stemcell
+    end
 
     it "updates/creates/uploads cf-release" do
       cf_releases_dir = File.join(@releases_dir, "cf-release")

@@ -10,13 +10,18 @@ module Bosh::Cli::Command
     DEFAULT_CONFIG_PATH = File.expand_path("~/.bosh_cf_config")
     DEFAULT_BASE_SYSTEM_PATH = "/var/vcap/store/systems"
     DEFAULT_RELEASES_PATH = "/var/vcap/store/releases"
+    DEFAULT_STEMCELLS_PATH = "/var/vcap/store/stemcells"
+    DEFAULT_REPOS_PATH = "/var/vcap/store/repos"
+    DEFAULT_CF_RELEASE_GIT_REPO = "git://github.com/cloudfoundry/bosh.git"
+    DEFAULT_BOSH_GIT_REPO = "git://github.com/cloudfoundry/bosh.git"
 
     # @return [Bosh::CloudFoundry::Config] Current CF configuration
     def cf_config
       @cf_config ||= begin
         config_file = options[:cf_config] || DEFAULT_CONFIG_PATH
         cf_config = Bosh::CloudFoundry::Config.new(config_file)
-        cf_config.cf_release_git_repo ||= "git://github.com/cloudfoundry/cf-release.git"
+        cf_config.cf_release_git_repo ||= DEFAULT_CF_RELEASE_GIT_REPO
+        cf_config.bosh_git_repo ||= DEFAULT_BOSH_GIT_REPO
         cf_config.save
         cf_config
       end
@@ -58,12 +63,21 @@ module Bosh::Cli::Command
 
     # @return [String] Path to store stemcells locally
     def stemcells_dir
-      options[:stemcells_dir] || cf_config.stemcells_dir || "/var/vcap/store/stemcells"
+      options[:stemcells_dir] || cf_config.stemcells_dir || choose_stemcells_dir
+    end
+
+    # @return [String] Path to store source repositories locally
+    def repos_dir
+      options[:repos_dir] || cf_config.repos_dir || choose_repos_dir
     end
 
     # @return [Boolean] true if skipping validations
     def skip_validations?
       options[:no_validation] || options[:no_validations] || options[:skip_validations]
+    end
+
+    def bosh_git_repo
+      options[:bosh_git_repo] || cf_config.bosh_git_repo
     end
 
     # @return [String] Path to store BOSH systems (collections of deployments)
@@ -324,6 +338,26 @@ module Bosh::Cli::Command
       end
     end
 
+    def create_custom_stemcell
+      chdir(repos_dir) do
+        clone_or_update_repository("bosh", bosh_git_repo)
+        chdir("bosh/agent") do
+          sh "bundle install --without development test"
+          sh "rake stemcell2:basic['#{bosh_provider}']"
+        end
+      end
+    end
+
+    def clone_or_update_repository(name, repo_uri)
+      if File.directory?(name)
+        chdir(name) do
+          sh "git pull origin master"
+        end
+      else
+        sh "git clone #{repo_uri} #{name}"
+      end
+    end
+
     # The latest relevant public stemcell name
     # Runs 'bosh public stemcells' and parses the output. Currently expects the output
     # to look like:
@@ -399,6 +433,40 @@ module Bosh::Cli::Command
       end
       cf_config.save
       cf_config.releases_dir
+    end
+
+    def choose_stemcells_dir
+      if non_interactive?
+        err "Please set stemcells_dir configuration for non-interactive mode"
+      end
+      
+      stemcells_dir = ask("Path to store downloaded/created stemcells: ") {
+        |q| q.default = DEFAULT_STEMCELLS_PATH }
+
+      cf_config.stemcells_dir = File.expand_path(stemcells_dir)
+      unless File.directory?(cf_config.stemcells_dir)
+        say "Creating stemcells path #{cf_config.stemcells_dir}"
+        FileUtils.mkdir_p(cf_config.stemcells_dir)
+      end
+      cf_config.save
+      cf_config.stemcells_dir
+    end
+
+    def choose_repos_dir
+      if non_interactive?
+        err "Please set repos_dir configuration for non-interactive mode"
+      end
+      
+      repos_dir = ask("Path to store source repositories: ") {
+        |q| q.default = DEFAULT_REPOS_PATH }
+
+      cf_config.repos_dir = File.expand_path(repos_dir)
+      unless File.directory?(cf_config.repos_dir)
+        say "Creating repos path #{cf_config.repos_dir}"
+        FileUtils.mkdir_p(cf_config.repos_dir)
+      end
+      cf_config.save
+      cf_config.repos_dir
     end
 
     def create_dev_release(release_name)
