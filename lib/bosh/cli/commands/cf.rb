@@ -331,13 +331,16 @@ module Bosh::Cli::Command
       confirm_bosh_target # fails if CLI is not targeting a BOSH
       if stemcell_type.to_s == "custom"
         create_custom_stemcell
+        stemcell_path = move_and_return_created_stemcell
       else
         stemcell_name = micro_bosh_stemcell_name(stemcell_type)
         stemcell_path = download_stemcell(stemcell_name)
-        upload_stemcell_to_bosh(stemcell_path)
       end
+      upload_stemcell_to_bosh(stemcell_path)
     end
 
+    # Creates a custom stemcell and copies it into +stemcells_dir+
+    # @returns [String] path to the new stemcell file
     def create_custom_stemcell
       chdir(repos_dir) do
         clone_or_update_repository("bosh", bosh_git_repo)
@@ -346,6 +349,15 @@ module Bosh::Cli::Command
           sh "rake stemcell2:basic['#{bosh_provider}']"
         end
       end
+    end
+
+    # Locates the newly created stemcell, moves it into +stemcells_dir+
+    # and returns the path of its final resting place
+    # @returns [String] path to new stemcell file
+    def move_and_return_created_stemcell
+      stemcell = Dir['/var/tmp/bosh/agent-*/work/work/*.tgz'].first
+      mv stemcell, "#{stemcells_dir}/"
+      File.join(stemcells_dir, File.basename(stemcell))
     end
 
     def clone_or_update_repository(name, repo_uri)

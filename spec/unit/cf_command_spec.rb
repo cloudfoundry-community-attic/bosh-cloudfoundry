@@ -59,8 +59,10 @@ describe Bosh::Cli::Command::Base do
       @cmd.should_receive(:sh).with("git pull origin master")
       @cmd.should_receive(:sh).with("bundle install --without development test")
       @cmd.should_receive(:sh).with("rake stemcell2:basic['aws']")
+      @cmd.should_receive(:move_and_return_created_stemcell).
+        and_return(File.join(@stemcells_dir, "bosh-stemcell-aws-0.6.7.tgz"))
       @cmd.should_receive(:sh).
-        with("bosh -n upload stemcell #{@stemcells_dir}/bosh-stemcell-aws-0.8.0.tgz")
+        with("bosh -n upload stemcell #{@stemcells_dir}/bosh-stemcell-aws-0.6.7.tgz")
 
       @cmd.add_option(:stemcells_dir, @stemcells_dir)
       @cmd.add_option(:repos_dir, @repos_dir)
