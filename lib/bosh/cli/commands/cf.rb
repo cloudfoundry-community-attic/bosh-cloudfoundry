@@ -345,6 +345,7 @@ module Bosh::Cli::Command
       chdir(repos_dir) do
         clone_or_update_repository("bosh", bosh_git_repo)
         chdir("bosh/agent") do
+          say "Creating new stemcell for '#{bosh_provider.green}'..."
           sh "bundle install --without development test"
           sh "rake stemcell2:basic['#{bosh_provider}']"
         end
@@ -363,9 +364,11 @@ module Bosh::Cli::Command
     def clone_or_update_repository(name, repo_uri)
       if File.directory?(name)
         chdir(name) do
+          say "Updating #{name} repositry..."
           sh "git pull origin master"
         end
       else
+        say "Cloning #{repo_uri} repositry..."
         sh "git clone #{repo_uri} #{name}"
       end
     end
