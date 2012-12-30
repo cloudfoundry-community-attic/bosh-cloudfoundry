@@ -90,7 +90,7 @@ describe Bosh::Cli::Command::Base do
       @cmd.should_receive(:sh).with("sed -i 's#git://github.com#https://github.com#g' .gitmodules")
       @cmd.should_receive(:sh).with("git submodule update --init")
       @cmd.should_receive(:write_dev_config_file).with("cf-dev")
-      @cmd.should_receive(:sh).with("bosh create release --force")
+      @cmd.should_receive(:sh).with("bosh create release --with-tarball --force")
       @cmd.should_receive(:sh).with("bosh -n --color upload release")
       @cmd.upload_release
     end

@@ -494,7 +494,7 @@ module Bosh::Cli::Command
     def create_dev_release(release_name)
       chdir(cf_release_dir) do
         write_dev_config_file(release_name)
-        sh "bosh create release --force"
+        sh "bosh create release --with-tarball --force"
       end
     end
 
