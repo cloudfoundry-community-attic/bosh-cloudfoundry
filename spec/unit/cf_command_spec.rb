@@ -60,6 +60,7 @@ describe Bosh::Cli::Command::Base do
       @cmd.should_receive(:sh).with("bundle install --without development test")
       @cmd.should_receive(:sh).with("sudo bundle exec rake stemcell2:basic['aws']")
       @cmd.should_receive(:sh).with("sudo chown -R vcap:vcap /var/tmp/bosh/agent-*")
+      @cmd.should_receive(:validate_stemcell_created_successfully)
       @cmd.should_receive(:move_and_return_created_stemcell).
         and_return(File.join(@stemcells_dir, "bosh-stemcell-aws-0.6.7.tgz"))
       @cmd.should_receive(:sh).

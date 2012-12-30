@@ -331,6 +331,7 @@ module Bosh::Cli::Command
       confirm_bosh_target # fails if CLI is not targeting a BOSH
       if stemcell_type.to_s == "custom"
         create_custom_stemcell
+        validate_stemcell_created_successfully
         stemcell_path = move_and_return_created_stemcell
       else
         stemcell_name = micro_bosh_stemcell_name(stemcell_type)
@@ -353,12 +354,17 @@ module Bosh::Cli::Command
       end
     end
 
+    def validate_stemcell_created_successfully
+      stemcell = Dir['/var/tmp/bosh/agent-*/work/work/*.tgz'].first
+      err "Stemcell was not created successfully" unless stemcell
+    end
+
     # Locates the newly created stemcell, moves it into +stemcells_dir+
     # and returns the path of its final resting place
-    # @returns [String] path to new stemcell file
+    # @returns [String] path to new stemcell file; or nil if no stemcell found
     def move_and_return_created_stemcell
       stemcell = Dir['/var/tmp/bosh/agent-*/work/work/*.tgz'].first
-      mv stemcell, "#{stemcells_dir}/"
+      mv generated_stemcell_path, "#{stemcells_dir}/"
       File.join(stemcells_dir, File.basename(stemcell))
     end
 
