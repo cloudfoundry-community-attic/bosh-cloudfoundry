@@ -12,7 +12,7 @@ module Bosh::Cli::Command
     DEFAULT_RELEASES_PATH = "/var/vcap/store/releases"
     DEFAULT_STEMCELLS_PATH = "/var/vcap/store/stemcells"
     DEFAULT_REPOS_PATH = "/var/vcap/store/repos"
-    DEFAULT_CF_RELEASE_GIT_REPO = "git://github.com/cloudfoundry/bosh.git"
+    DEFAULT_CF_RELEASE_GIT_REPO = "git://github.com/cloudfoundry/cf-release.git"
     DEFAULT_BOSH_GIT_REPO = "git://github.com/cloudfoundry/bosh.git"
 
     # @return [Bosh::CloudFoundry::Config] Current CF configuration
