@@ -374,14 +374,16 @@ module Bosh::Cli::Command
       # 
       # (origin/warden)
       # 
-      latest_git_tag = `git log --tags --simplify-by-decoration --pretty='%d' | head -n 1`
-      if latest_git_tag =~ /v(\d+)/
-        return $1.to_i
-      else
-        say "The following command did not return a v123 formatted number:".red
-        say "git log --tags --simplify-by-decoration --pretty='%d' | head -n 1"
-        say "Method #latest_final_release_tag_number needs to be fixed"
-        err("Please raise an issue with https://github.com/StarkAndWayne/bosh-cloudfoundry/issues")
+      chdir(cf_release_dir) do
+        latest_git_tag = `git log --tags --simplify-by-decoration --pretty='%d' | head -n 1`
+        if latest_git_tag =~ /v(\d+)/
+          return $1.to_i
+        else
+          say "The following command did not return a v123 formatted number:".red
+          say "git log --tags --simplify-by-decoration --pretty='%d' | head -n 1"
+          say "Method #latest_final_release_tag_number needs to be fixed"
+          err("Please raise an issue with https://github.com/StarkAndWayne/bosh-cloudfoundry/issues")
+        end
       end
     end
 
