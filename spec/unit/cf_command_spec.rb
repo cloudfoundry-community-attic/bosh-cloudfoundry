@@ -44,9 +44,9 @@ describe Bosh::Cli::Command::Base do
         with("bosh public stemcells --tags aws,stable | grep ' bosh-stemcell-' | awk '{ print $2 }' | sort -r | head -n 1").
         and_return("bosh-stemcell-aws-0.6.7.tgz")
       @cmd.should_receive(:sh).
-        with("bosh -n download public stemcell bosh-stemcell-aws-0.6.7.tgz")
+        with("bosh -n --color download public stemcell bosh-stemcell-aws-0.6.7.tgz")
       @cmd.should_receive(:sh).
-        with("bosh -n upload stemcell #{@stemcells_dir}/bosh-stemcell-aws-0.6.7.tgz")
+        with("bosh -n --color upload stemcell #{@stemcells_dir}/bosh-stemcell-aws-0.6.7.tgz")
 
       @cmd.add_option(:stemcells_dir, @stemcells_dir)
       @cmd.add_option(:repos_dir, @repos_dir)
@@ -64,7 +64,7 @@ describe Bosh::Cli::Command::Base do
       @cmd.should_receive(:move_and_return_created_stemcell).
         and_return(File.join(@stemcells_dir, "bosh-stemcell-aws-0.6.7.tgz"))
       @cmd.should_receive(:sh).
-        with("bosh -n upload stemcell #{@stemcells_dir}/bosh-stemcell-aws-0.6.7.tgz")
+        with("bosh -n --color upload stemcell #{@stemcells_dir}/bosh-stemcell-aws-0.6.7.tgz")
 
       @cmd.add_option(:stemcells_dir, @stemcells_dir)
       @cmd.add_option(:repos_dir, @repos_dir)

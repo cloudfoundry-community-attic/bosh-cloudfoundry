@@ -31,7 +31,6 @@ module Bosh::Cli::Command
     option "--cf-release name", String, "Name of BOSH release uploaded to target BOSH"
     option "--skip-validations", "Skip all validations"
     def cf_system(name=nil)
-      
       if name
         new_or_set_system(name)
       else
@@ -521,7 +520,7 @@ module Bosh::Cli::Command
     end
 
     def bosh_cmd(command)
-      full_command = "bosh -n #{command}"
+      full_command = "bosh -n --color #{command}"
       sh full_command
     end
   end
