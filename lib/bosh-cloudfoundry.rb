@@ -24,3 +24,4 @@ require "fog"
 require 'fog/aws/models/compute/flavors'
 
 require "bosh-cloudfoundry/config"
+require "bosh-cloudfoundry/config_options"
