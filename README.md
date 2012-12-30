@@ -63,8 +63,8 @@ cf upload release [<release_name>]
 
 ```
 bundle
-rake spec
-rake install
+bundle exec rake spec
+bundle exec rake install
 ```
 
 ## Contributing
