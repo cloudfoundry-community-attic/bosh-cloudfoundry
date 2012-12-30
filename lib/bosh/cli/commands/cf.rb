@@ -343,29 +343,35 @@ module Bosh::Cli::Command
     # Creates a custom stemcell and copies it into +stemcells_dir+
     # @returns [String] path to the new stemcell file
     def create_custom_stemcell
-      chdir(repos_dir) do
-        clone_or_update_repository("bosh", bosh_git_repo)
-        chdir("bosh/agent") do
-          say "Creating new stemcell for '#{bosh_provider.green}'..."
-          sh "bundle install --without development test"
-          sh "sudo bundle exec rake stemcell2:basic['#{bosh_provider}']"
-          sh "sudo chown -R vcap:vcap /var/tmp/bosh/agent-*"
+      if generated_stemcell
+        say "Skipping stemcell creation as one sits in the tmp folder waiting patiently..."
+      else
+        say "Creating new stemcell for '#{bosh_provider.green}'..."
+        chdir(repos_dir) do
+          clone_or_update_repository("bosh", bosh_git_repo)
+          chdir("bosh/agent") do
+            sh "bundle install --without development test"
+            sh "sudo bundle exec rake stemcell2:basic['#{bosh_provider}']"
+            sh "sudo chown -R vcap:vcap /var/tmp/bosh/agent-*"
+          end
         end
       end
     end
 
+    def generated_stemcell
+      @generated_stemcell ||= Dir['/var/tmp/bosh/agent-*/work/work/*.tgz'].first
+    end
+
     def validate_stemcell_created_successfully
-      stemcell = Dir['/var/tmp/bosh/agent-*/work/work/*.tgz'].first
-      err "Stemcell was not created successfully" unless stemcell
+      err "Stemcell was not created successfully" unless generated_stemcell
     end
 
     # Locates the newly created stemcell, moves it into +stemcells_dir+
     # and returns the path of its final resting place
     # @returns [String] path to new stemcell file; or nil if no stemcell found
     def move_and_return_created_stemcell
-      stemcell = Dir['/var/tmp/bosh/agent-*/work/work/*.tgz'].first
-      mv generated_stemcell_path, "#{stemcells_dir}/"
-      File.join(stemcells_dir, File.basename(stemcell))
+      mv generated_stemcell, "#{stemcells_dir}/"
+      File.join(stemcells_dir, File.basename(generated_stemcell))
     end
 
     def clone_or_update_repository(name, repo_uri)
