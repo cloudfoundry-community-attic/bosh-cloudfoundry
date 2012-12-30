@@ -420,7 +420,7 @@ module Bosh::Cli::Command
         chdir(releases_dir) do
           sh "git clone #{cf_release_git_repo} #{cf_release_dirname}"
           chdir(cf_release_dirname) do
-            sh "git update-index --assume-unchanged config/final.yml"
+            sh "git update-index --assume-unchanged config/final.yml 2>/dev/null"
           end
         end
       end
