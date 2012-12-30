@@ -51,12 +51,16 @@ module Bosh::Cli::Command
 
     usage "cf upload release"
     desc "fetch & upload public cloudfoundry release to BOSH"
-    def upload_release(release_name="cf-dev")
-      cf_config.cf_release_name = release_name
-      cf_config.save
+    option "--edge", "Create development release from very latest cf-release commits"
+    def upload_release
+      create_edge_development_release = options[:edge]
       clone_or_update_cf_release
-      create_dev_release(release_name)
-      upload_dev_release
+      if create_edge_development_release
+        create_dev_release
+        upload_dev_release
+      else
+        upload_latest_final_release
+      end
     end
 
     usage "cf dea"
@@ -340,7 +344,48 @@ module Bosh::Cli::Command
       end
     end
 
-    def create_dev_release(release_name)
+    def upload_latest_final_release
+      release_number = latest_final_release_tag_number
+      chdir(cf_release_dir) do
+        bosh_cmd "upload release releases/appcloud-#{release_number}.yml"
+      end
+    end
+
+    # Examines the git tags of the cf-release repo and
+    # finds the latest tag for a release (v126 or v119-fixed)
+    # and returns the integer value (126 or 119).
+    # @returns [Integer] the number of the latest final release tag
+    def latest_final_release_tag_number
+      # FIXME this assumes the most recent tag is a final release:
+      #  (v126)
+      #  (v126, origin/built)
+      #  (v119-fixed)
+      # But it might return an empty row
+      # Example values in the output from the "git log" command below is:
+      # (v126, origin/built)
+      # (v125)
+      # (origin/te)
+      # (v121)
+      # (v120)
+      # (v119-fixed)
+      # (v119)
+      # (origin/v113-fix)
+      # (v109)
+      # 
+      # (origin/warden)
+      # 
+      latest_git_tag = `git log --tags --simplify-by-decoration --pretty='%d' | head -n 1`
+      if latest_git_tag =~ /v(\d+)/
+        return $1.to_i
+      else
+        say "The following command did not return a v123 formatted number:".red
+        say "git log --tags --simplify-by-decoration --pretty='%d' | head -n 1"
+        say "Method #latest_final_release_tag_number needs to be fixed"
+        err("Please raise an issue with https://github.com/StarkAndWayne/bosh-cloudfoundry/issues")
+      end
+    end
+
+    def create_dev_release(release_name="appcloud-dev")
       chdir(cf_release_dir) do
         write_dev_config_file(release_name)
         sh "bosh create release --with-tarball --force"

@@ -72,7 +72,7 @@ describe Bosh::Cli::Command::Base do
       @cmd.upload_stemcell
     end
 
-    it "updates/creates/uploads cf-release" do
+    it "updates/creates/uploads final cf-release" do
       cf_releases_dir = File.join(@releases_dir, "cf-release")
       FileUtils.mkdir_p(cf_releases_dir)
       @cmd.add_option(:cf_release_dir, @releases_dir)
@@ -89,7 +89,31 @@ describe Bosh::Cli::Command::Base do
       @cmd.should_receive(:sh).with("sed -i 's#git@github.com:#https://github.com/#g' .gitmodules")
       @cmd.should_receive(:sh).with("sed -i 's#git://github.com#https://github.com#g' .gitmodules")
       @cmd.should_receive(:sh).with("git submodule update --init")
-      @cmd.should_receive(:write_dev_config_file).with("cf-dev")
+      @cmd.should_receive(:`).with("git log --tags --simplify-by-decoration --pretty='%d' | head -n 1").
+        and_return(" (v126, origin/built)\n")
+      @cmd.should_receive(:sh).with("bosh -n --color upload release releases/appcloud-126.yml")
+      @cmd.upload_release
+    end
+
+    it "updates/creates/uploads development/edge cf-release" do
+      cf_releases_dir = File.join(@releases_dir, "cf-release")
+      FileUtils.mkdir_p(cf_releases_dir)
+      @cmd.add_option(:cf_release_dir, @releases_dir)
+      @cmd.add_option(:edge, true)
+
+      @cmd.should_receive(:sh).with("git pull origin master")
+      script = <<-BASH.gsub(/^      /, '')
+      grep -rI "github.com" * .gitmodules | awk 'BEGIN {FS=":"} { print($1) }' | uniq while read file
+      do
+        echo "changing - $file"
+        sed -i 's#git://github.com#https://github.com#g' $file
+        sed -i 's#git@github.com:#https://github.com:#g' $file
+      done
+      BASH
+      @cmd.should_receive(:sh).with("sed -i 's#git@github.com:#https://github.com/#g' .gitmodules")
+      @cmd.should_receive(:sh).with("sed -i 's#git://github.com#https://github.com#g' .gitmodules")
+      @cmd.should_receive(:sh).with("git submodule update --init")
+      @cmd.should_receive(:write_dev_config_file).with("appcloud-dev")
       @cmd.should_receive(:sh).with("bosh create release --with-tarball --force")
       @cmd.should_receive(:sh).with("bosh -n --color upload release")
       @cmd.upload_release
