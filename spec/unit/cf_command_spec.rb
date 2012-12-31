@@ -119,6 +119,23 @@ describe Bosh::Cli::Command::Base do
       @cmd.upload_release
     end
 
+    it "generates and deploys micro CloudFoundry" do
+      @cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
+      # @cmd.should_receive(:bosh_release_names).and_return(['appcloud-dev', 'appcloud'])
+      @cmd.should_receive(:validate_dns_a_record).with("api.mycompany.com", '1.2.3.4').and_return(true)
+      @cmd.should_receive(:validate_dns_a_record).with("demoapp.mycompany.com", '1.2.3.4').and_return(true)
+
+      @cmd.add_option(:cf_release_dir, @releases_dir)
+      @cmd.add_option(:stemcells_dir, @stemcells_dir)
+
+      @cmd.add_option(:ip, '1.2.3.4')
+      @cmd.add_option(:dns, 'mycompany.com')
+      @cmd.add_option(:cf_release, 'appcloud')
+      @cmd.cf_micro_and_deploy
+
+      File.basename(@cmd.system).should == "demo"
+    end
+
     def generate_new_system(cmd = nil)
       cmd ||= begin
         cmd = Bosh::Cli::Command::CloudFoundry.new(nil)

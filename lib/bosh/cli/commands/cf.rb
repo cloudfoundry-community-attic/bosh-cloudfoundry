@@ -22,6 +22,26 @@ module Bosh::Cli::Command
     usage "cf deploy"
     desc  "deploy cloudfoundry"
     def deploy
+      
+    end
+
+    usage "cf micro"
+    desc "create and deploy Micro CloudFoundry"
+    option "--ip ip", String, "Static IP for CloudController/router, e.g. 1.2.3.4"
+    option "--dns dns", String, "Base DNS for CloudFoundry applications, e.g. vcap.me"
+    option "--cf-release name", String, "Name of BOSH release uploaded to target BOSH"
+    option "--skip-validations", "Skip all validations"
+    def cf_micro_and_deploy(name="demo")
+      confirm_or_prompt_all_defaults
+      cf_config.cf_release_name = DEFAULT_CF_RELEASE_NAME
+      cf_config.save
+      
+      main_ip, root_dns = confirm_or_choose_micro_system
+      confirm_or_upload_release
+      confirm_or_upload_stemcell
+      generate_micro_system(name, main_ip, root_dns)
+      set_system(name)
+      deploy
     end
 
     usage "cf system"
@@ -199,6 +219,37 @@ module Bosh::Cli::Command
     def aws?
       true
     end
+
+    # User is prompted for common values at the
+    # start of a command rather than intermittently
+    # during a long-running command.
+    def confirm_or_prompt_all_defaults
+      confirm_bosh_target
+      cf_release_dir
+      stemcells_dir
+    end
+
+    # User is prompted for values required for
+    # Micro CloudFoundry deployment
+    # @returns [Array] of [main_ip, root_dns]
+    def confirm_or_choose_micro_system
+      main_ip = choose_main_ip # options[:ip]
+      root_dns = choose_root_dns # options[:dns]
+
+      validate_dns_a_record("api.#{root_dns}", main_ip)
+      validate_dns_a_record("demoapp.#{root_dns}", main_ip)
+
+      [main_ip, root_dns]
+    end
+
+    def confirm_or_upload_release
+      
+    end
+    
+    def confirm_or_upload_stemcell
+      
+    end
+    
 
     def confirm_cf_release_name
       return true if skip_validations?
@@ -434,6 +485,35 @@ module Bosh::Cli::Command
       else
         say "ok".green
         true
+      end
+    end
+
+    def generate_micro_system(system_name, main_ip, root_dns)
+      director_uuid = "DIRECTOR_UUID"
+      release_name = "appcloud"
+      stemcell_version = "0.6.4"
+      if aws?
+        resource_pool_cloud_properties = "instance_type: m1.xlarge"
+      else
+        err("Please implemenet cf.rb's generate_system for this IaaS")
+      end
+      persistent_disk = 16192
+      dea_max_memory = 2048
+      admin_email = "drnic@starkandwayne.com"
+      router_password = "router1234"
+      nats_password = "mynats1234"
+      ccdb_password = "ccdbroot"
+      system_dir = File.join(base_systems_dir, system_name)
+      mkdir_p(system_dir)
+      chdir system_dir do
+        require 'bosh-cloudfoundry/generators/micro_system_generator'
+        Bosh::CloudFoundry::Generators::MicroSystemGenerator.start([
+          system_name, main_ip, root_dns,
+          director_uuid, release_name, stemcell_version,
+          resource_pool_cloud_properties, persistent_disk,
+          dea_max_memory,
+          admin_email,
+          router_password, nats_password, ccdb_password])
       end
     end
 
