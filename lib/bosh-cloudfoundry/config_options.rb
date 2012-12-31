@@ -44,6 +44,16 @@ module Bosh::CloudFoundry::ConfigOptions
     @system_name ||= File.basename(File.expand_path(system))
   end
 
+  # @return [String] Name of BOSH release in target BOSH
+  def cf_release_name
+    options[:cf_release_name] || cf_config.cf_release_name
+  end
+
+  # @return [String] Version of BOSH stemcell to use for deployments
+  def cf_stemcell_version
+    options[:cf_stemcell_version] || cf_config.cf_stemcell_version
+  end
+
   # @return [String] CloudFoundry BOSH release git URI
   def cf_release_git_repo
     options[:cf_release_git_repo] || cf_config.cf_release_git_repo

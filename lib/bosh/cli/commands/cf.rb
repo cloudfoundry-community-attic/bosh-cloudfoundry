@@ -5,6 +5,7 @@ require 'bosh-cloudfoundry'
 module Bosh::Cli::Command
   class CloudFoundry < Base
     include Bosh::Cli::DeploymentHelper
+    include Bosh::Cli::VersionCalc
     include Bosh::CloudFoundry::ConfigOptions
     include FileUtils
 
@@ -231,7 +232,7 @@ module Bosh::Cli::Command
 
     # User is prompted for values required for
     # Micro CloudFoundry deployment
-    # @returns [Array] of [main_ip, root_dns]
+    # @return [Array] of [main_ip, root_dns]
     def confirm_or_choose_micro_system
       main_ip = choose_main_ip # options[:ip]
       root_dns = choose_root_dns # options[:dns]
@@ -242,12 +243,53 @@ module Bosh::Cli::Command
       [main_ip, root_dns]
     end
 
+    # Confirms that the requested release name is
+    # already uploaded to BOSH, else
+    # proceeds to upload the release
     def confirm_or_upload_release
-      
+      unless cf_release_name
+        cf_config.cf_release_name = DEFAULT_CF_RELEASE_NAME
+        if options[:edge]
+          cf_config.cf_release_name += "-dev"
+        end
+        cf_config.save
+        say "Using BOSH release name #{cf_release_name}".green
+      end
+      if bosh_release_names.include?(cf_release_name)
+        say "BOSH already contains release #{cf_release_name.green}".green
+      else
+        say "BOSH does not contain release #{cf_release_name.green}, uploading...".yellow
+        upload_release
+      end
     end
     
+    # Confirms that a stemcell has been uploaded
+    # and if so, determines its name/version.
+    # Otherwise, uploads the latest stable
+    # stemcell.
+    #
+    # At a more granular level:
+    #   Are there any stemcells uploaded?
+    #     If no, then upload one then set cf_stemcell_version
+    #   If there are stemcells
+    #     If cf_stemcell_version is set and its not in stemcell list
+    #       then change cf_stemcell_version to the latest stemcell
+    #     Else if cf_stemcell_version not set, then set to latest stemcell
     def confirm_or_upload_stemcell
-      
+      unless latest_bosh_stemcell_version
+        say "There are no stemcells available in BOSH yet, so uploading one..."
+        upload_stemcell
+      end
+      unless cf_stemcell_version
+        cf_config.cf_stemcell_version = latest_bosh_stemcell_version
+        cf_config.save
+      end
+      unless bosh_stemcell_versions.include?(cf_stemcell_version)
+        say "Requested stemcell version #{cf_stemcell_version} is not available.".red
+        cf_config.cf_stemcell_version = latest_bosh_stemcell_version
+        cf_config.save
+      end
+      say "Using stemcell version #{cf_stemcell_version}".green
     end
     
 
@@ -272,6 +314,27 @@ module Bosh::Cli::Command
       end
     end
 
+    # List of versions of stemcell called "bosh-stemcell" that are available
+    # in target BOSH.
+    # Ordered by version number.
+    # @return [Array] BOSH stemcell versions available in target BOSH, e.g. ["0.6.4", "0.6.7"]
+    def bosh_stemcell_versions
+      @bosh_stemcell_versions ||= begin
+        # [{"name"=>"bosh-stemcell", "version"=>"0.6.7", "cid"=>"ami-9730bffe"}]
+        stemcells = director.list_stemcells
+        stemcells.select! {|s| s["name"] == "bosh-stemcell"}
+        stemcells.map { |rel| rel["version"] }.sort { |v1, v2|
+          version_cmp(v1, v2)
+        }
+      end
+    end
+
+    # Largest version number BOSH stemcell ("bosh-stemcell")
+    # @return [String] version number, e.g. "0.6.7"
+    def latest_bosh_stemcell_version
+      bosh_stemcell_versions.last
+    end
+
     # Creates/downloads a stemcell; then uploads it to target BOSH
     # If +stemcell_type+ is "stable", then download the latest stemcell tagged "stable"
     # If +stemcell_type+ is "latest", then download the latest stemcell, might not be "stable"
@@ -290,7 +353,7 @@ module Bosh::Cli::Command
     end
 
     # Creates a custom stemcell and copies it into +stemcells_dir+
-    # @returns [String] path to the new stemcell file
+    # @return [String] path to the new stemcell file
     def create_custom_stemcell
       if generated_stemcell
         say "Skipping stemcell creation as one sits in the tmp folder waiting patiently..."
@@ -317,7 +380,7 @@ module Bosh::Cli::Command
 
     # Locates the newly created stemcell, moves it into +stemcells_dir+
     # and returns the path of its final resting place
-    # @returns [String] path to new stemcell file; or nil if no stemcell found
+    # @return [String] path to new stemcell file; or nil if no stemcell found
     def move_and_return_created_stemcell
       mv generated_stemcell, "#{stemcells_dir}/"
       File.join(stemcells_dir, File.basename(generated_stemcell))
@@ -405,7 +468,7 @@ module Bosh::Cli::Command
     # Examines the git tags of the cf-release repo and
     # finds the latest tag for a release (v126 or v119-fixed)
     # and returns the integer value (126 or 119).
-    # @returns [Integer] the number of the latest final release tag
+    # @return [Integer] the number of the latest final release tag
     def latest_final_release_tag_number
       # FIXME this assumes the most recent tag is a final release:
       #  (v126)
@@ -490,8 +553,8 @@ module Bosh::Cli::Command
 
     def generate_micro_system(system_name, main_ip, root_dns)
       director_uuid = "DIRECTOR_UUID"
-      release_name = "appcloud"
-      stemcell_version = "0.6.4"
+      release_name = cf_release_name
+      stemcell_version = cf_stemcell_version
       if aws?
         resource_pool_cloud_properties = "instance_type: m1.xlarge"
       else
