@@ -232,7 +232,7 @@ module Bosh::Cli::Command
         validate_stemcell_created_successfully
         stemcell_path = move_and_return_created_stemcell
       else
-        stemcell_name = micro_bosh_stemcell_name(stemcell_type)
+        stemcell_name = bosh_stemcell_name(stemcell_type)
         stemcell_path = download_stemcell(stemcell_name)
       end
       upload_stemcell_to_bosh(stemcell_path)
@@ -293,7 +293,7 @@ module Bosh::Cli::Command
     # | bosh-stemcell-0.5.2.tgz                 | vsphere                |
     # | bosh-stemcell-aws-0.6.4.tgz             | aws, stable            |
     # | bosh-stemcell-aws-0.6.7.tgz             | aws                    |
-    def micro_bosh_stemcell_name(stemcell_type)
+    def bosh_stemcell_name(stemcell_type)
       tags = [bosh_provider]
       tags << "stable" if stemcell_type == "stable"
       bosh_stemcells_cmd = "bosh public stemcells --tags #{tags.join(',')}"
