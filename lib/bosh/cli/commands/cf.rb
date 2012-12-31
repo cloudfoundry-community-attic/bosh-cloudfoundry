@@ -42,6 +42,8 @@ module Bosh::Cli::Command
       confirm_or_upload_stemcell
       generate_micro_system(name, main_ip, root_dns)
       set_system(name)
+      # only on manifest, so set CLI to target it as current deployment manifest
+      set_deployment(File.join(system, "deployments", "#{name}-micro.yml"))
       deploy
     end
 
@@ -181,9 +183,15 @@ module Bosh::Cli::Command
       say(system ? "Current CloudFoundry system is '#{system.green}'" : "CloudFoundry system not set")
     end
 
+    # Helper to tell the CLI to target a specific deployment manifest for the "bosh deploy" command
+    def set_deployment(path)
+      cmd = Bosh::Cli::Command::Deployment.new
+      cmd.set_current(path)
+    end
+
     def confirm_bosh_target
       return true if skip_validations?
-      if bosh_target
+      if bosh_target && bosh_target_uuid
         say("Current BOSH is '#{bosh_target.green}'")
       else
         err("BOSH target not set")
@@ -550,7 +558,7 @@ module Bosh::Cli::Command
     end
 
     def generate_micro_system(system_name, main_ip, root_dns)
-      director_uuid = "DIRECTOR_UUID"
+      director_uuid = bosh_target_uuid
       release_name = cf_release_name
       stemcell_version = cf_stemcell_version
       if aws?

@@ -40,6 +40,7 @@ describe Bosh::Cli::Command::Base do
 
     it "downloads stemcell and uploads it" do
       @cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
+      @cmd.stub!(:bosh_target_uuid).and_return("DIRECTOR_UUID")
       @cmd.should_receive(:`).
         with("bosh public stemcells --tags aws,stable | grep ' bosh-stemcell-' | awk '{ print $2 }' | sort -r | head -n 1").
         and_return("bosh-stemcell-aws-0.6.7.tgz")
@@ -56,6 +57,7 @@ describe Bosh::Cli::Command::Base do
     it "creates bosh stemcell and uploads it" do
       mkdir_p(File.join(@repos_dir, "bosh", "agent"))
       @cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
+      @cmd.stub!(:bosh_target_uuid).and_return("DIRECTOR_UUID")
       @cmd.should_receive(:sh).with("git pull origin master")
       @cmd.should_receive(:sh).with("bundle install --without development test")
       @cmd.should_receive(:sh).with("sudo bundle exec rake stemcell2:basic['aws']")
@@ -121,6 +123,7 @@ describe Bosh::Cli::Command::Base do
 
     it "generates and deploys micro CloudFoundry without uploading release/stemcell" do
       @cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
+      @cmd.stub!(:bosh_target_uuid).and_return("DIRECTOR_UUID")
       @cmd.should_receive(:bosh_release_names).and_return(['appcloud-dev', 'appcloud'])
       @cmd.should_receive(:bosh_stemcell_versions).any_number_of_times.and_return(['0.6.4', '0.6.7'])
 
@@ -130,24 +133,33 @@ describe Bosh::Cli::Command::Base do
       @cmd.add_option(:cf_release_dir, @releases_dir)
       @cmd.add_option(:stemcells_dir, @stemcells_dir)
 
+      manifest = File.join(@systems_dir, "demo", "deployments", "demo-micro.yml")
+      @cmd.should_receive(:set_deployment).with(manifest)
+
       @cmd.add_option(:ip, '1.2.3.4')
       @cmd.add_option(:dns, 'mycompany.com')
       @cmd.add_option(:cf_release, 'appcloud')
       @cmd.cf_micro_and_deploy
 
       File.basename(@cmd.system).should == "demo"
+      File.should be_exist(manifest)
     end
 
     it "generates and deploys micro CloudFoundry including upload of release/stemcell" do
       @cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
+      @cmd.stub!(:bosh_target_uuid).and_return("DIRECTOR_UUID")
       @cmd.should_receive(:bosh_release_names).and_return([]) # release needs to be uploaded
-      @cmd.should_receive(:bosh_stemcell_versions).any_number_of_times.and_return([])
+      @cmd.should_receive(:bosh_stemcell_versions).exactly(2).times.and_return([])
+      @cmd.should_receive(:bosh_stemcell_versions).exactly(2).times.and_return(['0.6.7']) # after upload
 
       @cmd.should_receive(:validate_dns_a_record).with("api.mycompany.com", '1.2.3.4').and_return(true)
       @cmd.should_receive(:validate_dns_a_record).with("demoapp.mycompany.com", '1.2.3.4').and_return(true)
 
       @cmd.should_receive(:upload_release)
       @cmd.should_receive(:upload_stemcell)
+
+      manifest = File.join(@systems_dir, "demo", "deployments", "demo-micro.yml")
+      @cmd.should_receive(:set_deployment).with(manifest)
 
       @cmd.add_option(:cf_release_dir, @releases_dir)
       @cmd.add_option(:stemcells_dir, @stemcells_dir)
@@ -158,6 +170,7 @@ describe Bosh::Cli::Command::Base do
       @cmd.cf_micro_and_deploy
 
       File.basename(@cmd.system).should == "demo"
+      File.should be_exist(manifest)
     end
 
     def generate_new_system(cmd = nil)
@@ -172,6 +185,7 @@ describe Bosh::Cli::Command::Base do
       end
 
       cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
+      cmd.stub!(:bosh_target_uuid).and_return("DIRECTOR_UUID")
       cmd.should_receive(:bosh_release_names).and_return(['appcloud-dev', 'appcloud'])
       cmd.should_receive(:validate_dns_a_record).with("api.mycompany.com", '1.2.3.4').and_return(true)
       cmd.should_receive(:validate_dns_a_record).with("demoapp.mycompany.com", '1.2.3.4').and_return(true)

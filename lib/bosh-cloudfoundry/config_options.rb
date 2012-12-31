@@ -34,6 +34,11 @@ module Bosh::CloudFoundry::ConfigOptions
     options[:bosh_target] || config.target
   end
 
+  # @return [String] BOSH target director UUID
+  def bosh_target_uuid
+    options[:bosh_target_uuid] || config.target_uuid
+  end
+
   # @return [String] CloudFoundry system path
   def system
     options[:system] || cf_config.cf_system
