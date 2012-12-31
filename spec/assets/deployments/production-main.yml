@@ -2,7 +2,7 @@
 name: 
 director_uuid: DIRECTOR_UUID
 release:
-  name: cf-dev
+  name: appcloud
   version: latest
 compilation:
   workers: 10

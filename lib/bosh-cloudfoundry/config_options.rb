@@ -15,6 +15,7 @@ module Bosh::CloudFoundry::ConfigOptions
   DEFAULT_RELEASES_PATH = "/var/vcap/store/releases"
   DEFAULT_STEMCELLS_PATH = "/var/vcap/store/stemcells"
   DEFAULT_REPOS_PATH = "/var/vcap/store/repos"
+  DEFAULT_CF_RELEASE_NAME = "appcloud" # name of cf-release final release name
 
   # @return [Bosh::CloudFoundry::Config] Current CF configuration
   def cf_config

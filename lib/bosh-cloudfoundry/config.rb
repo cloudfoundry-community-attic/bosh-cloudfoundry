@@ -8,7 +8,7 @@ module Bosh::CloudFoundry
     [
       :base_systems_dir, # e.g. /var/vcap/store/systems
       :cf_system,        # e.g. /var/vcap/store/systems/production
-      :cf_release_name,  # e.g. 'cf-dev' TODO - per system, not global
+      :cf_release_name,  # e.g. 'appcloud' TODO - per system, not global
       :cf_release_git_repo, # e.g. "git://github.com/cloudfoundry/cf-release.git"
       :bosh_git_repo,    # e.g. "git://github.com/cloudfoundry/bosh.git"
       :releases_dir,     # e.g. /var/vcap/store/releases

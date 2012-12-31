@@ -131,13 +131,13 @@ describe Bosh::Cli::Command::Base do
       end
 
       cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
-      cmd.should_receive(:bosh_release_names).and_return(['cf-dev', 'cf-production'])
+      cmd.should_receive(:bosh_release_names).and_return(['appcloud-dev', 'appcloud'])
       cmd.should_receive(:validate_dns_a_record).with("api.mycompany.com", '1.2.3.4').and_return(true)
       cmd.should_receive(:validate_dns_a_record).with("demoapp.mycompany.com", '1.2.3.4').and_return(true)
 
       cmd.add_option(:ip, '1.2.3.4')
       cmd.add_option(:dns, 'mycompany.com')
-      cmd.add_option(:cf_release, 'cf-dev')
+      cmd.add_option(:cf_release, 'appcloud')
 
       cmd.system.should be_nil
       cmd.cf_system("production")

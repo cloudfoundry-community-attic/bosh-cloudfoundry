@@ -215,7 +215,7 @@ module Bosh::Cli::Command
     # @return [Array] BOSH releases available in target BOSH
     def bosh_release_names
       @bosh_releases ||= begin
-        # [{"name"=>"cf-dev", "versions"=>["126.1-dev"], "in_use"=>[]}]
+        # [{"name"=>"appcloud", "versions"=>["126.1-dev"], "in_use"=>[]}]
         releases = director.list_releases
         releases.map { |rel| rel["name"] }
       end
@@ -439,7 +439,7 @@ module Bosh::Cli::Command
 
     def generate_system(system_name, main_ip, root_dns)
       director_uuid = "DIRECTOR_UUID"
-      release_name = "cf-dev"
+      release_name = "appcloud"
       stemcell_version = "0.6.4"
       if aws?
         resource_pool_cloud_properties = "instance_type: m1.small"
@@ -483,7 +483,7 @@ module Bosh::Cli::Command
 
     def generate_dea_servers(server_count, server_flavor)
       director_uuid = "DIRECTOR_UUID"
-      release_name = "cf-dev"
+      release_name = "appcloud"
       stemcell_version = "0.6.4"
       if aws?
         resource_pool_cloud_properties = "instance_type: #{server_flavor}"
@@ -521,7 +521,7 @@ module Bosh::Cli::Command
 
     def generate_service_servers(service_name, server_count, server_flavor)
       director_uuid = "DIRECTOR_UUID"
-      release_name = "cf-dev"
+      release_name = "appcloud"
       stemcell_version = "0.6.4"
       if aws?
         resource_pool_cloud_properties = "instance_type: #{server_flavor}"
