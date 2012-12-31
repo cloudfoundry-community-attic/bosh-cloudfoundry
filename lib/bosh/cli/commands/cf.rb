@@ -286,12 +286,12 @@ module Bosh::Cli::Command
         say "There are no stemcells available in BOSH yet, so uploading one..."
         upload_stemcell
       end
-      unless cf_stemcell_version
+      unless cf_stemcell_version && cf_stemcell_version.size
         cf_config.cf_stemcell_version = latest_bosh_stemcell_version
         cf_config.save
       end
       unless bosh_stemcell_versions.include?(cf_stemcell_version)
-        say "Requested stemcell version #{cf_stemcell_version} is not available.".red
+        say "Requested stemcell version #{cf_stemcell_version} is not available.".yellow
         cf_config.cf_stemcell_version = latest_bosh_stemcell_version
         cf_config.save
       end
@@ -437,6 +437,7 @@ module Bosh::Cli::Command
     def upload_stemcell_to_bosh(stemcell_path)
       say "Uploading stemcell located at #{stemcell_path}..."
       bosh_cmd("upload stemcell #{stemcell_path}")
+      @bosh_stemcell_versions = nil # reset cache
     end
 
     # assume unchanged config/final.yml
@@ -469,6 +470,7 @@ module Bosh::Cli::Command
       chdir(cf_release_dir) do
         bosh_cmd "upload release releases/appcloud-#{release_number}.yml"
       end
+      @bosh_releases = nil # reset cache
     end
 
     # Examines the git tags of the cf-release repo and
@@ -529,6 +531,7 @@ module Bosh::Cli::Command
       chdir(cf_release_dir) do
         sh "bosh -n --color upload release"
       end
+      @bosh_releases = nil # reset cache
     end
 
     # Validates that +domain+ is an A record that resolves to +expected_ip_addresses+
