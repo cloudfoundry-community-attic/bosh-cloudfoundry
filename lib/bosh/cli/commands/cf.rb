@@ -236,6 +236,7 @@ module Bosh::Cli::Command
       confirm_bosh_target
       cf_release_dir
       stemcells_dir
+      base_systems_dir
     end
 
     # User is prompted for values required for
