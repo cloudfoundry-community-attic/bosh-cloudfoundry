@@ -253,11 +253,9 @@ module Bosh::Cli::Command
           cf_config.cf_release_name += "-dev"
         end
         cf_config.save
-        say "Using BOSH release name #{cf_release_name}".green
       end
-      if bosh_release_names.include?(cf_release_name)
-        say "BOSH already contains release #{cf_release_name.green}".green
-      else
+      say "Using BOSH release name #{cf_release_name}".green
+      unless bosh_release_names.include?(cf_release_name)
         say "BOSH does not contain release #{cf_release_name.green}, uploading...".yellow
         upload_release
       end
