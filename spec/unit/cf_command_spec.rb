@@ -136,6 +136,8 @@ describe Bosh::Cli::Command::Base do
       manifest = File.join(@systems_dir, "demo", "deployments", "demo-micro.yml")
       @cmd.should_receive(:set_deployment).with(manifest)
 
+      @cmd.should_receive(:sh).with("bosh -n --color deploy")
+
       @cmd.add_option(:ip, '1.2.3.4')
       @cmd.add_option(:dns, 'mycompany.com')
       @cmd.add_option(:cf_release, 'appcloud')
@@ -160,6 +162,8 @@ describe Bosh::Cli::Command::Base do
 
       manifest = File.join(@systems_dir, "demo", "deployments", "demo-micro.yml")
       @cmd.should_receive(:set_deployment).with(manifest)
+
+      @cmd.should_receive(:sh).with("bosh -n --color deploy")
 
       @cmd.add_option(:cf_release_dir, @releases_dir)
       @cmd.add_option(:stemcells_dir, @stemcells_dir)

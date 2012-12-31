@@ -23,7 +23,11 @@ module Bosh::Cli::Command
     usage "cf deploy"
     desc  "deploy cloudfoundry"
     def deploy
-      
+      confirm_system
+      Dir["#{system}/deployments/*.yml"].each do |deployment|
+        set_deployment(deployment)
+        bosh_cmd "deploy"
+      end
     end
 
     usage "cf micro"
@@ -42,8 +46,6 @@ module Bosh::Cli::Command
       confirm_or_upload_stemcell
       generate_micro_system(name, main_ip, root_dns)
       set_system(name)
-      # only on manifest, so set CLI to target it as current deployment manifest
-      set_deployment(File.join(system, "deployments", "#{name}-micro.yml"))
       deploy
     end
 
