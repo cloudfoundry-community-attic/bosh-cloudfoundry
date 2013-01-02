@@ -26,3 +26,5 @@ require 'fog/aws/models/compute/flavors'
 require "bosh-cloudfoundry/common_config"
 require "bosh-cloudfoundry/system_config"
 require "bosh-cloudfoundry/config_options"
+
+require "bosh-cloudfoundry/system_deployment_manifest_renderer"

@@ -25,10 +25,4 @@ describe Bosh::CloudFoundry::SystemConfig do
   it "defaults system_dir attribute based on location of config file" do
     @config.system_dir == @dir
   end
-  
-  describe "rendering deployment manifest(s)" do
-    def system_config(name)
-      @config.system_name = name
-    end
-  end
 end
