@@ -35,7 +35,7 @@ resource_pools:
     name: bosh-stemcell
     version: <%= stemcell_version %>
   cloud_properties:
-    <%= resource_pool_cloud_properties %>
+    <%= resource_pool_cloud_properties.gsub(/^    /, '') %>
   persistent_disk: <%= persistent_disk %>
 jobs:
 - name: main

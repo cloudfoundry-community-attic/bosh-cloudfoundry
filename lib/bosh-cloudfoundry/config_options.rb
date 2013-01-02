@@ -36,6 +36,7 @@ module Bosh::CloudFoundry::ConfigOptions
     end
     @system_config ||= begin
       system_config = Bosh::CloudFoundry::SystemConfig.new(system)
+      system_config.bosh_provider = 'aws' # TODO support other BOSH providers
       system_config.release_name ||= DEFAULT_CF_RELEASE_NAME
       system_config.save
       system_config

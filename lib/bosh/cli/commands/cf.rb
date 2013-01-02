@@ -69,6 +69,9 @@ module Bosh::Cli::Command
       main_ip, root_dns = confirm_or_choose_micro_system
       confirm_or_upload_release
       confirm_or_upload_stemcell
+
+      # TODO use render_system
+
       generate_micro_system(name, main_ip, root_dns)
       set_system(name)
       deploy
@@ -91,9 +94,7 @@ module Bosh::Cli::Command
       validate_dns_a_record("api.#{root_dns}", main_ip)
       validate_dns_a_record("demoapp.#{root_dns}", main_ip)
 
-      generate_system(name, main_ip, root_dns)
-      set_system(name)
-
+      prepare_system(name)
       render_system
     end
 
@@ -592,35 +593,6 @@ module Bosh::Cli::Command
       chdir system_dir do
         require 'bosh-cloudfoundry/generators/micro_system_generator'
         Bosh::CloudFoundry::Generators::MicroSystemGenerator.start([
-          system_name, main_ip, root_dns,
-          director_uuid, release_name, stemcell_version,
-          resource_pool_cloud_properties, persistent_disk,
-          dea_max_memory,
-          admin_email,
-          router_password, nats_password, ccdb_password])
-      end
-    end
-
-    def generate_system(system_name, main_ip, root_dns)
-      director_uuid = "DIRECTOR_UUID"
-      release_name = "appcloud"
-      stemcell_version = "0.6.4"
-      if aws?
-        resource_pool_cloud_properties = "instance_type: m1.small"
-      else
-        err("Please implemenet cf.rb's generate_system for this IaaS")
-      end
-      persistent_disk = 16192
-      dea_max_memory = 2048
-      admin_email = "drnic@starkandwayne.com"
-      router_password = "router1234"
-      nats_password = "mynats1234"
-      ccdb_password = "ccdbroot"
-      system_dir = File.join(base_systems_dir, system_name)
-      mkdir_p(system_dir)
-      chdir system_dir do
-        require 'bosh-cloudfoundry/generators/new_system_generator'
-        Bosh::CloudFoundry::Generators::NewSystemGenerator.start([
           system_name, main_ip, root_dns,
           director_uuid, release_name, stemcell_version,
           resource_pool_cloud_properties, persistent_disk,
