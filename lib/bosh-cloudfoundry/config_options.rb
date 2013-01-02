@@ -17,15 +17,29 @@ module Bosh::CloudFoundry::ConfigOptions
   DEFAULT_REPOS_PATH = "/var/vcap/store/repos"
   DEFAULT_CF_RELEASE_NAME = "appcloud" # name of cf-release final release name
 
-  # @return [Bosh::CloudFoundry::Config] Current CF configuration
+  # @return [Bosh::CloudFoundry::CommonConfig] Current common CF configuration
   def common_config
-    @common_config_config ||= begin
+    @common_config ||= begin
       config_file = options[:common_config] || DEFAULT_CONFIG_PATH
       common_config = Bosh::CloudFoundry::CommonConfig.new(config_file)
       common_config.cf_release_git_repo ||= DEFAULT_CF_RELEASE_GIT_REPO
       common_config.bosh_git_repo ||= DEFAULT_BOSH_GIT_REPO
       common_config.save
       common_config
+    end
+  end
+
+  # @return [Bosh::CloudFoundry::SystemConfig] System-specific configuration
+  def system_config
+    unless system
+      err("Internal bug: cannot access system_config until a system has been selected by user")
+    end
+    @system_config ||= begin
+      config_file = File.join(system, "manifest.yml")
+      system_config = Bosh::CloudFoundry::SystemConfig.new(config_file)
+      system_config.release_name ||= DEFAULT_CF_RELEASE_NAME
+      system_config.save
+      system_config
     end
   end
 
@@ -41,22 +55,22 @@ module Bosh::CloudFoundry::ConfigOptions
 
   # @return [String] CloudFoundry system path
   def system
-    options[:system] || common_config.cf_system
+    options[:system] || common_config.target_system
   end
 
   # @return [String] CloudFoundry system name
   def system_name
-    @system_name ||= File.basename(File.expand_path(system))
+    @system_name ||= system_config.system_name
   end
 
   # @return [String] Name of BOSH release in target BOSH
   def cf_release_name
-    options[:cf_release_name] || common_config.cf_release_name
+    options[:cf_release_name] || system_config.release_name
   end
 
   # @return [String] Version of BOSH stemcell to use for deployments
   def cf_stemcell_version
-    options[:cf_stemcell_version] || common_config.cf_stemcell_version
+    options[:cf_stemcell_version] || system_config.stemcell_version
   end
 
   # @return [String] CloudFoundry BOSH release git URI

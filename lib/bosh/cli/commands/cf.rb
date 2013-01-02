@@ -63,9 +63,9 @@ module Bosh::Cli::Command
     option "--skip-validations", "Skip all validations"
     def cf_micro_and_deploy(name="demo")
       confirm_or_prompt_all_defaults
-      common_config.cf_release_name = DEFAULT_CF_RELEASE_NAME
-      common_config.save
-      
+
+      prepare_system(name)
+
       main_ip, root_dns = confirm_or_choose_micro_system
       confirm_or_upload_release
       confirm_or_upload_stemcell
@@ -164,6 +164,19 @@ module Bosh::Cli::Command
       # TODO set DEA count/flavor in SystemConfig
     end
 
+    # Creates initial system folder & targets that system folder
+    # The +system_config+ configuration does not work until
+    # a system folder is created and targeted so that a
+    # local configuration manifest can be stored (SystemConfig)
+    def prepare_system(name)
+      system_dir = File.join(base_systems_dir, name)
+      unless File.directory?(system_dir)
+        say "Creating new system #{name} directory"
+        mkdir_p(system_dir)
+      end
+      set_system(name)
+    end
+
     # Set +system+ to specified name
     def set_system(name)
       system_dir = File.join(base_systems_dir, name)
@@ -171,8 +184,8 @@ module Bosh::Cli::Command
         err "CloudFoundry system path '#{system_dir.red}` does not exist"
       end
       
-      say "CloudFoundry system set to '#{system_dir.green}'"
-      common_config.cf_system = system_dir
+      say "CloudFoundry system set to #{system_dir.green}"
+      common_config.target_system = system_dir
       common_config.save
     end
 
@@ -280,13 +293,13 @@ module Bosh::Cli::Command
         upload_stemcell
       end
       unless cf_stemcell_version && cf_stemcell_version.size
-        common_config.cf_stemcell_version = latest_bosh_stemcell_version
-        common_config.save
+        system_config.stemcell_version = latest_bosh_stemcell_version
+        system_config.save
       end
       unless bosh_stemcell_versions.include?(cf_stemcell_version)
         say "Requested stemcell version #{cf_stemcell_version} is not available.".yellow
-        common_config.cf_stemcell_version = latest_bosh_stemcell_version
-        common_config.save
+        system_config.stemcell_version = latest_bosh_stemcell_version
+        system_config.save
       end
       say "Using stemcell version #{cf_stemcell_version}".green
     end
