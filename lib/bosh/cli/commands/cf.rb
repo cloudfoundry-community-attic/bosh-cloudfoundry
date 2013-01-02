@@ -77,17 +77,14 @@ module Bosh::Cli::Command
 
     usage "cf create system"
     desc "create current CloudFoundry system"
-    option "--ip ip", String, "Static IP for CloudController/router, e.g. 1.2.3.4"
-    option "--dns dns", String, "Base DNS for CloudFoundry applications, e.g. vcap.me"
+    option "--core-ip ip", String, "Static IP for CloudController/router, e.g. 1.2.3.4"
+    option "--root-dns dns", String, "Base DNS for CloudFoundry applications, e.g. vcap.me"
     option "--cf-release name", String, "Name of BOSH release uploaded to target BOSH"
     option "--skip-validations", "Skip all validations"
     def new_system(name=nil)
-      confirm_bosh_target # fails if CLI is not targeting a BOSH
-
+      confirm_or_prompt_all_defaults
       prepare_system(name)
-
       confirm_or_prompt_for_system_requirements
-
       render_system
     end
 

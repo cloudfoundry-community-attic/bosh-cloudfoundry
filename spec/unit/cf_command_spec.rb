@@ -138,8 +138,8 @@ describe Bosh::Cli::Command::Base do
 
       @cmd.should_receive(:sh).with("bosh -n --color deploy")
 
-      @cmd.add_option(:ip, '1.2.3.4')
-      @cmd.add_option(:dns, 'mycompany.com')
+      @cmd.add_option(:core_ip, '1.2.3.4')
+      @cmd.add_option(:root_dns, 'mycompany.com')
       @cmd.add_option(:cf_release, 'appcloud')
       @cmd.cf_micro_and_deploy
 
@@ -168,8 +168,8 @@ describe Bosh::Cli::Command::Base do
       @cmd.add_option(:cf_release_dir, @releases_dir)
       @cmd.add_option(:stemcells_dir, @stemcells_dir)
 
-      @cmd.add_option(:ip, '1.2.3.4')
-      @cmd.add_option(:dns, 'mycompany.com')
+      @cmd.add_option(:core_ip, '1.2.3.4')
+      @cmd.add_option(:root_dns, 'mycompany.com')
       @cmd.add_option(:cf_release, 'appcloud')
       @cmd.cf_micro_and_deploy
 
@@ -196,9 +196,12 @@ describe Bosh::Cli::Command::Base do
       cmd.should_receive(:bosh_stemcell_versions).exactly(3).times.and_return(['0.6.4'])
       cmd.should_receive(:render_system)
 
-      cmd.add_option(:ip, '1.2.3.4')
-      cmd.add_option(:dns, 'mycompany.com')
+      cmd.add_option(:core_ip, '1.2.3.4')
+      cmd.add_option(:root_dns, 'mycompany.com')
       cmd.add_option(:cf_release, 'appcloud')
+
+      cmd.common_config.cf_release_dir = @releases_dir
+      cmd.common_config.stemcells_dir = @stemcells_dir
 
       cmd.system.should be_nil
       cmd.new_system("production")

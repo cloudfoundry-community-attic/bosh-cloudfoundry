@@ -64,25 +64,51 @@ module Bosh::CloudFoundry::ConfigOptions
     @system_name ||= system_config.system_name
   end
 
-  # @return [String] Name of BOSH release in target BOSH
-  def cf_release_name
-    options[:cf_release_name] || system_config.release_name
+  # Example usage:
+  #   overriddable_config_option :cf_release_name, :system_config, :release_name
+  #   overriddable_config_option :core_ip, :system_config
+  #   overriddable_config_option :cf_release_git_repo, :common_config
+  #
+  # +target_config+ is a method name resolving to
+  # an instance of either +SystemConfig+ or +CommonConfig+.
+  def self.overriddable_config_option(config_option, target_config_accessor, target_config_name=nil)
+    target_config_name ||= config_option
+    config_option          = config_option.to_sym
+    target_config_accessor = target_config_accessor.to_sym
+    target_config_name     = target_config_name.to_sym
+    # The call:
+    #   overriddable_config_option :cf_release_name, :system_config, :release_name
+    # Creates the following method:
+    #   def cf_release_name
+    #     if override = options[:cf_release_name]
+    #       system_config.release_name = override
+    #       system_config.save
+    #     end
+    #     system_config.release_name
+    #   end
+    define_method config_option do
+      # convert :system_config into the instance of SystemConfig
+      target_config = self.send(target_config_accessor)
+      # determine if options has an override for
+      if override = options[config_option]
+        target_config.send("#{target_config_name}=".to_sym, override)
+        target_config.save
+      end
+      target_config.send(target_config_name)
+    end
   end
+
+  # @return [String] Name of BOSH release in target BOSH
+  overriddable_config_option :cf_release_name, :system_config, :release_name
 
   # @return [String] Version of BOSH stemcell to use for deployments
-  def cf_stemcell_version
-    options[:cf_stemcell_version] || system_config.stemcell_version
-  end
+  overriddable_config_option :cf_stemcell_version, :system_config, :stemcell_version
 
   # @return [String] public IP address for the Core CF server (to the router)
-  def core_ip
-    options[:core_ip] || system_config.core_ip || choose_core_ip
-  end
+  overriddable_config_option :core_ip, :system_config
 
   # @return [String] public DNS all apps & api access, e.g. mycompany.com
-  def root_dns
-    options[:root_dns] || system_config.root_dns || choose_root_dns
-  end
+  overriddable_config_option :root_dns, :system_config
 
   # @return [String] CloudFoundry BOSH release git URI
   def cf_release_git_repo
@@ -194,14 +220,14 @@ module Bosh::CloudFoundry::ConfigOptions
 
   # @return [String] Primary static IP for CloudController & Router
   def choose_core_ip
-    @core_ip = options[:ip] || begin
+    @core_ip = options[:core_ip] || begin
       err("Currently, please provide static IP via --ip flag")
     end
   end
 
   # @return [String] Root DNS for applications & CloudController API
   def choose_root_dns
-    @root_dns = options[:dns] || begin
+    @root_dns = options[:root_dns] || begin
       err("Currently, please provide root DNS via --dns flag")
     end
   end
