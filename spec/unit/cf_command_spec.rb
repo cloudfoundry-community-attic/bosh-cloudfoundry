@@ -7,7 +7,7 @@ describe Bosh::Cli::Command::Base do
 
   before :each do
     @config = File.join(Dir.mktmpdir, "bosh_config")
-    @cf_config = File.join(Dir.mktmpdir, "bosh_cf_config")
+    @common_config = File.join(Dir.mktmpdir, "bosh_common_config")
     @cache = File.join(Dir.mktmpdir, "bosh_cache")
     @systems_dir = File.join(Dir.mktmpdir, "systems")
     @releases_dir = File.join(Dir.mktmpdir, "releases")
@@ -25,7 +25,7 @@ describe Bosh::Cli::Command::Base do
       @cmd = Bosh::Cli::Command::CloudFoundry.new(nil)
       @cmd.add_option(:non_interactive, true)
       @cmd.add_option(:config, @config)
-      @cmd.add_option(:cf_config, @cf_config)
+      @cmd.add_option(:common_config, @common_config)
       @cmd.add_option(:cache_dir, @cache)
       @cmd.add_option(:base_systems_dir, @systems_dir)
     end
@@ -182,7 +182,7 @@ describe Bosh::Cli::Command::Base do
         cmd = Bosh::Cli::Command::CloudFoundry.new(nil)
         cmd.add_option(:non_interactive, true)
         cmd.add_option(:config, @config)
-        cmd.add_option(:cf_config, @cf_config)
+        cmd.add_option(:common_config, @common_config)
         cmd.add_option(:cache_dir, @cache)
         cmd.add_option(:base_systems_dir, @systems_dir)
         cmd

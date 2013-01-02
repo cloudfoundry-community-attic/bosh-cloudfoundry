@@ -3,7 +3,7 @@
 module Bosh; end
 
 module Bosh::CloudFoundry
-  class Config < Bosh::Cli::Config
+  class CommonConfig < Bosh::Cli::Config
 
     [
       :base_systems_dir, # e.g. /var/vcap/store/systems

@@ -23,5 +23,5 @@ require 'thor/group'
 require "fog"
 require 'fog/aws/models/compute/flavors'
 
-require "bosh-cloudfoundry/config"
+require "bosh-cloudfoundry/common_config"
 require "bosh-cloudfoundry/config_options"

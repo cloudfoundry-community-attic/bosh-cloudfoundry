@@ -63,8 +63,8 @@ module Bosh::Cli::Command
     option "--skip-validations", "Skip all validations"
     def cf_micro_and_deploy(name="demo")
       confirm_or_prompt_all_defaults
-      cf_config.cf_release_name = DEFAULT_CF_RELEASE_NAME
-      cf_config.save
+      common_config.cf_release_name = DEFAULT_CF_RELEASE_NAME
+      common_config.save
       
       main_ip, root_dns = confirm_or_choose_micro_system
       confirm_or_upload_release
@@ -172,8 +172,8 @@ module Bosh::Cli::Command
       end
       
       say "CloudFoundry system set to '#{system_dir.green}'"
-      cf_config.cf_system = system_dir
-      cf_config.save
+      common_config.cf_system = system_dir
+      common_config.save
     end
 
     # Helper to tell the CLI to target a specific deployment manifest for the "bosh deploy" command
@@ -249,11 +249,11 @@ module Bosh::Cli::Command
     # proceeds to upload the release
     def confirm_or_upload_release
       unless cf_release_name
-        cf_config.cf_release_name = DEFAULT_CF_RELEASE_NAME
+        common_config.cf_release_name = DEFAULT_CF_RELEASE_NAME
         if options[:edge]
-          cf_config.cf_release_name += "-dev"
+          common_config.cf_release_name += "-dev"
         end
-        cf_config.save
+        common_config.save
       end
       say "Using BOSH release name #{cf_release_name}".green
       unless bosh_release_names.include?(cf_release_name)
@@ -280,13 +280,13 @@ module Bosh::Cli::Command
         upload_stemcell
       end
       unless cf_stemcell_version && cf_stemcell_version.size
-        cf_config.cf_stemcell_version = latest_bosh_stemcell_version
-        cf_config.save
+        common_config.cf_stemcell_version = latest_bosh_stemcell_version
+        common_config.save
       end
       unless bosh_stemcell_versions.include?(cf_stemcell_version)
         say "Requested stemcell version #{cf_stemcell_version} is not available.".yellow
-        cf_config.cf_stemcell_version = latest_bosh_stemcell_version
-        cf_config.save
+        common_config.cf_stemcell_version = latest_bosh_stemcell_version
+        common_config.save
       end
       say "Using stemcell version #{cf_stemcell_version}".green
     end
@@ -294,7 +294,7 @@ module Bosh::Cli::Command
 
     def confirm_cf_release_name
       return true if skip_validations?
-      if release_name = options[:cf_release] || cf_config.cf_release_name
+      if release_name = options[:cf_release] || common_config.cf_release_name
         unless bosh_release_names.include?(release_name)
           err("BOSH target #{bosh_target} does not have a release '#{release_name.red}'")
         end
