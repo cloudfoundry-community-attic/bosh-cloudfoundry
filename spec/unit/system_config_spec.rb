@@ -13,23 +13,10 @@ describe Bosh::CloudFoundry::SystemConfig do
     FileUtils.remove_entry_secure @dir
   end
 
-  it "has system_name attribute" do
-    @config.system_name.should == nil
-  end
+  it("has system_name attribute") { @config.system_name.should == nil }
+  it("has system_dir attribute") { @config.system_dir.should == nil }
+  it("has release_name attribute") { @config.release_name.should == nil }
+  it("has stemcell_version attribute") { @config.stemcell_version.should == nil }
+  it("has runtimes attribute") { @config.runtimes.should == nil }
 
-  it "has system_dir attribute" do
-    @config.system_dir.should == nil
-  end
-
-  it "has release_name attribute" do
-    @config.release_name.should == nil
-  end
-
-  it "has stemcell_version attribute" do
-    @config.stemcell_version.should == nil
-  end
-
-  it "has known runtimes attribute" do
-    @config.runtimes.should == nil
-  end
 end
