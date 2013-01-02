@@ -32,6 +32,7 @@ module Bosh::CloudFoundry::ConfigOptions
   # @return [Bosh::CloudFoundry::SystemConfig] System-specific configuration
   def system_config
     unless system
+      puts caller
       err("Internal bug: cannot access system_config until a system has been selected by user")
     end
     @system_config ||= begin
