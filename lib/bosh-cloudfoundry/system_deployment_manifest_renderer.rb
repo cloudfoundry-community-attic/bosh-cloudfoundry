@@ -6,10 +6,12 @@ module Bosh; module CloudFoundry; end; end
 # manifest(s).
 class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
   include FileUtils
-  attr_reader :system_config
+  attr_reader :system_config, :common_config, :bosh_config
 
-  def initialize(system_config)
+  def initialize(system_config, common_config, bosh_config)
     @system_config = system_config
+    @common_config = common_config
+    @bosh_config = bosh_config
   end
 
   # Render deployment manifest(s) for a system
@@ -18,7 +20,7 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
   def perform
     validate_system_config
 
-    director_uuid = "DIRECTOR_UUID"
+    director_uuid = bosh_config.target_uuid
     system_name = system_config.system_name
     release_name = system_config.release_name
     stemcell_version = system_config.stemcell_version

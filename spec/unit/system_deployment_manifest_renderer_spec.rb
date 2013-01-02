@@ -6,21 +6,31 @@ describe Bosh::CloudFoundry::SystemDeploymentManifestRenderer do
   include FileUtils
 
   before(:each) do
-    @dir = Dir.mktmpdir("system_config_spec")
-    @system_dir = File.join(@dir, "production")
+    @home_dir = Dir.mktmpdir("home")
+    common_config_file = File.join(@home_dir, "cf_config")
+    @common_config =  Bosh::CloudFoundry::CommonConfig.new(common_config_file)
+
+    bosh_config_file = File.join(@home_dir, "bosh_config")
+    @bosh_config =  Bosh::Cli::Config.new(bosh_config_file)
+    @bosh_config.target_uuid = "DIRECTOR_UUID"
+    @bosh_config.save
+    
+    @systems_dir = Dir.mktmpdir("system_config")
+    @system_dir = File.join(@systems_dir, "production")
     mkdir_p(@system_dir)
-    @config = Bosh::CloudFoundry::SystemConfig.new(@system_dir)
-    @config.bosh_provider = 'aws'
-    @config.release_name = 'appcloud'
-    @config.stemcell_version = '0.6.4'
-    @config.core_server_flavor = 'm1.small'
-    @config.core_ip = '1.2.3.4'
-    @config.root_dns = 'mycompany.com'
-    @renderer = Bosh::CloudFoundry::SystemDeploymentManifestRenderer.new(@config)
+    @system_config = Bosh::CloudFoundry::SystemConfig.new(@system_dir)
+    @system_config.bosh_provider = 'aws'
+    @system_config.release_name = 'appcloud'
+    @system_config.stemcell_version = '0.6.4'
+    @system_config.core_server_flavor = 'm1.small'
+    @system_config.core_ip = '1.2.3.4'
+    @system_config.root_dns = 'mycompany.com'
+    @renderer = Bosh::CloudFoundry::SystemDeploymentManifestRenderer.new(
+      @system_config, @common_config, @bosh_config)
   end
 
   after(:each) do
-    FileUtils.remove_entry_secure @dir
+    FileUtils.remove_entry_secure @systems_dir
     @renderer = nil
   end
 
@@ -28,7 +38,7 @@ describe Bosh::CloudFoundry::SystemDeploymentManifestRenderer do
     it "renders a base system without DEAs/services into a deployment manifest" do
       @renderer.perform
 
-      chdir(@config.system_dir) do
+      chdir(@system_config.system_dir) do
         File.should be_exist("deployments/production-core.yml")
         files_match("deployments/production-core.yml", spec_asset("deployments/production-core.yml"))
       end
