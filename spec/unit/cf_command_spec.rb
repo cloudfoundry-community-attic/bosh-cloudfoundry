@@ -193,6 +193,7 @@ describe Bosh::Cli::Command::Base do
       cmd.should_receive(:bosh_release_names).and_return(['appcloud-dev', 'appcloud'])
       cmd.should_receive(:validate_dns_a_record).with("api.mycompany.com", '1.2.3.4').and_return(true)
       cmd.should_receive(:validate_dns_a_record).with("demoapp.mycompany.com", '1.2.3.4').and_return(true)
+      cmd.should_receive(:render_system)
 
       cmd.add_option(:ip, '1.2.3.4')
       cmd.add_option(:dns, 'mycompany.com')
@@ -205,20 +206,16 @@ describe Bosh::Cli::Command::Base do
     it "creates new system" do
       generate_new_system(@cmd)
       File.basename(@cmd.system).should == "production"
-
-      FileUtils.chdir(@cmd.system) do
-        File.should be_exist("deployments/production-main.yml")
-        files_match("deployments/production-main.yml", spec_asset("deployments/production-main.yml"))
-      end
     end
 
     it "sets 3 x m1.large dea server" do
       generate_new_system
+
+      @cmd.should_receive(:render_system)
+
       @cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
       @cmd.add_option(:flavor, 'm1.large')
       @cmd.change_deas(3)
-
-      pending
     end
 
     it "fails for unknown service" do
@@ -231,20 +228,22 @@ describe Bosh::Cli::Command::Base do
 
     it "add 4 postgresql nodes" do
       generate_new_system
+
+      @cmd.should_receive(:render_system)
+
       @cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
       @cmd.add_option(:flavor, 'm1.large')
       @cmd.add_service_node("postgresql", 4)
-
-      pending
     end
 
     it "add 2 redis nodes" do
       generate_new_system
+
+      @cmd.should_receive(:render_system)
+
       @cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
       @cmd.add_option(:flavor, 'm1.large')
       @cmd.add_service_node("redis", 2)
-
-      pending
     end
 
     it "deploys all the manifests"

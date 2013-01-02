@@ -93,6 +93,8 @@ module Bosh::Cli::Command
 
       generate_system(name, main_ip, root_dns)
       set_system(name)
+
+      render_system
     end
 
     usage "cf enable runtime"
@@ -134,6 +136,8 @@ module Bosh::Cli::Command
       validate_compute_flavor(server_flavor)
       
       # TODO add new service nodes to SystemConfig
+
+      render_system
     end
 
     usage "cf change deas"
@@ -160,8 +164,10 @@ module Bosh::Cli::Command
         err("Must provide server count and flavor values")
       end
       validate_compute_flavor(server_flavor)
-      
+
       # TODO set DEA count/flavor in SystemConfig
+
+      render_system
     end
 
     # Creates initial system folder & targets that system folder
@@ -637,6 +643,13 @@ module Bosh::Cli::Command
       else
         err("Please implemenet cf.rb's validate_compute_flavor for this IaaS")
       end
+    end
+
+    # Renders the +SystemConfig+ model (+system_config+) into the system's
+    # deployment manifest(s).
+    def render_system
+      renderer = SystemDeploymentManifestRenderer.new(system_config)
+      renderer.perform
     end
 
     def generate_dea_servers(server_count, server_flavor)
