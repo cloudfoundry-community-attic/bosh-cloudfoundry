@@ -264,10 +264,5 @@ describe Bosh::Cli::Command::Base do
       @cmd.deploy
     end
 
-    it "displays enabled runtimes"
-
-    it "enables the disabled ruby18 runtime"
-
-    it "disables the enabled ruby19 runtime"
   end
 end

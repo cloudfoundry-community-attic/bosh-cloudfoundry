@@ -98,18 +98,6 @@ module Bosh::Cli::Command
       render_system
     end
 
-    usage "cf enable runtime"
-    desc "enable a disabled CloudFoundry runtime"
-    def enable_runtime(name)
-      err("Not yet implemented")
-    end
-
-    usage "cf disable runtime"
-    desc "disable an enabled CloudFoundry runtime"
-    def disable_runtime(name)
-      err("Not yet implemented")
-    end
-
     usage "cf add service"
     desc "add additional CloudFoundry service node"
     option "--flavor flavor", String, "Flavor of new serverice server"
