@@ -233,6 +233,7 @@ module Bosh::Cli::Command
     # Assert that system configuration is available or prompt for values
     def confirm_or_prompt_for_system_requirements
       validate_root_dns_maps_to_core_ip
+      validate_compute_flavor(core_server_flavor)
       confirm_or_upload_release
       confirm_or_upload_stemcell
     end
