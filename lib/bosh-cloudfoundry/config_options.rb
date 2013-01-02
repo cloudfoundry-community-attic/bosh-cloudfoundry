@@ -110,6 +110,9 @@ module Bosh::CloudFoundry::ConfigOptions
   # @return [String] public DNS all apps & api access, e.g. mycompany.com
   overriddable_config_option :root_dns, :system_config
 
+  # @return [String] flavor of server for the Core server in CloudFoundry deployment
+  overriddable_config_option :core_server_flavor, :system_config
+
   # @return [String] CloudFoundry BOSH release git URI
   def cf_release_git_repo
     options[:cf_release_git_repo] || common_config.cf_release_git_repo

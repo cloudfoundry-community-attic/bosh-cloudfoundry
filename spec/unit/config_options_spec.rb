@@ -43,5 +43,11 @@ describe Bosh::CloudFoundry::ConfigOptions do
       root_dns.should == "CHANGED"
       system_config.root_dns.should == "CHANGED"
     end
+
+    it "core_server_flavor can be overridden but is stored in system_config" do
+      options[:core_server_flavor] = "CHANGED"
+      core_server_flavor.should == "CHANGED"
+      system_config.core_server_flavor.should == "CHANGED"
+    end
   end
 end
