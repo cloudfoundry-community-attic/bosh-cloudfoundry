@@ -610,7 +610,7 @@ module Bosh::Cli::Command
     # Renders the +SystemConfig+ model (+system_config+) into the system's
     # deployment manifest(s).
     def render_system
-      renderer = SystemDeploymentManifestRenderer.new(system_config)
+      renderer = Bosh::CloudFoundry::SystemDeploymentManifestRenderer.new(system_config)
       renderer.perform
     end
 
