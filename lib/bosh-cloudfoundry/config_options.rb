@@ -35,8 +35,7 @@ module Bosh::CloudFoundry::ConfigOptions
       err("Internal bug: cannot access system_config until a system has been selected by user")
     end
     @system_config ||= begin
-      config_file = File.join(system, "manifest.yml")
-      system_config = Bosh::CloudFoundry::SystemConfig.new(config_file)
+      system_config = Bosh::CloudFoundry::SystemConfig.new(system)
       system_config.release_name ||= DEFAULT_CF_RELEASE_NAME
       system_config.save
       system_config
