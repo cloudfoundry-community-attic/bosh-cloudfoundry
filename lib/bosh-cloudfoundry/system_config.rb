@@ -10,6 +10,7 @@ module Bosh::CloudFoundry
       :system_dir,       # e.g. /var/vcap/store/systems/production
       :release_name,     # e.g. 'appcloud'
       :stemcell_version, # e.g. '0.6.7'
+      :runtimes,         # e.g. { "ruby18" => false, "ruby19" => true }
     ].each do |attr|
       define_method attr do
         read(attr, false)

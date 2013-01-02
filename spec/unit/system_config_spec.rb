@@ -13,11 +13,6 @@ describe Bosh::CloudFoundry::SystemConfig do
     FileUtils.remove_entry_secure @dir
   end
 
-  # :system_name,      # e.g. production
-  # :system_dir,       # e.g. /var/vcap/store/systems/production
-  # :release_name,     # e.g. 'appcloud'
-  # :stemcell_version, # e.g. '0.6.7'
-
   it "has system_name attribute" do
     @config.system_name.should == nil
   end
@@ -32,5 +27,9 @@ describe Bosh::CloudFoundry::SystemConfig do
 
   it "has stemcell_version attribute" do
     @config.stemcell_version.should == nil
+  end
+
+  it "has known runtimes attribute" do
+    @config.runtimes.should == nil
   end
 end

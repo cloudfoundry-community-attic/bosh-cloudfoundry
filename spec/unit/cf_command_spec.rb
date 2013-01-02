@@ -77,7 +77,7 @@ describe Bosh::Cli::Command::Base do
     it "updates/creates/uploads final cf-release" do
       cf_release_dir = File.join(@releases_dir, "cf-release")
       FileUtils.mkdir_p(cf_release_dir)
-      @cmd.add_option(:cf_release_dir, cf_release_dir)
+      @cmd.common_config.cf_release_dir = cf_release_dir
 
       @cmd.should_receive(:sh).with("git pull origin master")
       script = <<-BASH.gsub(/^      /, '')
@@ -100,7 +100,7 @@ describe Bosh::Cli::Command::Base do
     it "updates/creates/uploads development/edge cf-release" do
       cf_release_dir = File.join(@releases_dir, "cf-release")
       FileUtils.mkdir_p(cf_release_dir)
-      @cmd.add_option(:cf_release_dir, cf_release_dir)
+      @cmd.common_config.cf_release_dir = cf_release_dir
       @cmd.add_option(:edge, true)
 
       @cmd.should_receive(:sh).with("git pull origin master")
@@ -130,7 +130,7 @@ describe Bosh::Cli::Command::Base do
       @cmd.should_receive(:validate_dns_a_record).with("api.mycompany.com", '1.2.3.4').and_return(true)
       @cmd.should_receive(:validate_dns_a_record).with("demoapp.mycompany.com", '1.2.3.4').and_return(true)
 
-      @cmd.add_option(:cf_release_dir, @releases_dir)
+      @cmd.common_config.cf_release_dir = @releases_dir
       @cmd.add_option(:stemcells_dir, @stemcells_dir)
 
       manifest = File.join(@systems_dir, "demo", "deployments", "demo-micro.yml")
