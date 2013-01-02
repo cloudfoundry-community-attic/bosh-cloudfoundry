@@ -193,6 +193,7 @@ describe Bosh::Cli::Command::Base do
       cmd.should_receive(:bosh_release_names).and_return(['appcloud-dev', 'appcloud'])
       cmd.should_receive(:validate_dns_a_record).with("api.mycompany.com", '1.2.3.4').and_return(true)
       cmd.should_receive(:validate_dns_a_record).with("demoapp.mycompany.com", '1.2.3.4').and_return(true)
+      cmd.should_receive(:bosh_stemcell_versions).exactly(3).times.and_return(['0.6.4'])
       cmd.should_receive(:render_system)
 
       cmd.add_option(:ip, '1.2.3.4')

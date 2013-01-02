@@ -74,6 +74,16 @@ module Bosh::CloudFoundry::ConfigOptions
     options[:cf_stemcell_version] || system_config.stemcell_version
   end
 
+  # @return [String] public IP address for the Core CF server (to the router)
+  def core_ip
+    options[:core_ip] || system_config.core_ip || choose_core_ip
+  end
+
+  # @return [String] public DNS all apps & api access, e.g. mycompany.com
+  def root_dns
+    options[:root_dns] || system_config.root_dns || choose_root_dns
+  end
+
   # @return [String] CloudFoundry BOSH release git URI
   def cf_release_git_repo
     options[:cf_release_git_repo] || common_config.cf_release_git_repo
@@ -183,8 +193,8 @@ module Bosh::CloudFoundry::ConfigOptions
   end
 
   # @return [String] Primary static IP for CloudController & Router
-  def choose_main_ip
-    @main_ip = options[:ip] || begin
+  def choose_core_ip
+    @core_ip = options[:ip] || begin
       err("Currently, please provide static IP via --ip flag")
     end
   end

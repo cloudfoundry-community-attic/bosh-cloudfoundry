@@ -11,7 +11,7 @@ class Bosh::CloudFoundry::Generators::MicroSystemGenerator < Thor::Group
   end
 
   argument :system_name
-  argument :main_ip
+  argument :core_ip
   argument :root_dns
   argument :director_uuid
   argument :release_name

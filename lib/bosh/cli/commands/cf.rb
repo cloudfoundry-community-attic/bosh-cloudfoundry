@@ -66,13 +66,11 @@ module Bosh::Cli::Command
 
       prepare_system(name)
 
-      main_ip, root_dns = confirm_or_choose_micro_system
-      confirm_or_upload_release
-      confirm_or_upload_stemcell
+      confirm_or_prompt_for_system_requirements
 
       # TODO use render_system
 
-      generate_micro_system(name, main_ip, root_dns)
+      generate_micro_system(name, core_ip, root_dns)
       set_system(name)
       deploy
     end
@@ -88,14 +86,7 @@ module Bosh::Cli::Command
 
       prepare_system(name)
 
-      cf_release_name = confirm_cf_release_name # returns false if not set or no-longer available
-      cf_release_name ||= choose_cf_release_name # options[:cf_release] # choose or upload
-
-      main_ip = choose_main_ip # options[:ip]
-      root_dns = choose_root_dns # options[:dns]
-
-      validate_dns_a_record("api.#{root_dns}", main_ip)
-      validate_dns_a_record("demoapp.#{root_dns}", main_ip)
+      confirm_or_prompt_for_system_requirements
 
       render_system
     end
@@ -241,17 +232,11 @@ module Bosh::Cli::Command
       base_systems_dir
     end
 
-    # User is prompted for values required for
-    # Micro CloudFoundry deployment
-    # @return [Array] of [main_ip, root_dns]
-    def confirm_or_choose_micro_system
-      main_ip = choose_main_ip # options[:ip]
-      root_dns = choose_root_dns # options[:dns]
-
-      validate_dns_a_record("api.#{root_dns}", main_ip)
-      validate_dns_a_record("demoapp.#{root_dns}", main_ip)
-
-      [main_ip, root_dns]
+    # Assert that system configuration is available or prompt for values
+    def confirm_or_prompt_for_system_requirements
+      validate_root_dns_maps_to_core_ip
+      confirm_or_upload_release
+      confirm_or_upload_stemcell
     end
 
     # Confirms that the requested release name is
@@ -537,6 +522,15 @@ module Bosh::Cli::Command
       @bosh_releases = nil # reset cache
     end
 
+    # It is assumed that there is only one m
+    def validate_root_dns_maps_to_core_ip
+      core_ip  # prompts if not already known
+      root_dns # prompts if not already known
+
+      validate_dns_a_record("api.#{root_dns}", core_ip)
+      validate_dns_a_record("demoapp.#{root_dns}", core_ip)
+    end
+
     # Validates that +domain+ is an A record that resolves to +expected_ip_addresses+
     # and no other IP addresses.
     # * +expected_ip_addresses+ is a String (IPv4 address)
@@ -563,7 +557,7 @@ module Bosh::Cli::Command
       end
     end
 
-    def generate_micro_system(system_name, main_ip, root_dns)
+    def generate_micro_system(system_name, core_ip, root_dns)
       director_uuid = bosh_target_uuid
       release_name = cf_release_name
       stemcell_version = cf_stemcell_version
@@ -583,7 +577,7 @@ module Bosh::Cli::Command
       chdir system_dir do
         require 'bosh-cloudfoundry/generators/micro_system_generator'
         Bosh::CloudFoundry::Generators::MicroSystemGenerator.start([
-          system_name, main_ip, root_dns,
+          system_name, core_ip, root_dns,
           director_uuid, release_name, stemcell_version,
           resource_pool_cloud_properties, persistent_disk,
           dea_max_memory,

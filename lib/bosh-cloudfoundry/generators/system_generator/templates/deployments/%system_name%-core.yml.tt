@@ -60,7 +60,7 @@ jobs:
     - gateway
   - name: vip_network
     static_ips:
-    - <%= main_ip %>
+    - <%= core_ip %>
   persistent_disk: <%= persistent_disk %>
 properties:
   micro: true
