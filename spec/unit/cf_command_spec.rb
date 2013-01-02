@@ -201,6 +201,9 @@ describe Bosh::Cli::Command::Base do
 
       cmd.system.should be_nil
       cmd.new_system("production")
+
+      # expected from generate_new_system via Command#render_system
+      mkdir_p(File.join(cmd.system, "deployments"))
     end
 
     it "creates new system" do
@@ -246,7 +249,20 @@ describe Bosh::Cli::Command::Base do
       @cmd.add_service_node("redis", 2)
     end
 
-    it "deploys all the manifests"
+    # create some 'deployments/*.yml' files and
+    # assert that bosh attempted to deploy each one:
+    #   bosh deployment deployments/aaa.yml
+    #   bosh deploy
+    it "deploys all the manifests" do
+      generate_new_system
+      chdir(@cmd.system + "/deployments") do
+        cp(spec_asset("deployments/production-core.yml"), "production-core.yml")
+        cp(spec_asset("deployments/production-redis-aws-2-m1large.yml"), "production-redis.yml")
+      end
+      @cmd.should_receive(:set_deployment).exactly(2).times
+      @cmd.should_receive(:sh).with("bosh -n --color deploy").exactly(2).times
+      @cmd.deploy
+    end
 
     it "displays enabled runtimes"
 
