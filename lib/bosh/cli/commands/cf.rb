@@ -85,6 +85,9 @@ module Bosh::Cli::Command
     option "--skip-validations", "Skip all validations"
     def new_system(name=nil)
       confirm_bosh_target # fails if CLI is not targeting a BOSH
+
+      prepare_system(name)
+
       cf_release_name = confirm_cf_release_name # returns false if not set or no-longer available
       cf_release_name ||= choose_cf_release_name # options[:cf_release] # choose or upload
 
@@ -94,7 +97,6 @@ module Bosh::Cli::Command
       validate_dns_a_record("api.#{root_dns}", main_ip)
       validate_dns_a_record("demoapp.#{root_dns}", main_ip)
 
-      prepare_system(name)
       render_system
     end
 
