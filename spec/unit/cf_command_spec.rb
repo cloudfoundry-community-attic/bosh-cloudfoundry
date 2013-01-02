@@ -199,10 +199,10 @@ describe Bosh::Cli::Command::Base do
       cmd.add_option(:cf_release, 'appcloud')
 
       cmd.system.should be_nil
-      cmd.cf_system("production")
+      cmd.new_system("production")
     end
 
-    it "generates new system folder/manifests, using all options" do
+    it "creates new system" do
       generate_new_system(@cmd)
       File.basename(@cmd.system).should == "production"
 

@@ -74,18 +74,25 @@ module Bosh::Cli::Command
       deploy
     end
 
-    usage "cf system"
-    desc "create/set/show current CloudFoundry system"
+    usage "cf create system"
+    desc "create current CloudFoundry system"
     option "--ip ip", String, "Static IP for CloudController/router, e.g. 1.2.3.4"
     option "--dns dns", String, "Base DNS for CloudFoundry applications, e.g. vcap.me"
     option "--cf-release name", String, "Name of BOSH release uploaded to target BOSH"
     option "--skip-validations", "Skip all validations"
-    def cf_system(name=nil)
-      if name
-        new_or_set_system(name)
-      else
-        show_system
-      end
+    def new_system(name=nil)
+      confirm_bosh_target # fails if CLI is not targeting a BOSH
+      cf_release_name = confirm_cf_release_name # returns false if not set or no-longer available
+      cf_release_name ||= choose_cf_release_name # options[:cf_release] # choose or upload
+
+      main_ip = choose_main_ip # options[:ip]
+      root_dns = choose_root_dns # options[:dns]
+
+      validate_dns_a_record("api.#{root_dns}", main_ip)
+      validate_dns_a_record("demoapp.#{root_dns}", main_ip)
+
+      generate_system(name, main_ip, root_dns)
+      set_system(name)
     end
 
     usage "cf enable runtime"
@@ -157,17 +164,7 @@ module Bosh::Cli::Command
       # TODO set DEA count/flavor in SystemConfig
     end
 
-    # Create system if +name+ doesn't exist
     # Set +system+ to specified name
-    def new_or_set_system(name)
-      system_dir = File.join(base_systems_dir, name)
-      if File.directory?(system_dir)
-        set_system(name)
-      else
-        new_system(name)
-      end
-    end
-
     def set_system(name)
       system_dir = File.join(base_systems_dir, name)
       unless File.directory?(system_dir)
@@ -177,25 +174,6 @@ module Bosh::Cli::Command
       say "CloudFoundry system set to '#{system_dir.green}'"
       cf_config.cf_system = system_dir
       cf_config.save
-    end
-
-    def new_system(name)
-      confirm_bosh_target # fails if CLI is not targeting a BOSH
-      cf_release_name = confirm_cf_release_name # returns false if not set or no-longer available
-      cf_release_name ||= choose_cf_release_name # options[:cf_release] # choose or upload
-
-      main_ip = choose_main_ip # options[:ip]
-      root_dns = choose_root_dns # options[:dns]
-
-      validate_dns_a_record("api.#{root_dns}", main_ip)
-      validate_dns_a_record("demoapp.#{root_dns}", main_ip)
-
-      generate_system(name, main_ip, root_dns)
-      set_system(name)
-    end
-
-    def show_system
-      say(system ? "Current CloudFoundry system is '#{system.green}'" : "CloudFoundry system not set")
     end
 
     # Helper to tell the CLI to target a specific deployment manifest for the "bosh deploy" command
@@ -214,7 +192,6 @@ module Bosh::Cli::Command
     end
 
     def confirm_system
-      return true if skip_validations?
       if system
         say("Current CloudFoundry system is '#{system.green}'")
       else
