@@ -79,7 +79,7 @@ module Bosh::Cli::Command
     desc "create current CloudFoundry system"
     option "--core-ip ip", String, "Static IP for CloudController/router, e.g. 1.2.3.4"
     option "--root-dns dns", String, "Base DNS for CloudFoundry applications, e.g. vcap.me"
-    option "--core-server-flavor", String, "Flavor of the CloudFoundry Core server, e.g. m1.xlarge"
+    option "--core-server-flavor flavor", String, "Flavor of the CloudFoundry Core server, e.g. m1.xlarge"
     option "--cf-release name", String, "Name of BOSH release uploaded to target BOSH"
     option "--skip-validations", "Skip all validations"
     def new_system(name=nil)
