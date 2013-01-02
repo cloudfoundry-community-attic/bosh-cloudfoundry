@@ -212,12 +212,11 @@ describe Bosh::Cli::Command::Base do
       end
     end
 
-    it "adds dea servers" do
+    it "sets 3 x m1.large dea server" do
       generate_new_system
       @cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
-      @cmd.add_option(:count, '3')
       @cmd.add_option(:flavor, 'm1.large')
-      @cmd.set_dea_servers
+      @cmd.change_deas(3)
 
       FileUtils.chdir(@cmd.system) do
         File.should be_exist("deployments/production-dea.yml")
@@ -229,16 +228,15 @@ describe Bosh::Cli::Command::Base do
       generate_new_system
       @cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
       expect {
-        @cmd.set_service_servers("UNKNOWN")
+        @cmd.add_service_node("UNKNOWN")
       }.to raise_error(Bosh::Cli::CliError)
     end
 
-    it "adds postgresql nodes" do
+    it "add 4 postgresql nodes" do
       generate_new_system
       @cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
-      @cmd.add_option(:count, '4')
       @cmd.add_option(:flavor, 'm1.large')
-      @cmd.set_service_servers("postgresql")
+      @cmd.add_service_node("postgresql", 4)
 
       FileUtils.chdir(@cmd.system) do
         File.should be_exist("deployments/production-postgresql.yml")
@@ -246,12 +244,11 @@ describe Bosh::Cli::Command::Base do
       end
     end
 
-    it "adds redis nodes" do
+    it "add 2 redis nodes" do
       generate_new_system
       @cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
-      @cmd.add_option(:count, '2')
       @cmd.add_option(:flavor, 'm1.large')
-      @cmd.set_service_servers("redis")
+      @cmd.add_service_node("redis", 2)
 
       FileUtils.chdir(@cmd.system) do
         File.should be_exist("deployments/production-redis.yml")

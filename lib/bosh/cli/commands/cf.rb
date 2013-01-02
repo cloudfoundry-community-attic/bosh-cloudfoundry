@@ -20,8 +20,33 @@ module Bosh::Cli::Command
       Bosh::Cli::Command::Help.list_commands(cmds)
     end
 
+    usage "cf upload stemcell"
+    desc "download/create stemcell & upload to BOSH"
+    option "--latest", "Use latest stemcell; possibly not tagged stable"
+    option "--custom", "Create custom stemcell from BOSH git source"
+    def upload_stemcell
+      stemcell_type = "stable"
+      stemcell_type = "latest" if options[:latest]
+      stemcell_type = "custom" if options[:custom]
+      create_or_download_stemcell_then_upload(stemcell_type)
+    end
+
+    usage "cf upload release"
+    desc "fetch & upload public cloudfoundry release to BOSH"
+    option "--edge", "Create development release from very latest cf-release commits"
+    def upload_release
+      create_edge_development_release = options[:edge]
+      clone_or_update_cf_release
+      if create_edge_development_release
+        create_dev_release
+        upload_dev_release
+      else
+        upload_latest_final_release
+      end
+    end
+
     usage "cf deploy"
-    desc  "deploy cloudfoundry"
+    desc  "deploy CloudFoundry system or apply any changes"
     def deploy
       confirm_system
       Dir["#{system}/deployments/*.yml"].each do |deployment|
@@ -63,68 +88,31 @@ module Bosh::Cli::Command
       end
     end
 
-    usage "cf upload stemcell"
-    desc "download/create stemcell & upload to BOSH"
-    option "--latest", "Use latest stemcell; possibly not tagged stable"
-    option "--custom", "Create custom stemcell from BOSH git source"
-    def upload_stemcell
-      stemcell_type = "stable"
-      stemcell_type = "latest" if options[:latest]
-      stemcell_type = "custom" if options[:custom]
-      create_or_download_stemcell_then_upload(stemcell_type)
+    usage "cf enable runtime"
+    desc "enable a disabled CloudFoundry runtime"
+    def enable_runtime(name)
+      err("Not yet implemented")
     end
 
-    usage "cf upload release"
-    desc "fetch & upload public cloudfoundry release to BOSH"
-    option "--edge", "Create development release from very latest cf-release commits"
-    def upload_release
-      create_edge_development_release = options[:edge]
-      clone_or_update_cf_release
-      if create_edge_development_release
-        create_dev_release
-        upload_dev_release
-      else
-        upload_latest_final_release
-      end
+    usage "cf disable runtime"
+    desc "disable an enabled CloudFoundry runtime"
+    def disable_runtime(name)
+      err("Not yet implemented")
     end
 
-    usage "cf dea"
-    desc  "Run more applications by changing Droplet Execution Agent (DEA) server configuration"
-    option "--count count", Integer, "Number of servers for running applications"
-    option "--flavor flavor", String, "Flavor of server to use for all DEA servers, e.g. m1.large for AWS"
-    def set_dea_servers
-      confirm_system
-
-      server_count = options[:count]
-      server_flavor = options[:flavor]
-      unless non_interactive?
-        unless server_flavor
-          server_flavor = ask("Flavor of server for DEAs? ") do |q|
-            q.default = default_dea_server_flavor
-          end
-        end
-        unless server_count
-          server_count = ask("Number of DEA servers? ", Integer) { |q| q.default = 2 }
-        end
-      end
-      unless server_flavor && server_flavor
-        err("Must provide server count and flavor values")
-      end
-      validate_compute_flavor(server_flavor)
-
-      generate_dea_servers(server_count, server_flavor)
-    end
-
-    usage "cf service"
-    desc  "Support new/more services"
-    option "--count count", Integer, "Number of servers for service"
-    option "--flavor flavor", String, "Flavor of server to use for service"
-    def set_service_servers(service_name)
+    usage "cf add service"
+    desc "add additional CloudFoundry service node"
+    option "--flavor flavor", String, "Flavor of new serverice server"
+    def add_service_node(service_name, additional_count=1)
       confirm_system
 
       validate_service_name(service_name)
 
-      server_count = options[:count]
+      server_count = additional_count.to_i # TODO nicer integer validation
+      if server_count <= 0
+        say "Additional server count (#{server_count}) was less that 1, defaulting to 1"
+        server_count = 1
+      end
       server_flavor = options[:flavor]
       unless non_interactive?
         unless server_flavor
@@ -132,16 +120,41 @@ module Bosh::Cli::Command
             q.default = default_service_server_flavor(service_name)
           end
         end
-        unless server_count
-          server_count = ask("Number of #{service_name} service nodes? ", Integer) { |q| q.default = 1 }
+      end
+      unless server_flavor && server_flavor
+        err("Must provide server count and flavor values")
+      end
+      validate_compute_flavor(server_flavor)
+      
+      # TODO add new service nodes to SystemConfig
+    end
+
+    usage "cf change deas"
+    desc "change the number/flavor of DEA servers (servers that run CF apps)"
+    option "--flavor flavor", String, "Change flavor of all DEA servers"
+    def change_deas(additional_count=1)
+      confirm_system
+
+      server_count = additional_count.to_i # TODO nicer integer validation
+      if server_count <= 0
+        say "Additional server count (#{server_count}) was less that 1, defaulting to 1"
+        server_count = 1
+      end
+
+      server_flavor = options[:flavor]
+      unless non_interactive?
+        unless server_flavor
+          server_flavor = ask("Flavor of server for DEAs? ") do |q|
+            q.default = default_dea_server_flavor
+          end
         end
       end
       unless server_flavor && server_flavor
         err("Must provide server count and flavor values")
       end
       validate_compute_flavor(server_flavor)
-
-      generate_service_servers(service_name, server_count, server_flavor)
+      
+      # TODO set DEA count/flavor in SystemConfig
     end
 
     # Create system if +name+ doesn't exist
