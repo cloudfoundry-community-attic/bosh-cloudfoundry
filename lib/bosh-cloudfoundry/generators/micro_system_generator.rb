@@ -28,6 +28,7 @@ class Bosh::CloudFoundry::Generators::MicroSystemGenerator < Thor::Group
     directory "deployments"
   end
 
+  private
   def deployment_name
     "#{system_name}-micro"
   end

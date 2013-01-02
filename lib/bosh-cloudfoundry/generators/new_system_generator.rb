@@ -28,4 +28,8 @@ class Bosh::CloudFoundry::Generators::NewSystemGenerator < Thor::Group
     directory "deployments"
   end
 
+  private
+  def deployment_name
+    "#{system_name}-core"
+  end
 end

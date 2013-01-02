@@ -1,5 +1,5 @@
 ---
-name: 
+name: <%= deployment_name %>
 director_uuid: <%= director_uuid %>
 release:
   name: <%= release_name %>
