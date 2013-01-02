@@ -259,9 +259,9 @@ module Bosh::Cli::Command
     # proceeds to upload the release
     def confirm_or_upload_release
       unless cf_release_name
-        system_config.cf_release_name = DEFAULT_CF_RELEASE_NAME
+        system_config.release_name = DEFAULT_CF_RELEASE_NAME
         if options[:edge]
-          system_config.cf_release_name += "-dev"
+          system_config.release_name += "-dev"
         end
         system_config.save
       end
@@ -304,7 +304,7 @@ module Bosh::Cli::Command
 
     def confirm_cf_release_name
       return true if skip_validations?
-      if release_name = options[:cf_release] || system_config.cf_release_name
+      if release_name = options[:cf_release] || system_config.release_name
         unless bosh_release_names.include?(release_name)
           err("BOSH target #{bosh_target} does not have a release '#{release_name.red}'")
         end
