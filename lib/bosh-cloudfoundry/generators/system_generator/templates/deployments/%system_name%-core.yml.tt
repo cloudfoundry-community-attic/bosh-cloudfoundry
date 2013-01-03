@@ -92,20 +92,20 @@ properties:
     databases:
     - tag: cc
       name: appcloud
-    # - tag: acm
-    #   name: acm
-    # - tag: uaa
-    #   name: uaa
+    - tag: acm
+      name: acm
+    - tag: uaa
+      name: uaa
     roles:
     - name: root
       password: "<%= ccdb_password %>"
       tag: admin
-    # - name: acm
-    #   password:
-    #   tag: acm
-    # - name: uaa
-    #   password:
-    #   tag: uaa
+    - name: acm
+      password:
+      tag: acm
+    - name: uaa
+      password:
+      tag: uaa
   cc:
     description: "Cloud Foundry"
     srv_api_uri: http://api.<%= root_dns %>
@@ -192,19 +192,19 @@ properties:
   postgresql_server:
     max_connections: 30
     listen_address: 127.0.0.1
-  # acm:
-  #   user:
-  #   password:
-  # acmdb:
-  #   address: 127.0.0.1
-  #   port: 2544
-  #   roles:
-  #   - tag: admin
-  #     name: acm
-  #     password:
-  #   databases:
-  #   - tag: acm
-  #     name: acm
+  acm:
+    user:
+    password:
+  acmdb:
+    address: 127.0.0.1
+    port: 2544
+    roles:
+    - tag: admin
+      name: acm
+      password:
+    databases:
+    - tag: acm
+      name: acm
   serialization_data_server:
     upload_token:
     use_nginx: false
@@ -230,29 +230,29 @@ properties:
     max_active_tasks: 20
     queues:
     - staging
-  # uaa:
-  #   cc:
-  #     token_secret:
-  #     client_secret:
-  #   admin:
-  #     client_secret:
-  #   login:
-  #     client_secret:
-  #   batch:
-  #     username:
-  #     password:
-  #   port: 8100
-  #   catalina_opts: -Xmx128m -Xms30m -XX:MaxPermSize=128m
-  # uaadb:
-  #   address: 127.0.0.1
-  #   port: 2544
-  #   roles:
-  #   - tag: admin
-  #     name: uaa
-  #     password:
-  #   databases:
-  #   - tag: uaa
-  #     name: uaa
+  uaa:
+    cc:
+      token_secret:
+      client_secret:
+    admin:
+      client_secret:
+    login:
+      client_secret:
+    batch:
+      username:
+      password:
+    port: 8100
+    catalina_opts: -Xmx128m -Xms30m -XX:MaxPermSize=128m
+  uaadb:
+    address: 127.0.0.1
+    port: 2544
+    roles:
+    - tag: admin
+      name: uaa
+      password:
+    databases:
+    - tag: uaa
+      name: uaa
   vcap_redis:
     address: 127.0.0.1
     port: 3456
