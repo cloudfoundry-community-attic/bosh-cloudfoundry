@@ -35,6 +35,11 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
     nats_password = "mynats1234"
     ccdb_password = "ccdbroot"
     security_group = "default"
+    
+    # TODO - don't need provider-specific manifests
+    # * provider specifics are in various cloud_properties
+    #
+    # Create the file via to_yaml; then use Thor to generate the file
     chdir system_config.system_dir do
       require "bosh-cloudfoundry/generators/#{bosh_provider}_system_generator"
       Bosh::CloudFoundry::Generators::NewSystemGenerator.start([
