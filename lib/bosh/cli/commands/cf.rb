@@ -55,7 +55,7 @@ module Bosh::Cli::Command
       end
     end
 
-    usage "cf micro"
+    usage "cf create micro"
     desc "create and deploy Micro CloudFoundry"
     option "--ip ip", String, "Static IP for CloudController/router, e.g. 1.2.3.4"
     option "--dns dns", String, "Base DNS for CloudFoundry applications, e.g. vcap.me"
@@ -76,7 +76,7 @@ module Bosh::Cli::Command
     end
 
     usage "cf create system"
-    desc "create current CloudFoundry system"
+    desc "create CloudFoundry system"
     option "--core-ip ip", String, "Static IP for CloudController/router, e.g. 1.2.3.4"
     option "--root-dns dns", String, "Base DNS for CloudFoundry applications, e.g. vcap.me"
     option "--core-server-flavor flavor", String, "Flavor of the CloudFoundry Core server, e.g. m1.xlarge"
