@@ -84,17 +84,24 @@ module Bosh::CloudFoundry::ConfigOptions
     #       system_config.release_name = override
     #       system_config.save
     #     end
-    #     system_config.release_name
+    #     return system_config.release_name if system_config.release_name
+    #     choose_cf_release_name # if it exists
     #   end
     define_method config_option do
       # convert :system_config into the instance of SystemConfig
       target_config = self.send(target_config_accessor)
       # determine if options has an override for
       if override = options[config_option]
-        target_config.send("#{target_config_name}=".to_sym, override)
+        target_config.send(:"#{target_config_name}=", override)
         target_config.save
       end
-      target_config.send(target_config_name)
+      config_value = target_config.send(target_config_name)
+      return config_value if config_value
+      if self.respond_to?(:"choose_#{config_option}")
+        self.send(:"choose_#{config_option}")
+      else
+        nil
+      end
     end
   end
 
@@ -223,16 +230,24 @@ module Bosh::CloudFoundry::ConfigOptions
 
   # @return [String] Primary static IP for CloudController & Router
   def choose_core_ip
-    @core_ip = options[:core_ip] || begin
-      err("Currently, please provide static IP via --ip flag")
+    if non_interactive?
+      err "Please set core_ip configuration for non-interactive mode"
     end
+
+    system_config.core_ip = ask("Main public IP address (e.g. 10.22.22.22): ")
+    system_config.save
+    system_config.core_ip
   end
 
   # @return [String] Root DNS for applications & CloudController API
   def choose_root_dns
-    @root_dns = options[:root_dns] || begin
-      err("Currently, please provide root DNS via --dns flag")
+    if non_interactive?
+      err "Please set root_dns configuration for non-interactive mode"
     end
+
+    system_config.root_dns = ask("Root DNS (e.g. mycompany.com): ")
+    system_config.save
+    system_config.root_dns
   end
 
 end
