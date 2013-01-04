@@ -141,6 +141,7 @@ describe Bosh::Cli::Command::Base do
       @cmd.add_option(:core_ip, '1.2.3.4')
       @cmd.add_option(:root_dns, 'mycompany.com')
       @cmd.add_option(:cf_release, 'appcloud')
+      @cmd.add_option(:core_server_flavor, 'm1.large')
       @cmd.cf_micro_and_deploy
 
       File.basename(@cmd.system).should == "demo"
@@ -171,6 +172,7 @@ describe Bosh::Cli::Command::Base do
       @cmd.add_option(:core_ip, '1.2.3.4')
       @cmd.add_option(:root_dns, 'mycompany.com')
       @cmd.add_option(:cf_release, 'appcloud')
+      @cmd.add_option(:core_server_flavor, 'm1.large')
       @cmd.cf_micro_and_deploy
 
       File.basename(@cmd.system).should == "demo"
@@ -199,6 +201,7 @@ describe Bosh::Cli::Command::Base do
       cmd.add_option(:core_ip, '1.2.3.4')
       cmd.add_option(:root_dns, 'mycompany.com')
       cmd.add_option(:cf_release, 'appcloud')
+      cmd.add_option(:core_server_flavor, 'm1.large')
 
       cmd.common_config.cf_release_dir = @releases_dir
       cmd.common_config.stemcells_dir = @stemcells_dir

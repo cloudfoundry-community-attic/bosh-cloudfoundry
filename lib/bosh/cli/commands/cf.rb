@@ -670,6 +670,14 @@ module Bosh::Cli::Command
       end
     end
 
+    def default_core_server_flavor
+      if aws?
+        "m1.large"
+      else
+        err("Please implement cf.rb's default_core_server_flavor for this IaaS")
+      end
+    end
+
     def default_dea_server_flavor
       if aws?
         "m1.large"

@@ -250,4 +250,16 @@ module Bosh::CloudFoundry::ConfigOptions
     system_config.root_dns
   end
 
+  def choose_core_server_flavor
+    if non_interactive?
+      err "Please set core_server_flavor configuration for non-interactive mode"
+    end
+
+    server_flavor = ask("Server flavor for core of CloudFoundry? ") do |q|
+      q.default = default_core_server_flavor
+    end
+    system_config.core_server_flavor = server_flavor
+    system_config.save
+    system_config.core_server_flavor
+  end
 end
