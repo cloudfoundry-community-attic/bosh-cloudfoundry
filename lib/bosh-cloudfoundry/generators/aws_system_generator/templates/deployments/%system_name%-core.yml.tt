@@ -21,12 +21,12 @@ networks:
   type: dynamic
   cloud_properties:
     security_groups:
-    - default
+    - <%= security_group %>
 - name: vip_network
   type: vip
   cloud_properties:
     security_groups:
-    - default
+    - <%= security_group %>
 resource_pools:
 - name: common
   network: default

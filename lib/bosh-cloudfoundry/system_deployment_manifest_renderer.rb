@@ -21,6 +21,7 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
     validate_system_config
 
     director_uuid = bosh_config.target_uuid
+    bosh_provider = system_config.bosh_provider
     system_name = system_config.system_name
     release_name = system_config.release_name
     stemcell_version = system_config.stemcell_version
@@ -33,15 +34,18 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
     router_password = "router1234"
     nats_password = "mynats1234"
     ccdb_password = "ccdbroot"
+    security_group = "default"
     chdir system_config.system_dir do
-      require 'bosh-cloudfoundry/generators/new_system_generator'
+      require "bosh-cloudfoundry/generators/#{bosh_provider}_system_generator"
       Bosh::CloudFoundry::Generators::NewSystemGenerator.start([
         system_name, core_ip, root_dns,
         director_uuid, release_name, stemcell_version,
         core_cloud_properties, persistent_disk,
         dea_max_memory,
         admin_email,
-        router_password, nats_password, ccdb_password])
+        router_password, nats_password, ccdb_password,
+        security_group # TODO AWS only - change to network_cloud_properties { "security_groups" => ['default']}
+      ])
     end
   end
 

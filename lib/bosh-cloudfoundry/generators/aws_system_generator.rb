@@ -7,7 +7,7 @@ class Bosh::CloudFoundry::Generators::NewSystemGenerator < Thor::Group
   include Bosh::Common::PropertyHelper
 
   def self.source_root
-    File.join(File.dirname(__FILE__), "system_generator", "templates")
+    File.join(File.dirname(__FILE__), "aws_system_generator", "templates")
   end
 
   argument :system_name
@@ -23,6 +23,7 @@ class Bosh::CloudFoundry::Generators::NewSystemGenerator < Thor::Group
   argument :router_password
   argument :nats_password
   argument :ccdb_password
+  argument :security_group
 
   def deployment_dir
     directory "deployments"
@@ -32,4 +33,5 @@ class Bosh::CloudFoundry::Generators::NewSystemGenerator < Thor::Group
   def deployment_name
     "#{system_name}-core"
   end
+
 end
