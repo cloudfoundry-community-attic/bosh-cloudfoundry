@@ -109,8 +109,8 @@ properties:
   cc:
     description: "Cloud Foundry"
     srv_api_uri: http://api.<%= root_dns %>
-    password:
-    token:
+    password: c1oudc0wc1oudc0w
+    token: TOKEN
     allow_debug: true
     allow_registration: true
     admins:
