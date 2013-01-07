@@ -110,7 +110,7 @@ properties:
     description: "Cloud Foundry"
     srv_api_uri: http://api.mycompany.com
     password:
-    token:
+    token: SPECIAL_TOKEN
     allow_debug: true
     allow_registration: true
     admins:
@@ -138,7 +138,7 @@ properties:
     use_nginx: false
   mysql_gateway:
     ip_route: 127.0.0.1
-    token:
+    token: SPECIAL_TOKEN
     supported_versions: ["5.1"]
     version_aliases:
       current: "5.1"
@@ -151,7 +151,7 @@ properties:
     default_version: "5.1"
   redis_gateway:
     ip_route: 127.0.0.1
-    token:
+    token: SPECIAL_TOKEN
     supported_versions: ["2.2"]
     version_aliases:
       current: "2.2"
@@ -162,7 +162,7 @@ properties:
     default_version: "2.2"
   mongodb_gateway:
     ip_route: 127.0.0.1
-    token:
+    token: SPECIAL_TOKEN
     supported_versions: ["1.8", "2.0"]
     version_aliases:
       current: "2.0"
@@ -176,7 +176,7 @@ properties:
     ip_route: 127.0.0.1
     admin_user: psql_admin
     admin_passwd_hash:
-    token:
+    token: SPECIAL_TOKEN
     supported_versions: ["9.0"]
     version_aliases:
       current: "9.0"
@@ -206,7 +206,7 @@ properties:
     - tag: acm
       name: acm
   serialization_data_server:
-    upload_token:
+    upload_token: SPECIAL_TOKEN
     use_nginx: false
     upload_timeout: 10
     port: 8090

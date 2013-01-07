@@ -69,7 +69,7 @@ properties:
     port: 4222
   redis_gateway:
     ip_route: 127.0.0.1
-    token:
+    token: SPECIAL_TOKEN
     supported_versions: ["2.2"]
     version_aliases:
       current: "2.2"
