@@ -38,7 +38,7 @@ resource_pools:
     instance_type: m1.small
   persistent_disk: 16192
 jobs:
-- name: main
+- name: core
   template:
   - postgres
   - nats
@@ -74,7 +74,7 @@ properties:
   router:
     client_inactivity_timeout: 600
     app_inactivity_timeout: 600
-    local_route: 127.0.0.1
+    local_route: 1.2.3.4
     status:
       port: 8080
       user: router
@@ -82,12 +82,12 @@ properties:
   nats:
     user: nats
     password: "mynats1234"
-    address: 127.0.0.1
+    address: 1.2.3.4
     port: 4222
   db: ccdb
   ccdb:
     template: postgres
-    address: 127.0.0.1
+    address: 1.2.3.4
     port: 2544
     databases:
     - tag: cc
@@ -101,16 +101,16 @@ properties:
       password: "ccdbroot"
       tag: admin
     - name: acm
-      password:
+      password: c1oudc0wc1oudc0w
       tag: acm
     - name: uaa
-      password:
+      password: c1oudc0wc1oudc0w
       tag: uaa
   cc:
     description: "Cloud Foundry"
     srv_api_uri: http://api.mycompany.com
-    password:
-    token: SPECIAL_TOKEN
+    password: c1oudc0wc1oudc0w
+    token: TOKEN
     allow_debug: true
     allow_registration: true
     admins:
@@ -126,8 +126,8 @@ properties:
       services: 16
       apps: 16
     new_stager_percent: 100
-    staging_upload_user:
-    staging_upload_password:
+    staging_upload_user: vcap
+    staging_upload_password: c1oudc0wc1oudc0w
     uaa:
       enabled: true
       resource_id: cloud_controller
@@ -137,51 +137,51 @@ properties:
         max_upload_size: 5
     use_nginx: false
   mysql_gateway:
-    ip_route: 127.0.0.1
-    token: SPECIAL_TOKEN
+    ip_route: 1.2.3.4
+    token: TOKEN
     supported_versions: ["5.1"]
     version_aliases:
       current: "5.1"
   mysql_node:
-    ip_route: 127.0.0.1
+    ip_route: 1.2.3.4
     available_storage: 2048
-    password:
+    password: c1oudc0wc1oudc0w
     max_db_size: 256
     supported_versions: ["5.1"]
     default_version: "5.1"
   redis_gateway:
-    ip_route: 127.0.0.1
-    token: SPECIAL_TOKEN
+    ip_route: 1.2.3.4
+    token: TOKEN
     supported_versions: ["2.2"]
     version_aliases:
       current: "2.2"
   redis_node:
-    ip_route: 127.0.0.1
+    ip_route: 1.2.3.4
     available_memory: 256
     supported_versions: ["2.2"]
     default_version: "2.2"
   mongodb_gateway:
-    ip_route: 127.0.0.1
-    token: SPECIAL_TOKEN
+    ip_route: 1.2.3.4
+    token: TOKEN
     supported_versions: ["1.8", "2.0"]
     version_aliases:
       current: "2.0"
       deprecated: "1.8"
   mongodb_node:
-    ip_route: 127.0.0.1
+    ip_route: 1.2.3.4
     available_memory: 256
     supported_versions: ["1.8", "2.0"]
     default_version: "1.8"
   postgresql_gateway:
-    ip_route: 127.0.0.1
+    ip_route: 1.2.3.4
     admin_user: psql_admin
     admin_passwd_hash:
-    token: SPECIAL_TOKEN
+    token: TOKEN
     supported_versions: ["9.0"]
     version_aliases:
       current: "9.0"
   postgresql_node:
-    ip_route: 127.0.0.1
+    ip_route: 1.2.3.4
     admin_user: psql_admin
     admin_passwd_hash:
     available_storage: 2048
@@ -191,40 +191,40 @@ properties:
     default_version: "9.0"
   postgresql_server:
     max_connections: 30
-    listen_address: 127.0.0.1
+    listen_address: 0.0.0.0
   acm:
-    user:
-    password:
+    user: acm
+    password: c1oudc0wc1oudc0w
   acmdb:
-    address: 127.0.0.1
+    address: 0.0.0.0
     port: 2544
     roles:
     - tag: admin
       name: acm
-      password:
+      password: c1oudc0wc1oudc0w
     databases:
     - tag: acm
       name: acm
   serialization_data_server:
-    upload_token: SPECIAL_TOKEN
+    upload_token: TOKEN
     use_nginx: false
     upload_timeout: 10
     port: 8090
     upload_file_expire_time: 600
     purge_expired_interval: 30
   service_lifecycle:
-    download_url: 127.0.0.1
+    download_url: 1.2.3.4
     mount_point: /var/vcap/service_lifecycle
     tmp_dir: /var/vcap/service_lifecycle/tmp_dir
     resque:
-      host: 127.0.0.1
+      host: 1.2.3.4
       port: 3456
-      password:
+      password: c1oudc0wc1oudc0w
     nfs_server:
-      address: 127.0.0.1
+      address: 1.2.3.4
       export_dir: /cfsnapshot
     serialization_data_server:
-    - 127.0.0.1
+    - 1.2.3.4
   stager:
     max_staging_duration: 120
     max_active_tasks: 20
@@ -232,31 +232,31 @@ properties:
     - staging
   uaa:
     cc:
-      token_secret:
-      client_secret:
+      token_secret: TOKEN_SECRET
+      client_secret: CLIENT_SECRET
     admin:
-      client_secret:
+      client_secret: CLIENT_SECRET
     login:
-      client_secret:
+      client_secret: CLIENT_SECRET
     batch:
-      username:
-      password:
+      username: uaa
+      password: c1oudc0wc1oudc0w
     port: 8100
     catalina_opts: -Xmx128m -Xms30m -XX:MaxPermSize=128m
   uaadb:
-    address: 127.0.0.1
+    address: 1.2.3.4
     port: 2544
     roles:
     - tag: admin
       name: uaa
-      password:
+      password: c1oudc0wc1oudc0w
     databases:
     - tag: uaa
       name: uaa
   vcap_redis:
-    address: 127.0.0.1
+    address: 1.2.3.4
     port: 3456
-    password:
+    password: c1oudc0wc1oudc0w
     maxmemory: 500000000
   service_plans:
     mysql:

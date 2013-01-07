@@ -71,7 +71,7 @@ properties:
     ip_route: 127.0.0.1
     admin_user: psql_admin
     admin_passwd_hash:
-    token: SPECIAL_TOKEN
+    token: TOKEN
     supported_versions: ["9.0"]
     version_aliases:
       current: "9.0"
