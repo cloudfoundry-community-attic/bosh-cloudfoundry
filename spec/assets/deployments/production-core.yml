@@ -78,10 +78,10 @@ properties:
     status:
       port: 8080
       user: router
-      password: "router1234"
+      password: "c1oudc0wc1oudc0w"
   nats:
     user: nats
-    password: "mynats1234"
+    password: "c1oudc0wc1oudc0w"
     address: 1.2.3.4
     port: 4222
   db: ccdb
@@ -98,18 +98,18 @@ properties:
       name: uaa
     roles:
     - name: root
-      password: "ccdbroot"
+      password: "c1oudc0wc1oudc0w"
       tag: admin
     - name: acm
-      password: c1oudc0wc1oudc0w
+      password: "c1oudc0wc1oudc0w"
       tag: acm
     - name: uaa
-      password: c1oudc0wc1oudc0w
+      password: "c1oudc0wc1oudc0w"
       tag: uaa
   cc:
     description: "Cloud Foundry"
     srv_api_uri: http://api.mycompany.com
-    password: c1oudc0wc1oudc0w
+    password: "c1oudc0wc1oudc0w"
     token: TOKEN
     allow_debug: true
     allow_registration: true
@@ -127,7 +127,7 @@ properties:
       apps: 16
     new_stager_percent: 100
     staging_upload_user: vcap
-    staging_upload_password: c1oudc0wc1oudc0w
+    staging_upload_password: "c1oudc0wc1oudc0w"
     uaa:
       enabled: true
       resource_id: cloud_controller
@@ -145,7 +145,7 @@ properties:
   mysql_node:
     ip_route: 1.2.3.4
     available_storage: 2048
-    password: c1oudc0wc1oudc0w
+    password: "c1oudc0wc1oudc0w"
     max_db_size: 256
     supported_versions: ["5.1"]
     default_version: "5.1"
@@ -194,14 +194,14 @@ properties:
     listen_address: 0.0.0.0
   acm:
     user: acm
-    password: c1oudc0wc1oudc0w
+    password: "c1oudc0wc1oudc0w"
   acmdb:
     address: 0.0.0.0
     port: 2544
     roles:
     - tag: admin
       name: acm
-      password: c1oudc0wc1oudc0w
+      password: "c1oudc0wc1oudc0w"
     databases:
     - tag: acm
       name: acm
@@ -219,7 +219,7 @@ properties:
     resque:
       host: 1.2.3.4
       port: 3456
-      password: c1oudc0wc1oudc0w
+      password: "c1oudc0wc1oudc0w"
     nfs_server:
       address: 1.2.3.4
       export_dir: /cfsnapshot
@@ -240,7 +240,7 @@ properties:
       client_secret: CLIENT_SECRET
     batch:
       username: uaa
-      password: c1oudc0wc1oudc0w
+      password: "c1oudc0wc1oudc0w"
     port: 8100
     catalina_opts: -Xmx128m -Xms30m -XX:MaxPermSize=128m
   uaadb:
@@ -249,14 +249,14 @@ properties:
     roles:
     - tag: admin
       name: uaa
-      password: c1oudc0wc1oudc0w
+      password: "c1oudc0wc1oudc0w"
     databases:
     - tag: uaa
       name: uaa
   vcap_redis:
     address: 1.2.3.4
     port: 3456
-    password: c1oudc0wc1oudc0w
+    password: "c1oudc0wc1oudc0w"
     maxmemory: 500000000
   service_plans:
     mysql:

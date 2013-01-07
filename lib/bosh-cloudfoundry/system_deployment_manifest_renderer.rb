@@ -31,11 +31,18 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
     persistent_disk = 16192
     dea_max_memory = 2048
     admin_email = "drnic@starkandwayne.com"
-    router_password = "router1234"
-    nats_password = "mynats1234"
-    ccdb_password = "ccdbroot"
+    common_password = system_config.common_password
     security_group = "default"
     
+    p [
+      system_name, core_ip, root_dns,
+      director_uuid, release_name, stemcell_version,
+      core_cloud_properties, persistent_disk,
+      dea_max_memory,
+      admin_email,
+      common_password,
+      security_group # TODO AWS only - change to network_cloud_properties { "security_groups" => ['default']}
+    ]
     # TODO - don't need provider-specific manifests
     # * provider specifics are in various cloud_properties
     #
@@ -48,7 +55,7 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
         core_cloud_properties, persistent_disk,
         dea_max_memory,
         admin_email,
-        router_password, nats_password, ccdb_password,
+        common_password,
         security_group # TODO AWS only - change to network_cloud_properties { "security_groups" => ['default']}
       ])
     end

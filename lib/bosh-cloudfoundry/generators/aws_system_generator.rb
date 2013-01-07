@@ -20,9 +20,7 @@ class Bosh::CloudFoundry::Generators::NewSystemGenerator < Thor::Group
   argument :persistent_disk
   argument :dea_max_memory
   argument :admin_email
-  argument :router_password
-  argument :nats_password
-  argument :ccdb_password
+  argument :common_password
   argument :security_group
 
   def deployment_dir

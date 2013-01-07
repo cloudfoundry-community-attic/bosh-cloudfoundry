@@ -17,6 +17,7 @@ describe Bosh::CloudFoundry::SystemConfig do
   it("has release_name attribute") { @config.release_name.should == nil }
   it("has stemcell_version attribute") { @config.stemcell_version.should == nil }
   it("has runtimes attribute") { @config.runtimes.should == nil }
+  it("has common_password attribute") { @config.common_password.should == nil }
 
   it "defaults system_name attribute based on basename of location of config file" do
     @config.system_name == File.basename(@dir)

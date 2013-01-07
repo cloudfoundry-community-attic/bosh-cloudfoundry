@@ -25,6 +25,7 @@ describe Bosh::CloudFoundry::SystemDeploymentManifestRenderer do
     @system_config.core_server_flavor = 'm1.small'
     @system_config.core_ip = '1.2.3.4'
     @system_config.root_dns = 'mycompany.com'
+    @system_config.common_password = 'c1oudc0wc1oudc0w'
     @renderer = Bosh::CloudFoundry::SystemDeploymentManifestRenderer.new(
       @system_config, @common_config, @bosh_config)
   end

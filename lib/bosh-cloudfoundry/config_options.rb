@@ -39,6 +39,7 @@ module Bosh::CloudFoundry::ConfigOptions
       system_config = Bosh::CloudFoundry::SystemConfig.new(system)
       system_config.bosh_provider = 'aws' # TODO support other BOSH providers
       system_config.release_name ||= DEFAULT_CF_RELEASE_NAME
+      system_config.common_password = generate_random_password
       system_config.save
       system_config
     end
@@ -262,4 +263,9 @@ module Bosh::CloudFoundry::ConfigOptions
     system_config.save
     system_config.core_server_flavor
   end
+
+  def generate_random_password
+    'c1oudc0wc1oudc0w'
+  end
+  
 end

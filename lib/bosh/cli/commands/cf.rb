@@ -150,6 +150,13 @@ module Bosh::Cli::Command
       render_system
     end
 
+    usage "show password"
+    desc "display the common password for internal access"
+    def show_password
+      confirm_system
+      say "Password: #{system_config.common_password}"
+    end
+
     # Creates initial system folder & targets that system folder
     # The +system_config+ configuration does not work until
     # a system folder is created and targeted so that a
