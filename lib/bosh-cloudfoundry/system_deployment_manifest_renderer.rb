@@ -34,15 +34,6 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
     common_password = system_config.common_password
     security_group = "default"
     
-    p [
-      system_name, core_ip, root_dns,
-      director_uuid, release_name, stemcell_version,
-      core_cloud_properties, persistent_disk,
-      dea_max_memory,
-      admin_email,
-      common_password,
-      security_group # TODO AWS only - change to network_cloud_properties { "security_groups" => ['default']}
-    ]
     # TODO - don't need provider-specific manifests
     # * provider specifics are in various cloud_properties
     #
