@@ -196,7 +196,7 @@ properties:
     user: acm
     password: "c1oudc0wc1oudc0w"
   acmdb:
-    address: 0.0.0.0
+    address: 1.2.3.4
     port: 2544
     roles:
     - tag: admin

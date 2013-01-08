@@ -196,7 +196,7 @@ properties:
     user: acm
     password: "<%= common_password %>"
   acmdb:
-    address: 0.0.0.0
+    address: <%= core_ip %>
     port: 2544
     roles:
     - tag: admin
