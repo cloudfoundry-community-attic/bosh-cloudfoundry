@@ -48,30 +48,44 @@ $ bosh cf upload release --edge
 ### All available commands
 
 ```
-$ bosh help cf
-cf dea [--count count] [--flavor flavor] 
-    Run more applications by changing Droplet Execution Agent (DEA) server configuration 
-    --count count   Number of servers for running applications 
-    --flavor flavor Flavor of server to use for all DEA servers, e.g. m1.large for AWS 
+$ bosh cf
+
+cf upload stemcell [--latest] [--custom] 
+    download/create stemcell & upload to BOSH 
+    --latest Use latest stemcell; possibly not tagged stable 
+    --custom Create custom stemcell from BOSH git source 
+
+cf upload release [--edge] 
+    fetch & upload public cloudfoundry release to BOSH 
+    --edge Create development release from very latest cf-release commits 
 
 cf deploy 
-    deploy cloudfoundry 
+    deploy CloudFoundry system or apply any changes 
 
-cf service <service_name> [--count count] [--flavor flavor] 
-    Support new/more services 
-    --count count   Number of servers for service 
-    --flavor flavor Flavor of server to use for service 
-
-cf system [<name>] [--ip ip] [--dns dns] [--cf-release name] 
-          [--skip-validations] 
-    create/set/show current CloudFoundry system 
+cf create micro [<name>] [--ip ip] [--dns dns] [--cf-release name] 
+                [--skip-validations] 
+    create and deploy Micro CloudFoundry 
     --ip ip            Static IP for CloudController/router, e.g. 1.2.3.4 
     --dns dns          Base DNS for CloudFoundry applications, e.g. vcap.me 
     --cf-release name  Name of BOSH release uploaded to target BOSH 
     --skip-validations Skip all validations 
 
-cf upload release [<release_name>] 
-    fetch & upload public cloudfoundry release to BOSH 
+cf create system [<name>] [--core-ip ip] [--root-dns dns] 
+                 [--core-server-flavor flavor] [--cf-release name] [--skip-validations] 
+    create CloudFoundry system 
+    --core-ip ip                Static IP for CloudController/router, e.g. 1.2.3.4 
+    --root-dns dns              Base DNS for CloudFoundry applications, e.g. vcap.me 
+    --core-server-flavor flavor Flavor of the CloudFoundry Core server, e.g. m1.xlarge 
+    --cf-release name           Name of BOSH release uploaded to target BOSH 
+    --skip-validations          Skip all validations 
+
+cf add service <service_name> [<additional_count>] [--flavor flavor] 
+    add additional CloudFoundry service node 
+    --flavor flavor Flavor of new serverice server 
+
+cf change deas [<additional_count>] [--flavor flavor] 
+    change the number/flavor of DEA servers (servers that run CF apps) 
+    --flavor flavor Change flavor of all DEA servers
 ```
 
 ## Development
