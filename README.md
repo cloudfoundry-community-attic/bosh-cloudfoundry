@@ -2,6 +2,43 @@
 
 Create and manage your Cloud Foundry deployments via the BOSH CLI.
 
+Currently supports AWS only. OpenStack support is coming. vSphere and vCloud support will require someone to tell me that they really want it.
+
+## NOTE - currently requires latest edge of nearly everything
+
+This tool currently requires the latest merged patches. The readme below, from "Usage" onward, is written for when there are public stemcells and final releases.
+
+Today, to get everything running:
+
+```
+# on your laptop
+git clone git://github.com/StarkAndWayne/bosh-bootstrap.git
+cd bosh-bootstrap
+bundle
+rake install
+
+bosh-bootstrap deploy --latest-stemcell
+bosh-bootstrap ssh
+
+# now on the inception VM
+cd /var/vcap/store/repos
+git clone git://github.com/StarkAndWayne/bosh-cloudfoundry.git
+cd bosh-cloudfoundry
+bundle
+rake install
+
+export TMPDIR=/var/vcap/store/tmp
+bosh cf upload stemcell --custom
+bosh cf upload release --edge
+
+bosh cf create system production
+# prompts for a DNS host for your CloudFoundry, such as mycompany.com
+bosh cf change deas 1
+bosh cf add service postgresql 1
+bosh deploy
+```
+
+
 ## Usage
 
 ```
