@@ -41,9 +41,11 @@ bosh deploy
 
 ## Usage
 
+The tool is very simple to use and to get CloudFoundry deployed on a small set of initial servers.
+
 ```
 gem install bosh-cloudfoundry
-bosh cf create micro demo
+bosh cf create system demo
 bosh cf deploy
 ```
 
@@ -99,14 +101,6 @@ cf upload release [--edge]
 
 cf deploy 
     deploy CloudFoundry system or apply any changes 
-
-cf create micro [<name>] [--ip ip] [--dns dns] [--cf-release name] 
-                [--skip-validations] 
-    create and deploy Micro CloudFoundry 
-    --ip ip            Static IP for CloudController/router, e.g. 1.2.3.4 
-    --dns dns          Base DNS for CloudFoundry applications, e.g. vcap.me 
-    --cf-release name  Name of BOSH release uploaded to target BOSH 
-    --skip-validations Skip all validations 
 
 cf create system [<name>] [--core-ip ip] [--root-dns dns] 
                  [--core-server-flavor flavor] [--cf-release name] [--skip-validations] 

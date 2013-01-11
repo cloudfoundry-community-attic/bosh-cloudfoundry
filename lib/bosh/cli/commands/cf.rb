@@ -55,26 +55,6 @@ module Bosh::Cli::Command
       end
     end
 
-    usage "cf create micro"
-    desc "create and deploy Micro CloudFoundry"
-    option "--ip ip", String, "Static IP for CloudController/router, e.g. 1.2.3.4"
-    option "--dns dns", String, "Base DNS for CloudFoundry applications, e.g. vcap.me"
-    option "--cf-release name", String, "Name of BOSH release uploaded to target BOSH"
-    option "--skip-validations", "Skip all validations"
-    def cf_micro_and_deploy(name="demo")
-      confirm_or_prompt_all_defaults
-
-      prepare_system(name)
-
-      confirm_or_prompt_for_system_requirements
-
-      # TODO use render_system
-
-      generate_micro_system(name, core_ip, root_dns)
-      set_system(name)
-      deploy
-    end
-
     usage "cf create system"
     desc "create CloudFoundry system"
     option "--core-ip ip", String, "Static IP for CloudController/router, e.g. 1.2.3.4"
@@ -560,35 +540,6 @@ module Bosh::Cli::Command
       else
         say "ok".green
         true
-      end
-    end
-
-    def generate_micro_system(system_name, core_ip, root_dns)
-      director_uuid = bosh_target_uuid
-      release_name = cf_release_name
-      stemcell_version = cf_stemcell_version
-      if aws?
-        resource_pool_cloud_properties = "instance_type: m1.xlarge"
-      else
-        err("Please implemenet cf.rb's generate_system for this IaaS")
-      end
-      persistent_disk = 16192
-      dea_max_memory = 2048
-      admin_email = "drnic@starkandwayne.com"
-      router_password = "router1234"
-      nats_password = "mynats1234"
-      ccdb_password = "ccdbroot"
-      system_dir = File.join(base_systems_dir, system_name)
-      mkdir_p(system_dir)
-      chdir system_dir do
-        require 'bosh-cloudfoundry/generators/micro_system_generator'
-        Bosh::CloudFoundry::Generators::MicroSystemGenerator.start([
-          system_name, core_ip, root_dns,
-          director_uuid, release_name, stemcell_version,
-          resource_pool_cloud_properties, persistent_disk,
-          dea_max_memory,
-          admin_email,
-          router_password, nats_password, ccdb_password])
       end
     end
 

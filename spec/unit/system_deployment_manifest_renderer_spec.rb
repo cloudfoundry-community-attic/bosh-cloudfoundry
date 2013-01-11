@@ -47,6 +47,5 @@ describe Bosh::CloudFoundry::SystemDeploymentManifestRenderer do
     it "renders a simple system + DEAs into a deployment manifest"
     it "renders a simple system + postgresql into a deployment manifest"
     it "renders a simple system + postgresql + redis into a deployment manifest"
-    it "renders a micro system into a deployment manifest"
   end
 end
