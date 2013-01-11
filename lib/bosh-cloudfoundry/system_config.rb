@@ -30,6 +30,7 @@ class Bosh::CloudFoundry::SystemConfig < Bosh::Cli::Config
     :core_server_flavor, # Server size for CF Core; e.g. 'm1.xlarge' on AWS
     :runtimes,         # e.g. { "ruby18" => false, "ruby19" => true }
     :common_password,  # e.g. 'c1oudc0wc1oudc0w` - must be 16 chars for CC password
+    :dea,              # e.g. { "count" => 2, "flavor" => "m1.large" }
   ].each do |attr|
     define_method attr do
       read(attr, false)
