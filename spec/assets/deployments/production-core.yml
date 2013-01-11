@@ -63,7 +63,6 @@ jobs:
     - 1.2.3.4
   persistent_disk: 16192
 properties:
-  micro: true
   domain: mycompany.com
   env:
   networks:
