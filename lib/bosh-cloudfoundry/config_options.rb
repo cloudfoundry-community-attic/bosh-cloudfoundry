@@ -17,11 +17,11 @@ module Bosh::CloudFoundry::ConfigOptions
   DEFAULT_REPOS_PATH = "/var/vcap/store/repos"
   DEFAULT_CF_RELEASE_NAME = "appcloud" # name of cf-release final release name
 
-  # @return [Bosh::CloudFoundry::CommonConfig] Current common CF configuration
+  # @return [Bosh::CloudFoundry::Config:: CommonConfig] Current common CF configuration
   def common_config
     @common_config ||= begin
       config_file = options[:common_config] || DEFAULT_CONFIG_PATH
-      common_config = Bosh::CloudFoundry::CommonConfig.new(config_file)
+      common_config = Bosh::CloudFoundry::Config:: CommonConfig.new(config_file)
       common_config.cf_release_git_repo ||= DEFAULT_CF_RELEASE_GIT_REPO
       common_config.bosh_git_repo ||= DEFAULT_BOSH_GIT_REPO
       common_config.save
@@ -29,14 +29,14 @@ module Bosh::CloudFoundry::ConfigOptions
     end
   end
 
-  # @return [Bosh::CloudFoundry::SystemConfig] System-specific configuration
+  # @return [Bosh::CloudFoundry::Config::SystemConfig] System-specific configuration
   def system_config
     unless system
       puts caller
       err("Internal bug: cannot access system_config until a system has been selected by user")
     end
     @system_config ||= begin
-      system_config = Bosh::CloudFoundry::SystemConfig.new(system)
+      system_config = Bosh::CloudFoundry::Config::SystemConfig.new(system)
       system_config.bosh_provider = 'aws' # TODO support other BOSH providers
       system_config.release_name ||= DEFAULT_CF_RELEASE_NAME
       system_config.common_password = generate_random_password

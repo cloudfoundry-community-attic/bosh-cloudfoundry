@@ -8,7 +8,7 @@ describe Bosh::CloudFoundry::SystemDeploymentManifestRenderer do
   before(:each) do
     @home_dir = Dir.mktmpdir("home")
     common_config_file = File.join(@home_dir, "cf_config")
-    @common_config =  Bosh::CloudFoundry::CommonConfig.new(common_config_file)
+    @common_config =  Bosh::CloudFoundry::Config:: CommonConfig.new(common_config_file)
 
     bosh_config_file = File.join(@home_dir, "bosh_config")
     @bosh_config =  Bosh::Cli::Config.new(bosh_config_file)
@@ -18,7 +18,7 @@ describe Bosh::CloudFoundry::SystemDeploymentManifestRenderer do
     @systems_dir = Dir.mktmpdir("system_config")
     @system_dir = File.join(@systems_dir, "production")
     mkdir_p(@system_dir)
-    @system_config = Bosh::CloudFoundry::SystemConfig.new(@system_dir)
+    @system_config = Bosh::CloudFoundry::Config::SystemConfig.new(@system_dir)
     @system_config.bosh_provider = 'aws'
     @system_config.release_name = 'appcloud'
     @system_config.stemcell_version = '0.6.4'

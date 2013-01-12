@@ -1,12 +1,12 @@
 # Copyright (c) 2012-2013 Stark & Wayne, LLC
 
-module Bosh; module CloudFoundry; end; end
+module Bosh; module CloudFoundry; module Config; end; end; end
 
 # Model for the configuration data of a CloudFoundry System
 # description.
 # Stores the data as a YAML configuration file within a System's
 # home folder.
-class Bosh::CloudFoundry::SystemConfig < Bosh::Cli::Config
+class Bosh::CloudFoundry::Config::SystemConfig < Bosh::Cli::Config
 
   # Defaults the +system_dir+ and +system_name+ based on the path
   # of the +config_file+.

@@ -1,11 +1,11 @@
 # Copyright (c) 2012-2013 Stark & Wayne, LLC
 
-require File.expand_path("../../spec_helper", __FILE__)
+require File.expand_path("../../../spec_helper", __FILE__)
 
-describe Bosh::CloudFoundry::SystemConfig do
+describe Bosh::CloudFoundry::Config::SystemConfig do
   before(:each) do
     @dir = Dir.mktmpdir("system_config_spec")
-    @config = Bosh::CloudFoundry::SystemConfig.new(@dir)
+    @config = Bosh::CloudFoundry::Config::SystemConfig.new(@dir)
   end
 
   after(:each) do

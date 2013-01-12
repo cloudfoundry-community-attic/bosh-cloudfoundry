@@ -1,8 +1,8 @@
 # Copyright (c) 2012-2013 Stark & Wayne, LLC
 
-require File.expand_path("../../spec_helper", __FILE__)
+require File.expand_path("../../../spec_helper", __FILE__)
 
-describe Bosh::CloudFoundry::CommonConfig do
+describe Bosh::CloudFoundry::Config::CommonConfig do
   before(:each) do
     @dir = Dir.mktmpdir("common_config_spec")
   end
@@ -13,7 +13,7 @@ describe Bosh::CloudFoundry::CommonConfig do
 
   it "should default base_systems_dir and create it" do
     config_file = File.join(@dir, "config.yml")
-    config = Bosh::CloudFoundry::CommonConfig.new(config_file)
+    config = Bosh::CloudFoundry::Config::CommonConfig.new(config_file)
 
     base_systems_dir = config.base_systems_dir
     base_systems_dir.should == nil

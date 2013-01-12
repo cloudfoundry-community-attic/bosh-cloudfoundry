@@ -1,8 +1,8 @@
 # Copyright (c) 2012-2013 Stark & Wayne, LLC
 
-module Bosh; module CloudFoundry; end; end
+module Bosh; module CloudFoundry; module Config; end; end; end
 
-class Bosh::CloudFoundry::DeaConfig
+class Bosh::CloudFoundry::Config::DeaConfig
   attr_reader :count, :flavor
 
   def initialize(count, flavor, bosh_provider_name)
