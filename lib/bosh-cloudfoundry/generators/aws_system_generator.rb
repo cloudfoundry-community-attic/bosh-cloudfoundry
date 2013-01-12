@@ -27,9 +27,16 @@ class Bosh::CloudFoundry::Generators::NewSystemGenerator < Thor::Group
     directory "deployments"
   end
 
-  private
+  protected
   def deployment_name
     "#{system_name}-core"
   end
 
+  def bosh_provider
+    "aws"
+  end
+
+  def dea_max_memory
+    512
+  end
 end

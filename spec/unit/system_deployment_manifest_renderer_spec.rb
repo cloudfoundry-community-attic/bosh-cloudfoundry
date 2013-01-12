@@ -41,7 +41,7 @@ describe Bosh::CloudFoundry::SystemDeploymentManifestRenderer do
 
       chdir(@system_config.system_dir) do
         File.should be_exist("deployments/production-core.yml")
-        files_match("deployments/production-core.yml", spec_asset("deployments/production-core.yml"))
+        files_match("deployments/production-core.yml", spec_asset("deployments/aws-core-only.yml"))
       end
     end
     it "renders a simple system + DEAs into a deployment manifest"

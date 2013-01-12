@@ -212,7 +212,7 @@ describe Bosh::Cli::Command::Base do
     it "deploys all the manifests" do
       generate_new_system
       chdir(@cmd.system + "/deployments") do
-        cp(spec_asset("deployments/production-core.yml"), "production-core.yml")
+        cp(spec_asset("deployments/aws-core-only.yml"), "aws-core-only.yml")
         cp(spec_asset("deployments/production-redis-aws-2-m1large.yml"), "production-redis.yml")
       end
       @cmd.should_receive(:set_deployment).exactly(2).times

@@ -1,8 +1,8 @@
 ---
-name: <%= deployment_name %>
-director_uuid: <%= director_uuid %>
+name: production-core
+director_uuid: DIRECTOR_UUID
 release:
-  name: <%= release_name %>
+  name: appcloud
   version: latest
 compilation:
   workers: 10
@@ -21,22 +21,22 @@ networks:
   type: dynamic
   cloud_properties:
     security_groups:
-    - <%= security_group %>
+    - default
 - name: vip_network
   type: vip
   cloud_properties:
     security_groups:
-    - <%= security_group %>
+    - default
 resource_pools:
 - name: common
   network: default
   size: 1
   stemcell:
     name: bosh-stemcell
-    version: <%= stemcell_version %>
+    version: 0.6.4
   cloud_properties:
-    <%= resource_pool_cloud_properties.gsub(/^    /, '') %>
-  persistent_disk: <%= persistent_disk %>
+    instance_type: m1.small
+  persistent_disk: 16192
 jobs:
 - name: core
   template:
@@ -60,10 +60,10 @@ jobs:
     - gateway
   - name: vip_network
     static_ips:
-    - <%= core_ip %>
-  persistent_disk: <%= persistent_disk %>
+    - 1.2.3.4
+  persistent_disk: 16192
 properties:
-  domain: <%= root_dns %>
+  domain: mycompany.com
   env:
   networks:
     apps: default
@@ -71,20 +71,20 @@ properties:
   router:
     client_inactivity_timeout: 600
     app_inactivity_timeout: 600
-    local_route: <%= core_ip %>
+    local_route: 1.2.3.4
     status:
       port: 8080
       user: router
-      password: "<%= common_password %>"
+      password: "c1oudc0wc1oudc0w"
   nats:
     user: nats
-    password: "<%= common_password %>"
-    address: <%= core_ip %>
+    password: "c1oudc0wc1oudc0w"
+    address: 1.2.3.4
     port: 4222
   db: ccdb
   ccdb:
     template: postgres
-    address: <%= core_ip %>
+    address: 1.2.3.4
     port: 2544
     databases:
     - tag: cc
@@ -95,23 +95,23 @@ properties:
       name: uaa
     roles:
     - name: root
-      password: "<%= common_password %>"
+      password: "c1oudc0wc1oudc0w"
       tag: admin
     - name: acm
-      password: "<%= common_password %>"
+      password: "c1oudc0wc1oudc0w"
       tag: acm
     - name: uaa
-      password: "<%= common_password %>"
+      password: "c1oudc0wc1oudc0w"
       tag: uaa
   cc:
     description: "Cloud Foundry"
-    srv_api_uri: http://api.<%= root_dns %>
-    password: "<%= common_password %>"
+    srv_api_uri: http://api.mycompany.com
+    password: "c1oudc0wc1oudc0w"
     token: TOKEN
     allow_debug: true
     allow_registration: true
     admins:
-    - <%= admin_email %>
+    - drnic@starkandwayne.com
     admin_account_capacity:
       memory: 2048
       app_uris: 32
@@ -124,7 +124,7 @@ properties:
       apps: 16
     new_stager_percent: 100
     staging_upload_user: vcap
-    staging_upload_password: "<%= common_password %>"
+    staging_upload_password: "c1oudc0wc1oudc0w"
     uaa:
       enabled: true
       resource_id: cloud_controller
@@ -134,43 +134,43 @@ properties:
         max_upload_size: 5
     use_nginx: false
   mysql_gateway:
-    ip_route: <%= core_ip %>
+    ip_route: 1.2.3.4
     token: TOKEN
     supported_versions: ["5.1"]
     version_aliases:
       current: "5.1"
   mysql_node:
-    ip_route: <%= core_ip %>
+    ip_route: 1.2.3.4
     available_storage: 2048
-    password: "<%= common_password %>"
+    password: "c1oudc0wc1oudc0w"
     max_db_size: 256
     supported_versions: ["5.1"]
     default_version: "5.1"
   redis_gateway:
-    ip_route: <%= core_ip %>
+    ip_route: 1.2.3.4
     token: TOKEN
     supported_versions: ["2.2"]
     version_aliases:
       current: "2.2"
   redis_node:
-    ip_route: <%= core_ip %>
+    ip_route: 1.2.3.4
     available_memory: 256
     supported_versions: ["2.2"]
     default_version: "2.2"
   mongodb_gateway:
-    ip_route: <%= core_ip %>
+    ip_route: 1.2.3.4
     token: TOKEN
     supported_versions: ["1.8", "2.0"]
     version_aliases:
       current: "2.0"
       deprecated: "1.8"
   mongodb_node:
-    ip_route: <%= core_ip %>
+    ip_route: 1.2.3.4
     available_memory: 256
     supported_versions: ["1.8", "2.0"]
     default_version: "1.8"
   postgresql_gateway:
-    ip_route: <%= core_ip %>
+    ip_route: 1.2.3.4
     admin_user: psql_admin
     admin_passwd_hash:
     token: TOKEN
@@ -178,7 +178,7 @@ properties:
     version_aliases:
       current: "9.0"
   postgresql_node:
-    ip_route: <%= core_ip %>
+    ip_route: 1.2.3.4
     admin_user: psql_admin
     admin_passwd_hash:
     available_storage: 2048
@@ -191,14 +191,14 @@ properties:
     listen_address: 0.0.0.0
   acm:
     user: acm
-    password: "<%= common_password %>"
+    password: "c1oudc0wc1oudc0w"
   acmdb:
-    address: <%= core_ip %>
+    address: 1.2.3.4
     port: 2544
     roles:
     - tag: admin
       name: acm
-      password: "<%= common_password %>"
+      password: "c1oudc0wc1oudc0w"
     databases:
     - tag: acm
       name: acm
@@ -210,18 +210,18 @@ properties:
     upload_file_expire_time: 600
     purge_expired_interval: 30
   service_lifecycle:
-    download_url: <%= core_ip %>
+    download_url: 1.2.3.4
     mount_point: /var/vcap/service_lifecycle
     tmp_dir: /var/vcap/service_lifecycle/tmp_dir
     resque:
-      host: <%= core_ip %>
+      host: 1.2.3.4
       port: 3456
-      password: "<%= common_password %>"
+      password: "c1oudc0wc1oudc0w"
     nfs_server:
-      address: <%= core_ip %>
+      address: 1.2.3.4
       export_dir: /cfsnapshot
     serialization_data_server:
-    - <%= core_ip %>
+    - 1.2.3.4
   stager:
     max_staging_duration: 120
     max_active_tasks: 20
@@ -237,23 +237,23 @@ properties:
       client_secret: CLIENT_SECRET
     batch:
       username: uaa
-      password: "<%= common_password %>"
+      password: "c1oudc0wc1oudc0w"
     port: 8100
     catalina_opts: -Xmx128m -Xms30m -XX:MaxPermSize=128m
   uaadb:
-    address: <%= core_ip %>
+    address: 1.2.3.4
     port: 2544
     roles:
     - tag: admin
       name: uaa
-      password: "<%= common_password %>"
+      password: "c1oudc0wc1oudc0w"
     databases:
     - tag: uaa
       name: uaa
   vcap_redis:
-    address: <%= core_ip %>
+    address: 1.2.3.4
     port: 3456
-    password: "<%= common_password %>"
+    password: "c1oudc0wc1oudc0w"
     maxmemory: 500000000
   service_plans:
     mysql:
@@ -324,4 +324,4 @@ properties:
         configuration:
           capacity: 200
   dea:
-    max_memory: <%= dea_max_memory %>
+    max_memory: 512

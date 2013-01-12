@@ -68,8 +68,6 @@ properties:
   networks:
     apps: default
     management: default
-  dea:
-    max_memory: 2048
   router:
     client_inactivity_timeout: 600
     app_inactivity_timeout: 600
@@ -325,3 +323,5 @@ properties:
           high_water: 1400
         configuration:
           capacity: 200
+  dea:
+    max_memory: 15060
