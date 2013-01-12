@@ -55,13 +55,19 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
   def validate_system_config
     s = system_config
     must_not_be_nil = [
+      :system_dir,
       :bosh_provider,
       :release_name,
+      :release_version,
+      :stemcell_name,
       :stemcell_version,
       :core_server_flavor,
-      :system_dir,
       :core_ip,
-      :root_dns
+      :root_dns,
+      :admin_emails,
+      :common_password,
+      :common_persistent_disk,
+      :aws_security_group,
     ]
     must_not_be_nil_failures = must_not_be_nil.inject([]) do |list, attribute|
       list << attribute unless system_config.send(attribute)
