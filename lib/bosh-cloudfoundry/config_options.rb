@@ -15,7 +15,9 @@ module Bosh::CloudFoundry::ConfigOptions
   DEFAULT_RELEASES_PATH = "/var/vcap/store/releases"
   DEFAULT_STEMCELLS_PATH = "/var/vcap/store/stemcells"
   DEFAULT_REPOS_PATH = "/var/vcap/store/repos"
-  DEFAULT_CF_RELEASE_NAME = "appcloud" # name of cf-release final release name
+  DEFAULT_RELEASE_NAME = "appcloud" # name of cf-release final release name
+  DEFAULT_RELEASE_VERSION = "latest"
+  DEFAULT_STEMCELL_NAME = "bosh-stemcell"
 
   # @return [Bosh::CloudFoundry::Config:: CommonConfig] Current common CF configuration
   def common_config
@@ -38,7 +40,9 @@ module Bosh::CloudFoundry::ConfigOptions
     @system_config ||= begin
       system_config = Bosh::CloudFoundry::Config::SystemConfig.new(system)
       system_config.bosh_provider = 'aws' # TODO support other BOSH providers
-      system_config.release_name ||= DEFAULT_CF_RELEASE_NAME
+      system_config.release_name ||= DEFAULT_RELEASE_NAME
+      system_config.release_version ||= DEFAULT_RELEASE_VERSION
+      system_config.stemcell_name ||= DEFAULT_STEMCELL_NAME
       system_config.common_password = generate_random_password
       system_config.save
       system_config
@@ -66,7 +70,7 @@ module Bosh::CloudFoundry::ConfigOptions
   end
 
   # Example usage:
-  #   overriddable_config_option :cf_release_name, :system_config, :release_name
+  #   overriddable_config_option :release_name, :system_config, :release_name
   #   overriddable_config_option :core_ip, :system_config
   #   overriddable_config_option :cf_release_git_repo, :common_config
   #
@@ -78,15 +82,15 @@ module Bosh::CloudFoundry::ConfigOptions
     target_config_accessor = target_config_accessor.to_sym
     target_config_name     = target_config_name.to_sym
     # The call:
-    #   overriddable_config_option :cf_release_name, :system_config, :release_name
+    #   overriddable_config_option :release_name, :system_config, :release_name
     # Creates the following method:
-    #   def cf_release_name
-    #     if override = options[:cf_release_name]
+    #   def release_name
+    #     if override = options[:release_name]
     #       system_config.release_name = override
     #       system_config.save
     #     end
     #     return system_config.release_name if system_config.release_name
-    #     choose_cf_release_name # if it exists
+    #     choose_release_name # if it exists
     #   end
     define_method config_option do
       # convert :system_config into the instance of SystemConfig
@@ -107,10 +111,13 @@ module Bosh::CloudFoundry::ConfigOptions
   end
 
   # @return [String] Name of BOSH release in target BOSH
-  overriddable_config_option :cf_release_name, :system_config, :release_name
+  overriddable_config_option :release_name, :system_config
+
+  # @return [String] Name of BOSH stemcell to use for deployments
+  overriddable_config_option :stemcell_name, :system_config
 
   # @return [String] Version of BOSH stemcell to use for deployments
-  overriddable_config_option :cf_stemcell_version, :system_config, :stemcell_version
+  overriddable_config_option :stemcell_version, :system_config
 
   # @return [String] public IP address for the Core CF server (to the router)
   overriddable_config_option :core_ip, :system_config
@@ -120,6 +127,9 @@ module Bosh::CloudFoundry::ConfigOptions
 
   # @return [String] flavor of server for the Core server in CloudFoundry deployment
   overriddable_config_option :core_server_flavor, :system_config
+
+  # @return [Array] list of emails for pre-created admin accounts in CloudFoundry deployment
+  overriddable_config_option :admin_emails, :system_config
 
   # @return [String] CloudFoundry BOSH release git URI
   def cf_release_git_repo
@@ -262,6 +272,21 @@ module Bosh::CloudFoundry::ConfigOptions
     system_config.core_server_flavor = server_flavor
     system_config.save
     system_config.core_server_flavor
+  end
+
+  def choose_admin_emails
+    if non_interactive?
+      err "Please set admin_emails configuration for non-interactive mode"
+    end
+
+    admin_email_list = ask("Email address for administrator of CloudFoundry? ") do |q|
+      git_email = `git config user.email`.strip
+      q.default = git_email if git_email.size > 0
+    end
+    admin_emails = admin_email_list.split(",")
+    system_config.admin_emails = admin_emails
+    system_config.save
+    system_config.admin_emails
   end
 
   def generate_random_password

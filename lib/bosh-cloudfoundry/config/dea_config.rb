@@ -12,8 +12,8 @@ class Bosh::CloudFoundry::Config::DeaConfig
   def self.build_from_system_config(system_config)
     bosh_provider = system_config.bosh_provider
     if dea_config = system_config.dea
-      count = dea_config["count"]
-      flavor = dea_config["flavor"]
+      count = dea_config["count"] || dea_config[:count]
+      flavor = dea_config["flavor"] || dea_config[:flavor]
     else
       count = 0
       flavor = nil

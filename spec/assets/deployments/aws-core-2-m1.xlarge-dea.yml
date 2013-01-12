@@ -37,6 +37,14 @@ resource_pools:
   cloud_properties: 
     instance_type: m1.small
   persistent_disk: 16192
+- name: dea
+  network: default
+  size: 2
+  stemcell: 
+    name: bosh-stemcell
+    version: 0.6.4
+  cloud_properties: 
+    instance_type: m1.xlarge
 jobs: 
 - name: core
   template: 
@@ -50,7 +58,6 @@ jobs:
   - stager
   - uaa
   - vcap_redis
-  - dea
   instances: 1
   resource_pool: core
   networks: 
@@ -62,6 +69,16 @@ jobs:
     static_ips: 
     - 1.2.3.4
   persistent_disk: 16192
+- name: dea
+  template: 
+  - dea
+  instances: 2
+  resource_pool: dea
+  networks: 
+  - name: default
+    default: 
+    - dns
+    - gateway
 properties: 
   domain: mycompany.com
   env: 

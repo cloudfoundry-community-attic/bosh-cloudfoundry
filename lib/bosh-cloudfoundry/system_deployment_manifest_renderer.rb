@@ -20,17 +20,21 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
   def perform
     validate_system_config
 
+    deployment_name = "#{system_config.system_name}-core"
+
     manifest = base_manifest(
+      deployment_name,
       bosh_config.target_uuid,
       system_config.bosh_provider,
       system_config.system_name,
       system_config.release_name,
+      system_config.release_version,
       system_config.stemcell_version,
       cloud_properties_for_server_flavor(system_config.core_server_flavor),
       system_config.core_ip,
       system_config.root_dns,
       16192,
-      "drnic@starkandwayne.com",
+      system_config.admin_emails,
       system_config.common_password,
       "default"
     )
@@ -89,16 +93,18 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
 
   # 
   def base_manifest(
+      deployment_name,
       director_uuid,
       bosh_provider,
       system_name,
       release_name,
+      release_version,
       stemcell_version,
       core_cloud_properties,
       core_ip,
       root_dns,
       persistent_disk,
-      admin_email,
+      admin_emails,
       common_password,
       security_group
     )
@@ -109,9 +115,9 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
     #   manifest = YAML.load_file('spec/assets/deployments/aws-core-only.yml')
     #   require "pp"
     #   pp manifest
-    {"name"=>"production-core",
-     "director_uuid"=>"DIRECTOR_UUID",
-     "release"=>{"name"=>"appcloud", "version"=>"latest"},
+    {"name"=>deployment_name,
+     "director_uuid"=>director_uuid,
+     "release"=>{"name"=>release_name, "version"=>release_version},
      "compilation"=>
       {"workers"=>10,
        "network"=>"default",
@@ -191,7 +197,7 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
          "token"=>"TOKEN",
          "allow_debug"=>true,
          "allow_registration"=>true,
-         "admins"=>["drnic@starkandwayne.com"],
+         "admins"=>admin_emails,
          "admin_account_capacity"=>
           {"memory"=>2048, "app_uris"=>32, "services"=>16, "apps"=>16},
          "default_account_capacity"=>

@@ -5,7 +5,11 @@ module Bosh; module CloudFoundry; module Providers; end; end; end
 class Bosh::CloudFoundry::Providers::AWS
   # @returns [Integer] megabytes of RAM for requested flavor of server
   def ram_for_server_flavor(server_flavor_id)
-    fog_compute_flavor(server_flavor_id)[:ram]
+    if flavor = fog_compute_flavor(server_flavor_id)
+      flavor[:ram]
+    else
+      raise "Unknown AWS flavor '#{server_flavor_id}'"
+    end
   end
 
   # @returns [Hash] e.g. { :bits => 0, :cores => 2, :disk => 0, 

@@ -20,15 +20,15 @@ describe Bosh::CloudFoundry::ConfigOptions do
   end
 
   describe "system_config attribute" do
-    it "cf_release_name can be overridden but is stored in system_config" do
-      options[:cf_release_name] = "CHANGED"
-      cf_release_name.should == "CHANGED"
+    it "release_name can be overridden but is stored in system_config" do
+      options[:release_name] = "CHANGED"
+      release_name.should == "CHANGED"
       system_config.release_name.should == "CHANGED"
     end
 
-    it "cf_stemcell_version can be overridden but is stored in system_config" do
-      options[:cf_stemcell_version] = "CHANGED"
-      cf_stemcell_version.should == "CHANGED"
+    it "stemcell_version can be overridden but is stored in system_config" do
+      options[:stemcell_version] = "CHANGED"
+      stemcell_version.should == "CHANGED"
       system_config.stemcell_version.should == "CHANGED"
     end
 

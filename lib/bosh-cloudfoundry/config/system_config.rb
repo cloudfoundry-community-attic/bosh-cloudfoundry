@@ -24,12 +24,15 @@ class Bosh::CloudFoundry::Config::SystemConfig < Bosh::Cli::Config
     :system_name,      # e.g. production
     :system_dir,       # e.g. /var/vcap/store/systems/production
     :release_name,     # e.g. 'appcloud'
+    :release_version,  # e.g. 'latest'
+    :stemcell_name,    # e.g. 'bosh-stemcell'
     :stemcell_version, # e.g. '0.6.7'
     :core_ip,          # Static IP for Core CF server (router, cc) e.g. '1.2.3.4'
     :root_dns,         # Root DNS for cc & user apps, e.g. 'mycompanycloud.com'
     :core_server_flavor, # Server size for CF Core; e.g. 'm1.xlarge' on AWS
     :runtimes,         # e.g. { "ruby18" => false, "ruby19" => true }
     :common_password,  # e.g. 'c1oudc0wc1oudc0w` - must be 16 chars for CC password
+    :admin_emails,     # e.g. ['drnic@starkandwayne.com']
     :dea,              # e.g. { "count" => 2, "flavor" => "m1.large" }
   ].each do |attr|
     define_method attr do
