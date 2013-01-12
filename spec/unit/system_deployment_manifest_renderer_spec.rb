@@ -22,12 +22,15 @@ describe Bosh::CloudFoundry::SystemDeploymentManifestRenderer do
     @system_config.bosh_provider = 'aws'
     @system_config.release_name = 'appcloud'
     @system_config.release_version = 'latest'
+    @system_config.stemcell_name = 'bosh-stemcell'
     @system_config.stemcell_version = '0.6.4'
     @system_config.core_server_flavor = 'm1.small'
     @system_config.core_ip = '1.2.3.4'
     @system_config.root_dns = 'mycompany.com'
     @system_config.admin_emails = ['drnic@starkandwayne.com']
     @system_config.common_password = 'c1oudc0wc1oudc0w'
+    @system_config.common_persistent_disk = 16192
+    @system_config.aws_security_group = 'default'
     @renderer = Bosh::CloudFoundry::SystemDeploymentManifestRenderer.new(
       @system_config, @common_config, @bosh_config)
   end
