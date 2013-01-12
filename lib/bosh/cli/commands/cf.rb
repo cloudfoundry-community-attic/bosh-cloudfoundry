@@ -304,24 +304,11 @@ module Bosh::Cli::Command
       end
     end
 
-    # List of versions of stemcell called "bosh-stemcell" that are available
-    # in target BOSH.
-    # Ordered by version number.
-    # @return [Array] BOSH stemcell versions available in target BOSH, e.g. ["0.6.4", "0.6.7"]
-    def bosh_stemcell_versions
-      @bosh_stemcell_versions ||= begin
-        # [{"name"=>"bosh-stemcell", "version"=>"0.6.7", "cid"=>"ami-9730bffe"}]
-        stemcells = director.list_stemcells
-        stemcells.select! {|s| s["name"] == "bosh-stemcell"}
-        stemcells.map { |rel| rel["version"] }.sort { |v1, v2|
-          version_cmp(v1, v2)
-        }
-      end
-    end
-
     # Largest version number BOSH stemcell ("bosh-stemcell")
     # @return [String] version number, e.g. "0.6.7"
     def latest_bosh_stemcell_version
+      say "Available BOSH stemcells '#{stemcell_name}: #{bosh_stemcell_versions.join(', ')}"
+      say "Defaulting to #{bosh_stemcell_versions.last}".green
       bosh_stemcell_versions.last
     end
 

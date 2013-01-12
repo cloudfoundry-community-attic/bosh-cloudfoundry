@@ -7,6 +7,9 @@ module Bosh; module CloudFoundry; end; end
 # else from +Bosh::CloudFoundry::Config+.
 # Some helpers also prompt for values if
 # no option/common_config value found.
+#
+# Assumes there is a +director+ method for making 
+# API calls to the target BOSH Director API.
 module Bosh::CloudFoundry::ConfigOptions
   DEFAULT_CONFIG_PATH = File.expand_path("~/.bosh_common_config")
   DEFAULT_CF_RELEASE_GIT_REPO = "git://github.com/cloudfoundry/cf-release.git"
@@ -297,5 +300,20 @@ module Bosh::CloudFoundry::ConfigOptions
   def generate_random_password
     'c1oudc0wc1oudc0w'
   end
-  
+
+  # List of versions of stemcell called "bosh-stemcell" that are available
+  # in target BOSH.
+  # Ordered by version number.
+  # @return [Array] BOSH stemcell versions available in target BOSH, e.g. ["0.6.4", "0.6.7"]
+  def bosh_stemcell_versions
+    @bosh_stemcell_versions ||= begin
+      # [{"name"=>"bosh-stemcell", "version"=>"0.6.7", "cid"=>"ami-9730bffe"}]
+      stemcells = director.list_stemcells
+      stemcells.select! {|s| s["name"] == stemcell_name}
+      stemcells.map { |rel| rel["version"] }.sort { |v1, v2|
+        version_cmp(v1, v2)
+      }
+    end
+  end
+
 end
