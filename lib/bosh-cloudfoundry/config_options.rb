@@ -18,6 +18,7 @@ module Bosh::CloudFoundry::ConfigOptions
   DEFAULT_RELEASE_NAME = "appcloud" # name of cf-release final release name
   DEFAULT_RELEASE_VERSION = "latest"
   DEFAULT_STEMCELL_NAME = "bosh-stemcell"
+  DEFAULT_COMMONT_PERSISTENT_DISK = 16192
 
   # @return [Bosh::CloudFoundry::Config:: CommonConfig] Current common CF configuration
   def common_config
@@ -44,6 +45,7 @@ module Bosh::CloudFoundry::ConfigOptions
       system_config.release_version ||= DEFAULT_RELEASE_VERSION
       system_config.stemcell_name ||= DEFAULT_STEMCELL_NAME
       system_config.common_password = generate_random_password
+      system_config.common_persistent_disk = DEFAULT_COMMONT_PERSISTENT_DISK
       system_config.save
       system_config
     end
@@ -130,6 +132,9 @@ module Bosh::CloudFoundry::ConfigOptions
 
   # @return [Array] list of emails for pre-created admin accounts in CloudFoundry deployment
   overriddable_config_option :admin_emails, :system_config
+
+  # @return [Integer] the persistent disk size (Mb) attached to any server that wants one
+  overriddable_config_option :common_persistent_disk, :system_config
 
   # @return [String] CloudFoundry BOSH release git URI
   def cf_release_git_repo

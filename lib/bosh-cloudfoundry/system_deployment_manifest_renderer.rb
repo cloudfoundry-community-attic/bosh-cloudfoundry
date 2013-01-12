@@ -33,7 +33,7 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
       cloud_properties_for_server_flavor(system_config.core_server_flavor),
       system_config.core_ip,
       system_config.root_dns,
-      16192,
+      system_config.common_persistent_disk,
       system_config.admin_emails,
       system_config.common_password,
       "default"

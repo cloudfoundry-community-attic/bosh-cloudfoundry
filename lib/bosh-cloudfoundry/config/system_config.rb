@@ -32,6 +32,7 @@ class Bosh::CloudFoundry::Config::SystemConfig < Bosh::Cli::Config
     :core_server_flavor, # Server size for CF Core; e.g. 'm1.xlarge' on AWS
     :runtimes,         # e.g. { "ruby18" => false, "ruby19" => true }
     :common_password,  # e.g. 'c1oudc0wc1oudc0w` - must be 16 chars for CC password
+    :common_persistent_disk, # e.g. 16192 (integer in Mb)
     :admin_emails,     # e.g. ['drnic@starkandwayne.com']
     :dea,              # e.g. { "count" => 2, "flavor" => "m1.large" }
   ].each do |attr|
