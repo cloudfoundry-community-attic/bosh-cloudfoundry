@@ -131,7 +131,7 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
         "type"=>"vip",
         "cloud_properties"=>{"security_groups"=>["default"]}}],
      "resource_pools"=>
-      [{"name"=>"common",
+      [{"name"=>"core",
         "network"=>"default",
         "size"=>1,
         "stemcell"=>{"name"=>"bosh-stemcell", "version"=>"0.6.4"},
@@ -151,7 +151,7 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
           "uaa",
           "vcap_redis"],
         "instances"=>1,
-        "resource_pool"=>"common",
+        "resource_pool"=>"core",
         "networks"=>
          [{"name"=>"default", "default"=>["dns", "gateway"]},
           {"name"=>"vip_network", "static_ips"=>["1.2.3.4"]}],

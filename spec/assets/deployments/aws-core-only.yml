@@ -28,7 +28,7 @@ networks:
     security_groups: 
     - default
 resource_pools: 
-- name: common
+- name: core
   network: default
   size: 1
   stemcell: 
@@ -52,7 +52,7 @@ jobs:
   - vcap_redis
   - dea
   instances: 1
-  resource_pool: common
+  resource_pool: core
   networks: 
   - name: default
     default: 
