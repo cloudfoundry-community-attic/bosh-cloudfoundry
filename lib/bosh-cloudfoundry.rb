@@ -14,9 +14,6 @@ require "rake/file_utils"
 # for validating DNS -> IP setups
 require 'net/dns'
 
-# for generators
-require 'thor/group'
-
 # for:
 # * validating compute flavors
 # * provisioning IP addresses

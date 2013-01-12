@@ -1,49 +1,48 @@
----
+--- 
 name: production-core
 director_uuid: DIRECTOR_UUID
-release:
+release: 
   name: appcloud
   version: latest
-compilation:
+compilation: 
   workers: 10
   network: default
   reuse_compilation_vms: true
-  cloud_properties:
+  cloud_properties: 
     instance_type: m1.medium
-update:
+update: 
   canaries: 1
   canary_watch_time: 30000-150000
   update_watch_time: 30000-150000
   max_in_flight: 4
   max_errors: 1
-networks:
+networks: 
 - name: default
   type: dynamic
-  cloud_properties:
-    security_groups:
+  cloud_properties: 
+    security_groups: 
     - default
 - name: vip_network
   type: vip
-  cloud_properties:
-    security_groups:
+  cloud_properties: 
+    security_groups: 
     - default
-resource_pools:
+resource_pools: 
 - name: common
   network: default
   size: 1
-  stemcell:
+  stemcell: 
     name: bosh-stemcell
     version: 0.6.4
-  cloud_properties:
+  cloud_properties: 
     instance_type: m1.small
   persistent_disk: 16192
-jobs:
+jobs: 
 - name: core
-  template:
+  template: 
   - postgres
   - nats
   - router
-  - dea
   - health_manager
   - cloud_controller
   - acm
@@ -51,277 +50,289 @@ jobs:
   - stager
   - uaa
   - vcap_redis
+  - dea
   instances: 1
   resource_pool: common
-  networks:
+  networks: 
   - name: default
-    default:
+    default: 
     - dns
     - gateway
   - name: vip_network
-    static_ips:
+    static_ips: 
     - 1.2.3.4
   persistent_disk: 16192
-properties:
+properties: 
   domain: mycompany.com
-  env:
-  networks:
+  env: 
+  networks: 
     apps: default
     management: default
-  router:
+  router: 
     client_inactivity_timeout: 600
     app_inactivity_timeout: 600
     local_route: 1.2.3.4
-    status:
+    status: 
       port: 8080
       user: router
-      password: "c1oudc0wc1oudc0w"
-  nats:
+      password: c1oudc0wc1oudc0w
+  nats: 
     user: nats
-    password: "c1oudc0wc1oudc0w"
+    password: c1oudc0wc1oudc0w
     address: 1.2.3.4
     port: 4222
   db: ccdb
-  ccdb:
+  ccdb: 
     template: postgres
     address: 1.2.3.4
     port: 2544
-    databases:
+    databases: 
     - tag: cc
       name: appcloud
     - tag: acm
       name: acm
     - tag: uaa
       name: uaa
-    roles:
+    roles: 
     - name: root
-      password: "c1oudc0wc1oudc0w"
+      password: c1oudc0wc1oudc0w
       tag: admin
     - name: acm
-      password: "c1oudc0wc1oudc0w"
+      password: c1oudc0wc1oudc0w
       tag: acm
     - name: uaa
-      password: "c1oudc0wc1oudc0w"
+      password: c1oudc0wc1oudc0w
       tag: uaa
-  cc:
-    description: "Cloud Foundry"
+  cc: 
+    description: Cloud Foundry
     srv_api_uri: http://api.mycompany.com
-    password: "c1oudc0wc1oudc0w"
+    password: c1oudc0wc1oudc0w
     token: TOKEN
     allow_debug: true
     allow_registration: true
-    admins:
+    admins: 
     - drnic@starkandwayne.com
-    admin_account_capacity:
+    admin_account_capacity: 
       memory: 2048
       app_uris: 32
       services: 16
       apps: 16
-    default_account_capacity:
+    default_account_capacity: 
       memory: 2048
       app_uris: 32
       services: 16
       apps: 16
     new_stager_percent: 100
     staging_upload_user: vcap
-    staging_upload_password: "c1oudc0wc1oudc0w"
-    uaa:
+    staging_upload_password: c1oudc0wc1oudc0w
+    uaa: 
       enabled: true
       resource_id: cloud_controller
-      token_creation_email_filter: [""]
-    service_extension:
-      service_lifecycle:
+      token_creation_email_filter: 
+      - ""
+    service_extension: 
+      service_lifecycle: 
         max_upload_size: 5
     use_nginx: false
-  mysql_gateway:
+  mysql_gateway: 
     ip_route: 1.2.3.4
     token: TOKEN
-    supported_versions: ["5.1"]
-    version_aliases:
+    supported_versions: 
+    - "5.1"
+    version_aliases: 
       current: "5.1"
-  mysql_node:
+  mysql_node: 
     ip_route: 1.2.3.4
     available_storage: 2048
-    password: "c1oudc0wc1oudc0w"
+    password: c1oudc0wc1oudc0w
     max_db_size: 256
-    supported_versions: ["5.1"]
+    supported_versions: 
+    - "5.1"
     default_version: "5.1"
-  redis_gateway:
+  redis_gateway: 
     ip_route: 1.2.3.4
     token: TOKEN
-    supported_versions: ["2.2"]
-    version_aliases:
+    supported_versions: 
+    - "2.2"
+    version_aliases: 
       current: "2.2"
-  redis_node:
+  redis_node: 
     ip_route: 1.2.3.4
     available_memory: 256
-    supported_versions: ["2.2"]
+    supported_versions: 
+    - "2.2"
     default_version: "2.2"
-  mongodb_gateway:
+  mongodb_gateway: 
     ip_route: 1.2.3.4
     token: TOKEN
-    supported_versions: ["1.8", "2.0"]
-    version_aliases:
+    supported_versions: 
+    - "1.8"
+    - "2.0"
+    version_aliases: 
       current: "2.0"
       deprecated: "1.8"
-  mongodb_node:
+  mongodb_node: 
     ip_route: 1.2.3.4
     available_memory: 256
-    supported_versions: ["1.8", "2.0"]
+    supported_versions: 
+    - "1.8"
+    - "2.0"
     default_version: "1.8"
-  postgresql_gateway:
+  postgresql_gateway: 
     ip_route: 1.2.3.4
     admin_user: psql_admin
-    admin_passwd_hash:
+    admin_passwd_hash: 
     token: TOKEN
-    supported_versions: ["9.0"]
-    version_aliases:
+    supported_versions: 
+    - "9.0"
+    version_aliases: 
       current: "9.0"
-  postgresql_node:
+  postgresql_node: 
     ip_route: 1.2.3.4
     admin_user: psql_admin
-    admin_passwd_hash:
+    admin_passwd_hash: 
     available_storage: 2048
     max_db_size: 256
     max_long_tx: 30
-    supported_versions: ["9.0"]
+    supported_versions: 
+    - "9.0"
     default_version: "9.0"
-  postgresql_server:
+  postgresql_server: 
     max_connections: 30
     listen_address: 0.0.0.0
-  acm:
+  acm: 
     user: acm
-    password: "c1oudc0wc1oudc0w"
-  acmdb:
+    password: c1oudc0wc1oudc0w
+  acmdb: 
     address: 1.2.3.4
     port: 2544
-    roles:
+    roles: 
     - tag: admin
       name: acm
-      password: "c1oudc0wc1oudc0w"
-    databases:
+      password: c1oudc0wc1oudc0w
+    databases: 
     - tag: acm
       name: acm
-  serialization_data_server:
+  serialization_data_server: 
     upload_token: TOKEN
     use_nginx: false
     upload_timeout: 10
     port: 8090
     upload_file_expire_time: 600
     purge_expired_interval: 30
-  service_lifecycle:
+  service_lifecycle: 
     download_url: 1.2.3.4
     mount_point: /var/vcap/service_lifecycle
     tmp_dir: /var/vcap/service_lifecycle/tmp_dir
-    resque:
+    resque: 
       host: 1.2.3.4
       port: 3456
-      password: "c1oudc0wc1oudc0w"
-    nfs_server:
+      password: c1oudc0wc1oudc0w
+    nfs_server: 
       address: 1.2.3.4
       export_dir: /cfsnapshot
-    serialization_data_server:
+    serialization_data_server: 
     - 1.2.3.4
-  stager:
+  stager: 
     max_staging_duration: 120
     max_active_tasks: 20
-    queues:
+    queues: 
     - staging
-  uaa:
-    cc:
+  uaa: 
+    cc: 
       token_secret: TOKEN_SECRET
       client_secret: CLIENT_SECRET
-    admin:
+    admin: 
       client_secret: CLIENT_SECRET
-    login:
+    login: 
       client_secret: CLIENT_SECRET
-    batch:
+    batch: 
       username: uaa
-      password: "c1oudc0wc1oudc0w"
+      password: c1oudc0wc1oudc0w
     port: 8100
     catalina_opts: -Xmx128m -Xms30m -XX:MaxPermSize=128m
-  uaadb:
+  uaadb: 
     address: 1.2.3.4
     port: 2544
-    roles:
+    roles: 
     - tag: admin
       name: uaa
-      password: "c1oudc0wc1oudc0w"
-    databases:
+      password: c1oudc0wc1oudc0w
+    databases: 
     - tag: uaa
       name: uaa
-  vcap_redis:
+  vcap_redis: 
     address: 1.2.3.4
     port: 3456
-    password: "c1oudc0wc1oudc0w"
+    password: c1oudc0wc1oudc0w
     maxmemory: 500000000
-  service_plans:
-    mysql:
-      free:
-        job_management:
+  service_plans: 
+    mysql: 
+      free: 
+        job_management: 
           high_water: 1400
           low_water: 100
-        configuration:
+        configuration: 
           allow_over_provisioning: true
           capacity: 200
           max_db_size: 128
           max_long_query: 3
           max_long_tx: 30
           max_clients: 20
-          backup:
+          backup: 
             enable: true
-    postgresql:
-      free:
-        job_management:
+    postgresql: 
+      free: 
+        job_management: 
           high_water: 1400
           low_water: 100
-        configuration:
+        configuration: 
           capacity: 200
           max_db_size: 128
           max_long_query: 3
           max_long_tx: 30
           max_clients: 20
-          backup:
+          backup: 
             enable: true
-    mongodb:
-      free:
-        job_management:
+    mongodb: 
+      free: 
+        job_management: 
           high_water: 3000
           low_water: 100
-        configuration:
+        configuration: 
           allow_over_provisioning: true
           capacity: 200
           quota_files: 4
           max_clients: 500
-          backup:
+          backup: 
             enable: true
-    rabbit:
-      free:
-        job_management:
+    rabbit: 
+      free: 
+        job_management: 
           low_water: 100
           high_water: 1400
-        configuration:
+        configuration: 
           max_memory_factor: 0.5
           max_clients: 512
           capacity: 200
-    redis:
-      free:
-        job_management:
+    redis: 
+      free: 
+        job_management: 
           high_water: 1400
           low_water: 100
-        configuration:
+        configuration: 
           capacity: 200
           max_memory: 16
           max_swap: 32
           max_clients: 500
-          backup:
+          backup: 
             enable: true
-    vblob:
-      free:
-        job_management:
+    vblob: 
+      free: 
+        job_management: 
           low_water: 100
           high_water: 1400
-        configuration:
+        configuration: 
           capacity: 200
-  dea:
+  dea: 
     max_memory: 512
