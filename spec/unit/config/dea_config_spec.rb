@@ -29,7 +29,7 @@ describe Bosh::CloudFoundry::Config::DeaConfig do
   end
   describe "5 x m1.xlarge deas on AWS" do
     subject do
-      @system_config.dea = { count: 5, flavor: 'm1.xlarge' }
+      @system_config.dea = { "count" => 5, "flavor" => 'm1.xlarge' }
       Bosh::CloudFoundry::Config::DeaConfig.build_from_system_config(@system_config)
     end
     it "converts 1 dea into an explicit dea job" do

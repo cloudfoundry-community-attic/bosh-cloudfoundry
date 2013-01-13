@@ -20,19 +20,19 @@ class Bosh::CloudFoundry::Config::DeaConfig
   # Determine ow many DEA servers are required
   # based on the system configuration
   def dea_server_count
-    @system_config.dea[:count] || 0
+    @system_config.dea["count"] || 0
   end
 
   def dea_server_count=(count)
-    @system_config.dea[:count] = count
+    @system_config.dea["count"] = count
   end
 
   def dea_server_flavor
-    @system_config.dea[:flavor]
+    @system_config.dea["flavor"]
   end
 
   def dea_server_flavor=(flavor)
-    @system_config.dea[:flavor] = flavor
+    @system_config.dea["flavor"] = flavor
   end
 
   def save

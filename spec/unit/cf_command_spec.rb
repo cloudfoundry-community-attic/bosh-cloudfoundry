@@ -171,7 +171,7 @@ describe Bosh::Cli::Command::Base do
       @cmd.add_option(:flavor, 'm1.xlarge')
       @cmd.change_deas(3)
 
-      @cmd.system_config.dea.should == { count: 3, flavor: 'm1.xlarge' }
+      @cmd.system_config.dea.should == { "count" => 3, "flavor" => 'm1.xlarge' }
     end
 
     it "fails for unknown service" do
