@@ -321,12 +321,14 @@ module Bosh::Cli::Command
     # Largest version number BOSH stemcell ("bosh-stemcell")
     # @return [String] version number, e.g. "0.6.7"
     def latest_bosh_stemcell_version
-      if bosh_stemcell_versions.size > 0
-        say "Available BOSH stemcells '#{stemcell_name}': #{bosh_stemcell_versions.join(', ')}"
-        bosh_stemcell_versions.last
-      else
-        say "No stemcells '#{stemcell_name}' uploaded yet"
-        nil
+      @latest_bosh_stemcell_version ||= begin
+        if bosh_stemcell_versions.size > 0
+          say "Available BOSH stemcells '#{stemcell_name}': #{bosh_stemcell_versions.join(', ')}"
+          bosh_stemcell_versions.last
+        else
+          say "No stemcells '#{stemcell_name}' uploaded yet"
+          nil
+        end
       end
     end
 
