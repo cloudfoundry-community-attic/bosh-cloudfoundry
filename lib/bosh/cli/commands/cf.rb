@@ -267,8 +267,9 @@ module Bosh::Cli::Command
     #     Else if stemcell_version not set, then set to latest stemcell
     def confirm_or_upload_stemcell
       if stemcell_version
-        unless 
+        unless bosh_stemcell_versions.include?(stemcell_version)
           say "Stemcell #{stemcell_name} #{stemcell_version} no longer exists on BOSH, choosing another..."
+          system_config.stemcell_version = nil
         else
           return
         end
