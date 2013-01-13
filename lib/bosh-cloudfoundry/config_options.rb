@@ -119,6 +119,9 @@ module Bosh::CloudFoundry::ConfigOptions
   # @return [String] Name of BOSH release in target BOSH
   overriddable_config_option :release_name, :system_config
 
+  # @return [String] Version of BOSH release in target BOSH [defaulted above]
+  overriddable_config_option :release_version, :system_config
+
   # @return [String] Name of BOSH stemcell to use for deployments
   overriddable_config_option :stemcell_name, :system_config
 
