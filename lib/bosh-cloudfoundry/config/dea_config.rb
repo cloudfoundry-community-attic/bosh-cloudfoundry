@@ -45,30 +45,88 @@ class Bosh::CloudFoundry::Config::DeaConfig
     @system_config.save
   end
 
-  # @returns [Array] of strings representing 0+ job templates to
-  # include in the "core" server of colocated jobs in the
-  # generated deployment manifest
-  def jobs_to_add_to_core_server
+  # Adds additional cf-release jobs into the core server (the core job in the manifest)
+  def add_core_jobs_to_manifest(manifest, extra_core_jobs=[])
+    @core_job ||= manifest["jobs"].find { |job| job["name"] == "core" }
     if dea_server_count == 0
-      %w[dea]
+      @core_job["template"] << "dea"
     else
       []
     end
   end
 
-  def deployment_manifest_properties
-    {
-      "dea" => {
-        "max_memory" => max_memory
+  # Adds resource pools to the target manifest, if dea_server_count > 0
+  #
+  # - name: dea
+  #   network: default
+  #   size: 2
+  #   stemcell: 
+  #     name: bosh-stemcell
+  #     version: 0.6.4
+  #   cloud_properties: 
+  #     instance_type: m1.xlarge
+  def add_resource_pools_to_manifest(manifest)
+    if dea_server_count > 0
+      resource_pool = {
+        "name" => "dea",
+        "network" => "default",
+        "size" => dea_server_count,
+        "stemcell" => {
+          "name" => @system_config.stemcell_name,
+          "version" => @system_config.stemcell_version
+        },
+        # TODO how to create "cloud_properties" per-provider?
+        "cloud_properties" => {
+          "instance_type" => dea_server_flavor
+        }
       }
+      manifest["resource_pools"] << resource_pool
+    end
+  end
+
+  # Jobs to add to the target manifest
+  #
+  # - name: dea
+  #   template: 
+  #   - dea
+  #   instances: 2
+  #   resource_pool: dea
+  #   networks: 
+  #   - name: default
+  #     default: 
+  #     - dns
+  #     - gateway
+  def add_jobs_to_manifest(manifest)
+    if dea_server_count > 0
+      job = {
+        "name" => "dea",
+        "template" => ["dea"],
+        "instances" => dea_server_count,
+        "resource_pool" => "dea",
+        # TODO are these AWS-specific networks?
+        "networks" => [{
+          "name" => "default",
+          "default" => ["dns", "gateway"]
+        }]
+      }
+      manifest["jobs"] << job
+    end
+  end
+
+  # Add extra configuration properties into the manifest
+  # to configure the allocation of RAM to the DEA
+  def merge_manifest_properties(manifest)
+    manifest["properties"]["dea"] ||= {}
+    manifest["properties"]["dea"] = {
+      "max_memory" => max_memory
     }
   end
 
   def max_memory
-    if dea_server_count == 0
-      512
-    else
+    if dea_server_count > 0
       max_memory_for_dedicated_dea
+    else
+      512
     end
   end
 

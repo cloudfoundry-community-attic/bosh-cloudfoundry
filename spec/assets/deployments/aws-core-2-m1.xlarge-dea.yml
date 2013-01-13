@@ -352,4 +352,4 @@ properties:
         configuration: 
           capacity: 200
   dea: 
-    max_memory: 512
+    max_memory: 15060

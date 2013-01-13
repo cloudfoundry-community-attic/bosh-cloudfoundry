@@ -40,8 +40,10 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
       system_config.aws_security_group
     )
 
-    add_core_jobs(manifest, dea_config.jobs_to_add_to_core_server)
-    merge_properties(manifest, dea_config.deployment_manifest_properties)
+    dea_config.add_core_jobs_to_manifest(manifest)
+    dea_config.add_resource_pools_to_manifest(manifest)
+    dea_config.add_jobs_to_manifest(manifest)
+    dea_config.merge_manifest_properties(manifest)
 
     chdir system_config.system_dir do
       mkdir_p("deployments")
@@ -364,13 +366,4 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
        "dea"=>{"max_memory"=>512}}}
   end
 
-  # Adds additional cf-release jobs into the core server (the core job in the manifest)
-  def add_core_jobs(manifest, extra_core_jobs=[])
-    @core_job ||= manifest["jobs"].find { |job| job["name"] == "core" }
-    @core_job["template"].push(*extra_core_jobs)
-  end
-
-  def merge_properties(manifest, extra_properties)
-    manifest["properties"].merge(extra_properties)
-  end
 end
