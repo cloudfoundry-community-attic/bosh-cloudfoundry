@@ -170,7 +170,7 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
         "resource_pool"=>"core",
         "networks"=>
          [{"name"=>"default", "default"=>["dns", "gateway"]},
-          {"name"=>"vip_network", "static_ips"=>["1.2.3.4"]}],
+          {"name"=>"vip_network", "static_ips"=>[core_ip]}],
         "persistent_disk"=>common_persistent_disk}],
      "properties"=>
       {"domain"=>"mycompany.com",
@@ -179,18 +179,18 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
        "router"=>
         {"client_inactivity_timeout"=>600,
          "app_inactivity_timeout"=>600,
-         "local_route"=>"1.2.3.4",
+         "local_route"=>core_ip,
          "status"=>
           {"port"=>8080, "user"=>"router", "password"=>"c1oudc0wc1oudc0w"}},
        "nats"=>
         {"user"=>"nats",
          "password"=>"c1oudc0wc1oudc0w",
-         "address"=>"1.2.3.4",
+         "address"=>core_ip,
          "port"=>4222},
        "db"=>"ccdb",
        "ccdb"=>
         {"template"=>"postgres",
-         "address"=>"1.2.3.4",
+         "address"=>core_ip,
          "port"=>2544,
          "databases"=>
           [{"tag"=>"cc", "name"=>"appcloud"},
@@ -222,46 +222,46 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
          "service_extension"=>{"service_lifecycle"=>{"max_upload_size"=>5}},
          "use_nginx"=>false},
        "mysql_gateway"=>
-        {"ip_route"=>"1.2.3.4",
+        {"ip_route"=>core_ip,
          "token"=>"TOKEN",
          "supported_versions"=>["5.1"],
          "version_aliases"=>{"current"=>"5.1"}},
        "mysql_node"=>
-        {"ip_route"=>"1.2.3.4",
+        {"ip_route"=>core_ip,
          "available_storage"=>2048,
          "password"=>"c1oudc0wc1oudc0w",
          "max_db_size"=>256,
          "supported_versions"=>["5.1"],
          "default_version"=>"5.1"},
        "redis_gateway"=>
-        {"ip_route"=>"1.2.3.4",
+        {"ip_route"=>core_ip,
          "token"=>"TOKEN",
          "supported_versions"=>["2.2"],
          "version_aliases"=>{"current"=>"2.2"}},
        "redis_node"=>
-        {"ip_route"=>"1.2.3.4",
+        {"ip_route"=>core_ip,
          "available_memory"=>256,
          "supported_versions"=>["2.2"],
          "default_version"=>"2.2"},
        "mongodb_gateway"=>
-        {"ip_route"=>"1.2.3.4",
+        {"ip_route"=>core_ip,
          "token"=>"TOKEN",
          "supported_versions"=>["1.8", "2.0"],
          "version_aliases"=>{"current"=>"2.0", "deprecated"=>"1.8"}},
        "mongodb_node"=>
-        {"ip_route"=>"1.2.3.4",
+        {"ip_route"=>core_ip,
          "available_memory"=>256,
          "supported_versions"=>["1.8", "2.0"],
          "default_version"=>"1.8"},
        "postgresql_gateway"=>
-        {"ip_route"=>"1.2.3.4",
+        {"ip_route"=>core_ip,
          "admin_user"=>"psql_admin",
          "admin_passwd_hash"=>nil,
          "token"=>"TOKEN",
          "supported_versions"=>["9.0"],
          "version_aliases"=>{"current"=>"9.0"}},
        "postgresql_node"=>
-        {"ip_route"=>"1.2.3.4",
+        {"ip_route"=>core_ip,
          "admin_user"=>"psql_admin",
          "admin_passwd_hash"=>nil,
          "available_storage"=>2048,
@@ -272,7 +272,7 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
        "postgresql_server"=>{"max_connections"=>30, "listen_address"=>"0.0.0.0"},
        "acm"=>{"user"=>"acm", "password"=>"c1oudc0wc1oudc0w"},
        "acmdb"=>
-        {"address"=>"1.2.3.4",
+        {"address"=>core_ip,
          "port"=>2544,
          "roles"=>
           [{"tag"=>"admin", "name"=>"acm", "password"=>"c1oudc0wc1oudc0w"}],
@@ -285,13 +285,13 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
          "upload_file_expire_time"=>600,
          "purge_expired_interval"=>30},
        "service_lifecycle"=>
-        {"download_url"=>"1.2.3.4",
+        {"download_url"=>core_ip,
          "mount_point"=>"/var/vcap/service_lifecycle",
          "tmp_dir"=>"/var/vcap/service_lifecycle/tmp_dir",
          "resque"=>
-          {"host"=>"1.2.3.4", "port"=>3456, "password"=>"c1oudc0wc1oudc0w"},
-         "nfs_server"=>{"address"=>"1.2.3.4", "export_dir"=>"/cfsnapshot"},
-         "serialization_data_server"=>["1.2.3.4"]},
+          {"host"=>core_ip, "port"=>3456, "password"=>"c1oudc0wc1oudc0w"},
+         "nfs_server"=>{"address"=>core_ip, "export_dir"=>"/cfsnapshot"},
+         "serialization_data_server"=>[core_ip]},
        "stager"=>
         {"max_staging_duration"=>120,
          "max_active_tasks"=>20,
@@ -304,13 +304,13 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
          "port"=>8100,
          "catalina_opts"=>"-Xmx128m -Xms30m -XX:MaxPermSize=128m"},
        "uaadb"=>
-        {"address"=>"1.2.3.4",
+        {"address"=>core_ip,
          "port"=>2544,
          "roles"=>
           [{"tag"=>"admin", "name"=>"uaa", "password"=>"c1oudc0wc1oudc0w"}],
          "databases"=>[{"tag"=>"uaa", "name"=>"uaa"}]},
        "vcap_redis"=>
-        {"address"=>"1.2.3.4",
+        {"address"=>core_ip,
          "port"=>3456,
          "password"=>"c1oudc0wc1oudc0w",
          "maxmemory"=>500000000},
