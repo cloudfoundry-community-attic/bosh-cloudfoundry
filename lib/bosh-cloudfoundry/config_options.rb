@@ -254,7 +254,7 @@ module Bosh::CloudFoundry::ConfigOptions
       err "Please set core_ip configuration for non-interactive mode"
     end
 
-    system_config.core_ip = ask("Main public IP address (e.g. 10.22.22.22): ")
+    system_config.core_ip = ask("Main public IP address (e.g. 10.22.22.22): ").to_s
     system_config.save
     system_config.core_ip
   end
@@ -265,7 +265,7 @@ module Bosh::CloudFoundry::ConfigOptions
       err "Please set root_dns configuration for non-interactive mode"
     end
 
-    system_config.root_dns = ask("Root DNS (e.g. mycompany.com): ")
+    system_config.root_dns = ask("Root DNS (e.g. mycompany.com): ").to_s
     system_config.save
     system_config.root_dns
   end
@@ -278,7 +278,7 @@ module Bosh::CloudFoundry::ConfigOptions
     server_flavor = ask("Server flavor for core of CloudFoundry? ") do |q|
       q.default = default_core_server_flavor
     end
-    system_config.core_server_flavor = server_flavor
+    system_config.core_server_flavor = server_flavor.to_s
     system_config.save
     system_config.core_server_flavor
   end
@@ -293,7 +293,7 @@ module Bosh::CloudFoundry::ConfigOptions
       q.default = git_email if git_email.size > 0
     end
     admin_emails = admin_email_list.split(",")
-    system_config.admin_emails = admin_emails
+    system_config.admin_emails = admin_emails.to_s
     system_config.save
     system_config.admin_emails
   end

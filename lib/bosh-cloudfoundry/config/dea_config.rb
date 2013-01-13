@@ -18,8 +18,8 @@ class Bosh::CloudFoundry::Config::DeaConfig
   end
 
   def update_count_and_flavor(server_count, server_flavor)
-    self.dea_server_count = server_count
-    self.dea_server_flavor = server_flavor
+    self.dea_server_count = server_count.to_i
+    self.dea_server_flavor = server_flavor.to_s
     self.save
   end
 
