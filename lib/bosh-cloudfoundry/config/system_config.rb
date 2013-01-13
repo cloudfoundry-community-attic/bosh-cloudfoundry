@@ -35,6 +35,7 @@ class Bosh::CloudFoundry::Config::SystemConfig < Bosh::Cli::Config
     :common_persistent_disk, # e.g. 16192 (integer in Mb)
     :admin_emails,     # e.g. ['drnic@starkandwayne.com']
     :dea,              # e.g. { "count" => 2, "flavor" => "m1.large" }
+    :postgresql,       # e.g. [{ "count" => 2, "flavor" => "m1.large", "plan" => "free" }]
     :aws_security_group # e.g. "default"
   ].each do |attr|
     define_method attr do

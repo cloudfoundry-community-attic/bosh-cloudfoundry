@@ -59,7 +59,21 @@ describe Bosh::CloudFoundry::SystemDeploymentManifestRenderer do
                     spec_asset("deployments/aws-core-2-m1.xlarge-dea.yml"))
       end
     end
-    # it "renders a simple system + postgresql into a deployment manifest"
+
+    it "renders a simple system + postgresql into a deployment manifest" do
+      @system_config.postgresql = [
+        { "count" => 1, "flavor" => "m1.xlarge", "plan" =>"free" },
+        { "count" => 2, "flavor" => "m1.small", "plan" =>"free" },
+      ]
+      @renderer.perform
+    
+      chdir(@system_config.system_dir) do
+        File.should be_exist("deployments/production-core.yml")
+        files_match("deployments/production-core.yml",
+                    spec_asset("deployments/aws-core-1-m1.xlarge-free-postgresql-2-m1.small-free-postgresql.yml"))
+      end
+    end
+
     # it "renders a simple system + postgresql + redis into a deployment manifest"
   end
 end
