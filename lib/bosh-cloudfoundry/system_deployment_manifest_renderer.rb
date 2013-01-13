@@ -181,10 +181,10 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
          "app_inactivity_timeout"=>600,
          "local_route"=>core_ip,
          "status"=>
-          {"port"=>8080, "user"=>"router", "password"=>"c1oudc0wc1oudc0w"}},
+          {"port"=>8080, "user"=>"router", "password"=>common_password}},
        "nats"=>
         {"user"=>"nats",
-         "password"=>"c1oudc0wc1oudc0w",
+         "password"=>common_password,
          "address"=>core_ip,
          "port"=>4222},
        "db"=>"ccdb",
@@ -197,13 +197,13 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
            {"tag"=>"acm", "name"=>"acm"},
            {"tag"=>"uaa", "name"=>"uaa"}],
          "roles"=>
-          [{"name"=>"root", "password"=>"c1oudc0wc1oudc0w", "tag"=>"admin"},
-           {"name"=>"acm", "password"=>"c1oudc0wc1oudc0w", "tag"=>"acm"},
-           {"name"=>"uaa", "password"=>"c1oudc0wc1oudc0w", "tag"=>"uaa"}]},
+          [{"name"=>"root", "password"=>common_password, "tag"=>"admin"},
+           {"name"=>"acm", "password"=>common_password, "tag"=>"acm"},
+           {"name"=>"uaa", "password"=>common_password, "tag"=>"uaa"}]},
        "cc"=>
         {"description"=>"Cloud Foundry",
          "srv_api_uri"=>"http://api.mycompany.com",
-         "password"=>"c1oudc0wc1oudc0w",
+         "password"=>common_password,
          "token"=>"TOKEN",
          "allow_debug"=>true,
          "allow_registration"=>true,
@@ -214,7 +214,7 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
           {"memory"=>2048, "app_uris"=>32, "services"=>16, "apps"=>16},
          "new_stager_percent"=>100,
          "staging_upload_user"=>"vcap",
-         "staging_upload_password"=>"c1oudc0wc1oudc0w",
+         "staging_upload_password"=>common_password,
          "uaa"=>
           {"enabled"=>true,
            "resource_id"=>"cloud_controller",
@@ -229,7 +229,7 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
        "mysql_node"=>
         {"ip_route"=>core_ip,
          "available_storage"=>2048,
-         "password"=>"c1oudc0wc1oudc0w",
+         "password"=>common_password,
          "max_db_size"=>256,
          "supported_versions"=>["5.1"],
          "default_version"=>"5.1"},
@@ -270,12 +270,12 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
          "supported_versions"=>["9.0"],
          "default_version"=>"9.0"},
        "postgresql_server"=>{"max_connections"=>30, "listen_address"=>"0.0.0.0"},
-       "acm"=>{"user"=>"acm", "password"=>"c1oudc0wc1oudc0w"},
+       "acm"=>{"user"=>"acm", "password"=>common_password},
        "acmdb"=>
         {"address"=>core_ip,
          "port"=>2544,
          "roles"=>
-          [{"tag"=>"admin", "name"=>"acm", "password"=>"c1oudc0wc1oudc0w"}],
+          [{"tag"=>"admin", "name"=>"acm", "password"=>common_password}],
          "databases"=>[{"tag"=>"acm", "name"=>"acm"}]},
        "serialization_data_server"=>
         {"upload_token"=>"TOKEN",
@@ -289,7 +289,7 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
          "mount_point"=>"/var/vcap/service_lifecycle",
          "tmp_dir"=>"/var/vcap/service_lifecycle/tmp_dir",
          "resque"=>
-          {"host"=>core_ip, "port"=>3456, "password"=>"c1oudc0wc1oudc0w"},
+          {"host"=>core_ip, "port"=>3456, "password"=>common_password},
          "nfs_server"=>{"address"=>core_ip, "export_dir"=>"/cfsnapshot"},
          "serialization_data_server"=>[core_ip]},
        "stager"=>
@@ -300,19 +300,19 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
         {"cc"=>{"token_secret"=>"TOKEN_SECRET", "client_secret"=>"CLIENT_SECRET"},
          "admin"=>{"client_secret"=>"CLIENT_SECRET"},
          "login"=>{"client_secret"=>"CLIENT_SECRET"},
-         "batch"=>{"username"=>"uaa", "password"=>"c1oudc0wc1oudc0w"},
+         "batch"=>{"username"=>"uaa", "password"=>common_password},
          "port"=>8100,
          "catalina_opts"=>"-Xmx128m -Xms30m -XX:MaxPermSize=128m"},
        "uaadb"=>
         {"address"=>core_ip,
          "port"=>2544,
          "roles"=>
-          [{"tag"=>"admin", "name"=>"uaa", "password"=>"c1oudc0wc1oudc0w"}],
+          [{"tag"=>"admin", "name"=>"uaa", "password"=>common_password}],
          "databases"=>[{"tag"=>"uaa", "name"=>"uaa"}]},
        "vcap_redis"=>
         {"address"=>core_ip,
          "port"=>3456,
-         "password"=>"c1oudc0wc1oudc0w",
+         "password"=>common_password,
          "maxmemory"=>500000000},
        "service_plans"=>
         {"mysql"=>
