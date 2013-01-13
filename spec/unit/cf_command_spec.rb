@@ -151,7 +151,7 @@ describe Bosh::Cli::Command::Base do
       cmd.common_config.stemcells_dir = @stemcells_dir
 
       cmd.system.should be_nil
-      cmd.new_system("production")
+      cmd.prepare_system("production")
 
       # expected from generate_new_system via Command#render_system
       mkdir_p(File.join(cmd.system, "deployments"))

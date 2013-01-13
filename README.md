@@ -31,7 +31,7 @@ export TMPDIR=/var/vcap/store/tmp
 bosh cf upload stemcell --custom
 bosh cf upload release --edge
 
-bosh cf create system production
+bosh cf prepare system production
 # prompts for a DNS host for your CloudFoundry, such as mycompany.com
 bosh cf change deas 1
 bosh cf add service postgresql 1
@@ -45,7 +45,7 @@ The tool is very simple to use and to get CloudFoundry deployed on a small set o
 
 ```
 gem install bosh-cloudfoundry
-bosh cf create system demo
+bosh cf prepare system demo
 bosh cf deploy
 ```
 
@@ -60,14 +60,14 @@ bosh-bootstrap ssh
 # now on the inception VM
 gem install bosh-cloudfoundry
 export TMPDIR=/var/vcap/store/tmp
-bosh cf create system production
+bosh cf prepare system production
 # prompts for a DNS host for your CloudFoundry, such as mycompany.com
 bosh cf change deas 1
 bosh cf add service postgresql 1
 bosh deploy
 ```
 
-During `bosh cf create system production`, it will automatically upload the latest release of CloudFoundry (the latest final [BOSH release](http://github.com/cloudfoundry/cf-release)) and the latest stable stemcell (becomes the base AMI for AWS, for example).
+During `bosh cf prepare system production`, it will automatically upload the latest release of CloudFoundry (the latest final [BOSH release](http://github.com/cloudfoundry/cf-release)) and the latest stable stemcell (becomes the base AMI for AWS, for example).
 
 NOTE: `export TMPDIR=/var/vcap/store/tmp` tells the upload process to use the larger mounted volume at `/var/vcap/store`. 
 
@@ -102,7 +102,7 @@ cf upload release [--edge]
 cf deploy 
     deploy CloudFoundry system or apply any changes 
 
-cf create system [<name>] [--core-ip ip] [--root-dns dns] 
+cf prepare system [<name>] [--core-ip ip] [--root-dns dns] 
                  [--core-server-flavor flavor] [--cf-release name] [--skip-validations] 
     create CloudFoundry system 
     --core-ip ip                Static IP for CloudController/router, e.g. 1.2.3.4 

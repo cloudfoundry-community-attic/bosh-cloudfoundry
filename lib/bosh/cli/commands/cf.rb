@@ -55,7 +55,7 @@ module Bosh::Cli::Command
       end
     end
 
-    usage "cf create system"
+    usage "cf prepare system"
     desc "create CloudFoundry system"
     option "--core-ip ip", String, "Static IP for CloudController/router, e.g. 1.2.3.4"
     option "--root-dns dns", String, "Base DNS for CloudFoundry applications, e.g. vcap.me"
@@ -71,9 +71,9 @@ module Bosh::Cli::Command
       "Version of BOSH stemcell within target BOSH. Default: determines latest for stemcell"
     option "--admin-emails email1,email2", Array, "Admin email accounts in created CloudFoundry"
     option "--skip-validations", "Skip all validations"
-    def new_system(name=nil)
+    def prepare_system(name=nil)
       confirm_or_prompt_all_defaults
-      prepare_system(name)
+      setup_system_dir(name)
       confirm_or_prompt_for_system_requirements
       render_system
     end
@@ -151,7 +151,7 @@ module Bosh::Cli::Command
     # The +system_config+ configuration does not work until
     # a system folder is created and targeted so that a
     # local configuration manifest can be stored (SystemConfig)
-    def prepare_system(name)
+    def setup_system_dir(name)
       system_dir = File.join(base_systems_dir, name)
       unless File.directory?(system_dir)
         say "Creating new system #{name} directory"
