@@ -292,8 +292,8 @@ module Bosh::CloudFoundry::ConfigOptions
       git_email = `git config user.email`.strip
       q.default = git_email if git_email.size > 0
     end
-    admin_emails = admin_email_list.split(",")
-    system_config.admin_emails = admin_emails.to_s
+    admin_emails = admin_email_list.to_s.split(",")
+    system_config.admin_emails = admin_emails
     system_config.save
     system_config.admin_emails
   end
