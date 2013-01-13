@@ -3,35 +3,47 @@
 module Bosh; module CloudFoundry; module Config; end; end; end
 
 class Bosh::CloudFoundry::Config::DeaConfig
-  attr_reader :count, :flavor
 
-  def initialize(count, flavor, bosh_provider_name)
-    @count, @flavor, @bosh_provider_name = count, flavor, bosh_provider_name
+  def initialize(system_config)
+    @system_config = system_config
   end
 
   def self.build_from_system_config(system_config)
-    bosh_provider = system_config.bosh_provider
-    if dea_config = system_config.dea
-      count = dea_config["count"] || dea_config[:count]
-      flavor = dea_config["flavor"] || dea_config[:flavor]
-    else
-      count = 0
-      flavor = nil
-    end
-    new(count, flavor, bosh_provider)
+    system_config.dea ||= {}
+    new(system_config)
   end
 
+  def bosh_provider_name
+    @system_config.bosh_provider
+  end
+  
   # Determine ow many DEA servers are required
   # based on the system configuration
   def dea_server_count
-    @count
+    @system_config.dea[:count] || 0
+  end
+
+  def dea_server_count=(count)
+    @system_config.dea[:count] = count
+  end
+
+  def dea_server_flavor
+    @system_config.dea[:flavor]
+  end
+
+  def dea_server_flavor=(flavor)
+    @system_config.dea[:flavor] = flavor
+  end
+
+  def save
+    @system_config.save
   end
 
   # @returns [Array] of strings representing 0+ job templates to
   # include in the "core" server of colocated jobs in the
   # generated deployment manifest
   def jobs_to_add_to_core_server
-    if @count == 0
+    if dea_server_count == 0
       %w[dea]
     else
       []
@@ -47,7 +59,7 @@ class Bosh::CloudFoundry::Config::DeaConfig
   end
 
   def max_memory
-    if @count == 0
+    if dea_server_count == 0
       512
     else
       max_memory_for_dedicated_dea
@@ -65,11 +77,11 @@ class Bosh::CloudFoundry::Config::DeaConfig
   end
 
   def ram_for_server_flavor
-    provider.ram_for_server_flavor(flavor)
+    provider.ram_for_server_flavor(dea_server_flavor)
   end
 
   # a helper object for the target BOSH provider
   def provider
-    @provider ||= Bosh::CloudFoundry::Providers.for_bosh_provider_name(@bosh_provider_name)
+    @provider ||= Bosh::CloudFoundry::Providers.for_bosh_provider_name(bosh_provider_name)
   end
 end

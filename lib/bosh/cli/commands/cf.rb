@@ -112,10 +112,10 @@ module Bosh::Cli::Command
     usage "cf change deas"
     desc "change the number/flavor of DEA servers (servers that run CF apps)"
     option "--flavor flavor", String, "Change flavor of all DEA servers"
-    def change_deas(additional_count=1)
+    def change_deas(server_count="1")
       confirm_system
 
-      server_count = additional_count.to_i # TODO nicer integer validation
+      server_count = server_count.to_i # TODO nicer integer validation
       if server_count <= 0
         say "Additional server count (#{server_count}) was less that 1, defaulting to 1"
         server_count = 1
@@ -134,7 +134,10 @@ module Bosh::Cli::Command
       end
       validate_compute_flavor(server_flavor)
 
-      # TODO set DEA count/flavor in SystemConfig
+      dea_config = Bosh::CloudFoundry::Config::DeaConfig.build_from_system_config(system_config)
+      dea_config.dea_server_count = server_count
+      dea_config.dea_server_flavor = server_flavor
+      dea_config.save
 
       render_system
     end

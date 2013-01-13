@@ -168,8 +168,10 @@ describe Bosh::Cli::Command::Base do
       @cmd.should_receive(:render_system)
 
       @cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
-      @cmd.add_option(:flavor, 'm1.large')
+      @cmd.add_option(:flavor, 'm1.xlarge')
       @cmd.change_deas(3)
+
+      @cmd.system_config.dea.should == { count: 3, flavor: 'm1.xlarge' }
     end
 
     it "fails for unknown service" do
