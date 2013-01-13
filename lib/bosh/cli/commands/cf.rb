@@ -267,8 +267,13 @@ module Bosh::Cli::Command
     #     Else if stemcell_version not set, then set to latest stemcell
     def confirm_or_upload_stemcell
       unless latest_bosh_stemcell_version
-        say "There are no stemcells available in BOSH yet, so uploading one..."
-        upload_stemcell
+        if stemcell_name == DEFAULT_STEMCELL_NAME
+          say "Attempting to upload stemcell #{stemcell_name}..."
+          upload_stemcell
+        else
+          say "Please first upload stemcell #{stemcell_name} or change to default stemcell #{DEFAULT_STEMCELL_NAME}"
+          exit 1
+        end
       end
       unless stemcell_version && stemcell_version.size
         system_config.stemcell_version = latest_bosh_stemcell_version
@@ -307,8 +312,13 @@ module Bosh::Cli::Command
     # Largest version number BOSH stemcell ("bosh-stemcell")
     # @return [String] version number, e.g. "0.6.7"
     def latest_bosh_stemcell_version
-      say "Available BOSH stemcells '#{stemcell_name}: #{bosh_stemcell_versions.join(', ')}"
-      bosh_stemcell_versions.last
+      if bosh_stemcell_versions.size > 0
+        say "Available BOSH stemcells '#{stemcell_name}': #{bosh_stemcell_versions.join(', ')}"
+        bosh_stemcell_versions.last
+      else
+        say "No stemcells '#{stemcell_name}' uploaded yet"
+        nil
+      end
     end
 
     # Creates/downloads a stemcell; then uploads it to target BOSH
