@@ -271,6 +271,7 @@ module Bosh::Cli::Command
           say "Stemcell #{stemcell_name} #{stemcell_version} no longer exists on BOSH, choosing another..."
           system_config.stemcell_version = nil
         else
+          say "Using stemcell #{stemcell_name} #{stemcell_version}".green
           return
         end
       end
@@ -292,7 +293,7 @@ module Bosh::Cli::Command
         system_config.stemcell_version = latest_bosh_stemcell_version
         system_config.save
       end
-      say "Using stemcell version #{stemcell_version}".green
+      say "Using stemcell #{stemcell_name} #{stemcell_version}".green
     end
     
 
