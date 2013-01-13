@@ -16,7 +16,13 @@ class Bosh::CloudFoundry::Config::DeaConfig
   def bosh_provider_name
     @system_config.bosh_provider
   end
-  
+
+  def update_count_and_flavor(server_count, server_flavor)
+    self.dea_server_count = server_count
+    self.dea_server_flavor = server_flavor
+    self.save
+  end
+
   # Determine ow many DEA servers are required
   # based on the system configuration
   def dea_server_count

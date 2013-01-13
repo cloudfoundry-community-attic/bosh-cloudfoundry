@@ -135,9 +135,7 @@ module Bosh::Cli::Command
       validate_compute_flavor(server_flavor)
 
       dea_config = Bosh::CloudFoundry::Config::DeaConfig.build_from_system_config(system_config)
-      dea_config.dea_server_count = server_count
-      dea_config.dea_server_flavor = server_flavor
-      dea_config.save
+      dea_config.update_count_and_flavor(server_count, server_flavor)
 
       render_system
     end

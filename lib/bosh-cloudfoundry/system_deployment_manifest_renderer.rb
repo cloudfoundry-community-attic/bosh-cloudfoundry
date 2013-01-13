@@ -88,7 +88,7 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
   #   'instance_type: m1.large'
   def cloud_properties_for_server_flavor(server_flavor)
     if aws?
-      "instance_type: #{server_flavor}"
+      { "instance_type" => server_flavor }
     else
       raise 'Please implement #{self.class}#cloud_properties_for_server_flavor'
     end
@@ -149,7 +149,7 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
         "network"=>"default",
         "size"=>1,
         "stemcell"=>{"name"=>stemcell_name, "version"=>stemcell_version},
-        "cloud_properties"=>{"instance_type"=>"m1.small"},
+        "cloud_properties"=>core_cloud_properties,
         "persistent_disk"=>common_persistent_disk}],
      "jobs"=>
       [{"name"=>"core",
