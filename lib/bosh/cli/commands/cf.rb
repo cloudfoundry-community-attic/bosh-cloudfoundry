@@ -308,7 +308,6 @@ module Bosh::Cli::Command
     # @return [String] version number, e.g. "0.6.7"
     def latest_bosh_stemcell_version
       say "Available BOSH stemcells '#{stemcell_name}: #{bosh_stemcell_versions.join(', ')}"
-      say "Defaulting to #{bosh_stemcell_versions.last}".green
       bosh_stemcell_versions.last
     end
 

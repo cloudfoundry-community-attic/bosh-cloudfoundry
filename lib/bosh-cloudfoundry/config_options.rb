@@ -49,6 +49,7 @@ module Bosh::CloudFoundry::ConfigOptions
       system_config.stemcell_name ||= DEFAULT_STEMCELL_NAME
       system_config.common_password = generate_random_password
       system_config.common_persistent_disk = DEFAULT_COMMONT_PERSISTENT_DISK
+      system_config.aws_security_group = "default" # TODO create one with right ports
       system_config.save
       system_config
     end
