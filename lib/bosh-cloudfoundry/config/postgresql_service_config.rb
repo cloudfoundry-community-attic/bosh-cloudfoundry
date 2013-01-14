@@ -31,10 +31,10 @@ class Bosh::CloudFoundry::Config::PostgresqlServiceConfig
   end
 
   def update_cluster_count_for_flavor(server_count, server_flavor, server_plan="free")
-    if cluster = find_cluster_for_flavor(server_flavor)
+    if cluster = find_cluster_for_flavor(server_flavor.to_s)
       cluster["count"] = server_count
     else
-      config << {"count" => server_count, "flavor" => server_flavor, "plan" => server_plan}
+      config << {"count" => server_count, "flavor" => server_flavor.to_s, "plan" => server_plan}
     end
     self.save
   end

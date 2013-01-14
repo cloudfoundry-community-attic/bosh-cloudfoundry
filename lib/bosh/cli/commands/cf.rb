@@ -87,7 +87,7 @@ module Bosh::Cli::Command
         unless server_flavor
           server_flavor = ask("Flavor of server for #{service_name} service nodes? ") do |q|
             q.default = default_service_server_flavor(service_name)
-          end.to_s
+          end
         end
       end
       unless server_flavor && server_flavor
