@@ -38,6 +38,22 @@ bosh cf add service postgresql 1
 bosh deploy
 ```
 
+Overtime, as you add more DEAs and other service nodes, your set of VMs might look like:
+
+```
+$ bosh vms
++-----------------------------+---------+---------------------------+-----------------------------+
+| Job/index                   | State   | Resource Pool             | IPs                         |
++-----------------------------+---------+---------------------------+-----------------------------+
+| core/0                      | running | core                      | 10.4.70.116, 54.235.200.165 |
+| dea/0                       | running | dea                       | 10.4.49.7                   |
+| dea/1                       | running | dea                       | 10.111.39.12                |
+| postgresql_m1_medium_free/0 | running | postgresql_m1_medium_free | 10.4.71.164                 |
+| postgresql_m1_small_free/0  | running | postgresql_m1_small_free  | 10.110.83.128               |
+| postgresql_m1_small_free/1  | running | postgresql_m1_small_free  | 10.189.103.26               |
++-----------------------------+---------+---------------------------+-----------------------------+
+```
+
 
 ## Usage
 
