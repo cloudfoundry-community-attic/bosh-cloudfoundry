@@ -134,69 +134,6 @@ properties:
       service_lifecycle: 
         max_upload_size: 5
     use_nginx: false
-  mysql_gateway: 
-    ip_route: 1.2.3.4
-    token: TOKEN
-    supported_versions: 
-    - "5.1"
-    version_aliases: 
-      current: "5.1"
-  mysql_node: 
-    ip_route: 1.2.3.4
-    available_storage: 2048
-    password: c1oudc0wc1oudc0w
-    max_db_size: 256
-    supported_versions: 
-    - "5.1"
-    default_version: "5.1"
-  redis_gateway: 
-    ip_route: 1.2.3.4
-    token: TOKEN
-    supported_versions: 
-    - "2.2"
-    version_aliases: 
-      current: "2.2"
-  redis_node: 
-    ip_route: 1.2.3.4
-    available_memory: 256
-    supported_versions: 
-    - "2.2"
-    default_version: "2.2"
-  mongodb_gateway: 
-    ip_route: 1.2.3.4
-    token: TOKEN
-    supported_versions: 
-    - "1.8"
-    - "2.0"
-    version_aliases: 
-      current: "2.0"
-      deprecated: "1.8"
-  mongodb_node: 
-    ip_route: 1.2.3.4
-    available_memory: 256
-    supported_versions: 
-    - "1.8"
-    - "2.0"
-    default_version: "1.8"
-  postgresql_gateway: 
-    ip_route: 1.2.3.4
-    admin_user: psql_admin
-    admin_passwd_hash: 
-    token: TOKEN
-    supported_versions: 
-    - "9.0"
-    version_aliases: 
-      current: "9.0"
-  postgresql_node: 
-    ip_route: 1.2.3.4
-    admin_user: psql_admin
-    admin_passwd_hash: 
-    available_storage: 2048
-    max_db_size: 256
-    max_long_tx: 30
-    supported_versions: 
-    - "9.0"
-    default_version: "9.0"
   postgresql_server: 
     max_connections: 30
     listen_address: 0.0.0.0
@@ -266,73 +203,7 @@ properties:
     port: 3456
     password: c1oudc0wc1oudc0w
     maxmemory: 500000000
-  service_plans: 
-    mysql: 
-      free: 
-        job_management: 
-          high_water: 1400
-          low_water: 100
-        configuration: 
-          allow_over_provisioning: true
-          capacity: 200
-          max_db_size: 128
-          max_long_query: 3
-          max_long_tx: 30
-          max_clients: 20
-          backup: 
-            enable: true
-    postgresql: 
-      free: 
-        job_management: 
-          high_water: 1400
-          low_water: 100
-        configuration: 
-          capacity: 200
-          max_db_size: 128
-          max_long_query: 3
-          max_long_tx: 30
-          max_clients: 20
-          backup: 
-            enable: true
-    mongodb: 
-      free: 
-        job_management: 
-          high_water: 3000
-          low_water: 100
-        configuration: 
-          allow_over_provisioning: true
-          capacity: 200
-          quota_files: 4
-          max_clients: 500
-          backup: 
-            enable: true
-    rabbit: 
-      free: 
-        job_management: 
-          low_water: 100
-          high_water: 1400
-        configuration: 
-          max_memory_factor: 0.5
-          max_clients: 512
-          capacity: 200
-    redis: 
-      free: 
-        job_management: 
-          high_water: 1400
-          low_water: 100
-        configuration: 
-          capacity: 200
-          max_memory: 16
-          max_swap: 32
-          max_clients: 500
-          backup: 
-            enable: true
-    vblob: 
-      free: 
-        job_management: 
-          low_water: 100
-          high_water: 1400
-        configuration: 
-          capacity: 200
+  service_plans: {}
+
   dea: 
     max_memory: 512

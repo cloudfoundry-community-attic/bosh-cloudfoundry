@@ -81,7 +81,7 @@ jobs:
   persistent_disk: 16192
 - name: postgresql_m1_xlarge_free
   template: 
-  - dea
+  - postgresql_node
   instances: 1
   resource_pool: postgresql_m1_xlarge_free
   networks: 
@@ -91,7 +91,7 @@ jobs:
     - gateway
 - name: postgresql_m1_small_free
   template: 
-  - dea
+  - postgresql_node
   instances: 2
   resource_pool: postgresql_m1_small_free
   networks: 
@@ -171,6 +171,9 @@ properties:
       service_lifecycle: 
         max_upload_size: 5
     use_nginx: false
+  postgresql_server: 
+    max_connections: 30
+    listen_address: 0.0.0.0
   acm: 
     user: acm
     password: c1oudc0wc1oudc0w
@@ -272,6 +275,3 @@ properties:
     supported_versions: 
     - "9.0"
     default_version: "9.0"
-  postgresql_server: 
-    max_connections: 30
-    listen_address: 0.0.0.0

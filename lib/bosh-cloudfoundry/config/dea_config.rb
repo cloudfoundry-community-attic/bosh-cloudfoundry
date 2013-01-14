@@ -46,12 +46,10 @@ class Bosh::CloudFoundry::Config::DeaConfig
   end
 
   # Adds additional cf-release jobs into the core server (the core job in the manifest)
-  def add_core_jobs_to_manifest(manifest, extra_core_jobs=[])
-    @core_job ||= manifest["jobs"].find { |job| job["name"] == "core" }
+  def add_core_jobs_to_manifest(manifest)
     if dea_server_count == 0
+      @core_job ||= manifest["jobs"].find { |job| job["name"] == "core" }
       @core_job["template"] << "dea"
-    else
-      []
     end
   end
 

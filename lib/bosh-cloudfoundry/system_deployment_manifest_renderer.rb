@@ -45,6 +45,11 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
     dea_config.add_jobs_to_manifest(manifest)
     dea_config.merge_manifest_properties(manifest)
 
+    postgresql_service_config.add_core_jobs_to_manifest(manifest)
+    postgresql_service_config.add_resource_pools_to_manifest(manifest)
+    postgresql_service_config.add_jobs_to_manifest(manifest)
+    postgresql_service_config.merge_manifest_properties(manifest)
+
     chdir system_config.system_dir do
       mkdir_p("deployments")
       File.open("deployments/#{system_config.system_name}-core.yml", "w") do |file|
@@ -82,6 +87,11 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
 
   def dea_config
     @dea_config ||= Bosh::CloudFoundry::Config::DeaConfig.build_from_system_config(system_config)
+  end
+
+  def postgresql_service_config
+    @postgresql_service_config ||= 
+      Bosh::CloudFoundry::Config::PostgresqlServiceConfig.build_from_system_config(system_config)
   end
 
   # Converts a server flavor (such as 'm1.large' on AWS) into
@@ -221,54 +231,6 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
            "token_creation_email_filter"=>[""]},
          "service_extension"=>{"service_lifecycle"=>{"max_upload_size"=>5}},
          "use_nginx"=>false},
-       "mysql_gateway"=>
-        {"ip_route"=>core_ip,
-         "token"=>"TOKEN",
-         "supported_versions"=>["5.1"],
-         "version_aliases"=>{"current"=>"5.1"}},
-       "mysql_node"=>
-        {"ip_route"=>core_ip,
-         "available_storage"=>2048,
-         "password"=>common_password,
-         "max_db_size"=>256,
-         "supported_versions"=>["5.1"],
-         "default_version"=>"5.1"},
-       "redis_gateway"=>
-        {"ip_route"=>core_ip,
-         "token"=>"TOKEN",
-         "supported_versions"=>["2.2"],
-         "version_aliases"=>{"current"=>"2.2"}},
-       "redis_node"=>
-        {"ip_route"=>core_ip,
-         "available_memory"=>256,
-         "supported_versions"=>["2.2"],
-         "default_version"=>"2.2"},
-       "mongodb_gateway"=>
-        {"ip_route"=>core_ip,
-         "token"=>"TOKEN",
-         "supported_versions"=>["1.8", "2.0"],
-         "version_aliases"=>{"current"=>"2.0", "deprecated"=>"1.8"}},
-       "mongodb_node"=>
-        {"ip_route"=>core_ip,
-         "available_memory"=>256,
-         "supported_versions"=>["1.8", "2.0"],
-         "default_version"=>"1.8"},
-       "postgresql_gateway"=>
-        {"ip_route"=>core_ip,
-         "admin_user"=>"psql_admin",
-         "admin_passwd_hash"=>nil,
-         "token"=>"TOKEN",
-         "supported_versions"=>["9.0"],
-         "version_aliases"=>{"current"=>"9.0"}},
-       "postgresql_node"=>
-        {"ip_route"=>core_ip,
-         "admin_user"=>"psql_admin",
-         "admin_passwd_hash"=>nil,
-         "available_storage"=>2048,
-         "max_db_size"=>256,
-         "max_long_tx"=>30,
-         "supported_versions"=>["9.0"],
-         "default_version"=>"9.0"},
        "postgresql_server"=>{"max_connections"=>30, "listen_address"=>"0.0.0.0"},
        "acm"=>{"user"=>"acm", "password"=>common_password},
        "acmdb"=>
@@ -314,55 +276,7 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
          "port"=>3456,
          "password"=>common_password,
          "maxmemory"=>500000000},
-       "service_plans"=>
-        {"mysql"=>
-          {"free"=>
-            {"job_management"=>{"high_water"=>1400, "low_water"=>100},
-             "configuration"=>
-              {"allow_over_provisioning"=>true,
-               "capacity"=>200,
-               "max_db_size"=>128,
-               "max_long_query"=>3,
-               "max_long_tx"=>30,
-               "max_clients"=>20,
-               "backup"=>{"enable"=>true}}}},
-         "postgresql"=>
-          {"free"=>
-            {"job_management"=>{"high_water"=>1400, "low_water"=>100},
-             "configuration"=>
-              {"capacity"=>200,
-               "max_db_size"=>128,
-               "max_long_query"=>3,
-               "max_long_tx"=>30,
-               "max_clients"=>20,
-               "backup"=>{"enable"=>true}}}},
-         "mongodb"=>
-          {"free"=>
-            {"job_management"=>{"high_water"=>3000, "low_water"=>100},
-             "configuration"=>
-              {"allow_over_provisioning"=>true,
-               "capacity"=>200,
-               "quota_files"=>4,
-               "max_clients"=>500,
-               "backup"=>{"enable"=>true}}}},
-         "rabbit"=>
-          {"free"=>
-            {"job_management"=>{"low_water"=>100, "high_water"=>1400},
-             "configuration"=>
-              {"max_memory_factor"=>0.5, "max_clients"=>512, "capacity"=>200}}},
-         "redis"=>
-          {"free"=>
-            {"job_management"=>{"high_water"=>1400, "low_water"=>100},
-             "configuration"=>
-              {"capacity"=>200,
-               "max_memory"=>16,
-               "max_swap"=>32,
-               "max_clients"=>500,
-               "backup"=>{"enable"=>true}}}},
-         "vblob"=>
-          {"free"=>
-            {"job_management"=>{"low_water"=>100, "high_water"=>1400},
-             "configuration"=>{"capacity"=>200}}}},
+       "service_plans"=>{},
        "dea"=>{"max_memory"=>512}}}
   end
 
