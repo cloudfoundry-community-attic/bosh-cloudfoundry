@@ -192,15 +192,15 @@ describe Bosh::Cli::Command::Base do
       @cmd.add_service_node("postgresql", 4)
     end
 
-    it "add 2 redis nodes" do
-      generate_new_system
-
-      @cmd.should_receive(:render_system)
-
-      @cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
-      @cmd.add_option(:flavor, 'm1.large')
-      @cmd.add_service_node("redis", 2)
-    end
+    # it "add 2 redis nodes" do
+    #   generate_new_system
+    # 
+    #   @cmd.should_receive(:render_system)
+    # 
+    #   @cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
+    #   @cmd.add_option(:flavor, 'm1.large')
+    #   @cmd.add_service_node("redis", 2)
+    # end
 
     it "shows the common internal password" do
       generate_new_system

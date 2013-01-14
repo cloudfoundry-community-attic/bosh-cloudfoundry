@@ -80,17 +80,12 @@ module Bosh::Cli::Command
 
     usage "cf add service"
     desc "add additional CloudFoundry service node"
-    option "--flavor flavor", String, "Flavor of new serverice server"
+    option "--flavor flavor", String, "Server flavor for additional service nodes"
     def add_service_node(service_name, additional_count=1)
       confirm_system
 
       validate_service_name(service_name)
 
-      server_count = additional_count.to_i # TODO nicer integer validation
-      if server_count <= 0
-        say "Additional server count (#{server_count}) was less that 1, defaulting to 1"
-        server_count = 1
-      end
       server_flavor = options[:flavor]
       unless non_interactive?
         unless server_flavor
@@ -104,7 +99,13 @@ module Bosh::Cli::Command
       end
       validate_compute_flavor(server_flavor)
       
-      # TODO add new service nodes to SystemConfig
+      service_config = service_config(service_name)
+      flavor_cluster = service_config.find_cluster_for_flavor(server_flavor) || {}
+
+      current_count = flavor_cluster["count"] || 0
+      server_count = current_count + additional_count.to_i # TODO nicer integer validation
+      say "Changing #{service_name} #{server_flavor} from #{current_count} to #{server_count}"
+      service_config.update_cluster_count_for_flavor(server_count, server_flavor)
 
       render_system
     end
@@ -619,7 +620,16 @@ module Bosh::Cli::Command
     end
 
     def supported_services
-      %w[postgresql redis]
+      %w[postgresql]
+    end
+
+    def service_config(service_name)
+      case service_name.to_sym
+      when :postgresql
+        Bosh::CloudFoundry::Config::PostgresqlServiceConfig.build_from_system_config(system_config)
+      else
+        raise "please add #{service_name} support to #service_config method"
+      end
     end
 
     def generate_service_servers(service_name, server_count, server_flavor)
