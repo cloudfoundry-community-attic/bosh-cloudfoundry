@@ -31,7 +31,7 @@ export TMPDIR=/var/vcap/store/tmp
 bosh cf upload stemcell --custom
 bosh cf upload release --edge
 
-bosh cf prepare system production
+bosh cf prepare system production --release-name appcloud-dev
 # prompts for a DNS host for your CloudFoundry, such as mycompany.com
 bosh cf change deas 1
 bosh cf add service postgresql 1
