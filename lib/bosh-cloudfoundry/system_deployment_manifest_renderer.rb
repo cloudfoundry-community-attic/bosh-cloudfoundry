@@ -264,7 +264,8 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
          "login"=>{"client_secret"=>"CLIENT_SECRET"},
          "batch"=>{"username"=>"uaa", "password"=>common_password},
          "port"=>8100,
-         "catalina_opts"=>"-Xmx128m -Xms30m -XX:MaxPermSize=128m"},
+         "catalina_opts"=>"-Xmx128m -Xms30m -XX:MaxPermSize=128m",
+         "no_ssl"=>true},
        "uaadb"=>
         {"address"=>core_ip,
          "port"=>2544,
