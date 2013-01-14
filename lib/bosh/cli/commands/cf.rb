@@ -20,6 +20,92 @@ module Bosh::Cli::Command
       Bosh::Cli::Command::Help.list_commands(cmds)
     end
 
+    usage "cf prepare system"
+    desc "create CloudFoundry system"
+    option "--core-ip ip", String, "Static IP for CloudController/router, e.g. 1.2.3.4"
+    option "--root-dns dns", String, "Base DNS for CloudFoundry applications, e.g. vcap.me"
+    option "--core-server-flavor flavor", String,
+      "Flavor of the CloudFoundry Core server. Default: 'm1.large'"
+    option "--release-name name", String,
+      "Name of BOSH release within target BOSH. Default: 'appcloud'"
+    option "--release-version version", String,
+      "Version of target BOSH release within target BOSH. Default: 'latest'"
+    option "--stemcell-name name", String,
+      "Name of BOSH stemcell within target BOSH. Default: 'bosh-stemcell'"
+    option "--stemcell-version version", String,
+      "Version of BOSH stemcell within target BOSH. Default: determines latest for stemcell"
+    option "--admin-emails email1,email2", Array, "Admin email accounts in created CloudFoundry"
+    option "--skip-validations", "Skip all validations"
+    def prepare_system(name=nil)
+      confirm_or_prompt_all_defaults
+      setup_system_dir(name)
+      confirm_or_prompt_for_system_requirements
+      render_system
+    end
+
+    usage "cf change deas"
+    desc "change the number/flavor of DEA servers (servers that run CF apps)"
+    option "--flavor flavor", String, "Change flavor of all DEA servers"
+    def change_deas(server_count="1")
+      confirm_system
+
+      server_count = server_count.to_i # TODO nicer integer validation
+      if server_count <= 0
+        say "Additional server count (#{server_count}) was less that 1, defaulting to 1"
+        server_count = 1
+      end
+
+      server_flavor = options[:flavor]
+      unless non_interactive?
+        unless server_flavor
+          server_flavor = ask("Flavor of server for DEAs? ") do |q|
+            q.default = default_dea_server_flavor
+          end.to_s
+        end
+      end
+      unless server_flavor && server_flavor
+        err("Must provide server count and flavor values")
+      end
+      validate_compute_flavor(server_flavor)
+
+      dea_config = Bosh::CloudFoundry::Config::DeaConfig.build_from_system_config(system_config)
+      dea_config.update_count_and_flavor(server_count, server_flavor)
+
+      render_system
+    end
+
+    usage "cf add service"
+    desc "add additional CloudFoundry service node"
+    option "--flavor flavor", String, "Server flavor for additional service nodes"
+    def add_service_node(service_name, additional_count=1)
+      confirm_system
+
+      validate_service_name(service_name)
+
+      server_flavor = options[:flavor]
+      unless non_interactive?
+        unless server_flavor
+          server_flavor = ask("Flavor of server for #{service_name} service nodes? ") do |q|
+            q.default = default_service_server_flavor(service_name)
+          end.to_s
+        end
+      end
+      unless server_flavor && server_flavor
+        err("Must provide server count and flavor values")
+      end
+      validate_compute_flavor(server_flavor)
+      
+      service_config = service_config(service_name)
+      flavor_cluster = service_config.find_cluster_for_flavor(server_flavor) || {}
+
+      current_count = flavor_cluster["count"] || 0
+      server_count = current_count + additional_count.to_i # TODO nicer integer validation
+      say "Changing #{service_name} #{server_flavor} from #{current_count} to #{server_count}"
+      service_config.update_cluster_count_for_flavor(server_count, server_flavor)
+
+      render_system
+    end
+
     usage "cf upload stemcell"
     desc "download/create stemcell & upload to BOSH"
     option "--latest", "Use latest stemcell; possibly not tagged stable"
@@ -53,92 +139,6 @@ module Bosh::Cli::Command
         set_deployment(deployment)
         bosh_cmd "deploy"
       end
-    end
-
-    usage "cf prepare system"
-    desc "create CloudFoundry system"
-    option "--core-ip ip", String, "Static IP for CloudController/router, e.g. 1.2.3.4"
-    option "--root-dns dns", String, "Base DNS for CloudFoundry applications, e.g. vcap.me"
-    option "--core-server-flavor flavor", String,
-      "Flavor of the CloudFoundry Core server. Default: 'm1.large'"
-    option "--release-name name", String,
-      "Name of BOSH release within target BOSH. Default: 'appcloud'"
-    option "--release-version version", String,
-      "Version of target BOSH release within target BOSH. Default: 'latest'"
-    option "--stemcell-name name", String,
-      "Name of BOSH stemcell within target BOSH. Default: 'bosh-stemcell'"
-    option "--stemcell-version version", String,
-      "Version of BOSH stemcell within target BOSH. Default: determines latest for stemcell"
-    option "--admin-emails email1,email2", Array, "Admin email accounts in created CloudFoundry"
-    option "--skip-validations", "Skip all validations"
-    def prepare_system(name=nil)
-      confirm_or_prompt_all_defaults
-      setup_system_dir(name)
-      confirm_or_prompt_for_system_requirements
-      render_system
-    end
-
-    usage "cf add service"
-    desc "add additional CloudFoundry service node"
-    option "--flavor flavor", String, "Server flavor for additional service nodes"
-    def add_service_node(service_name, additional_count=1)
-      confirm_system
-
-      validate_service_name(service_name)
-
-      server_flavor = options[:flavor]
-      unless non_interactive?
-        unless server_flavor
-          server_flavor = ask("Flavor of server for #{service_name} service nodes? ") do |q|
-            q.default = default_service_server_flavor(service_name)
-          end
-        end
-      end
-      unless server_flavor && server_flavor
-        err("Must provide server count and flavor values")
-      end
-      validate_compute_flavor(server_flavor)
-      
-      service_config = service_config(service_name)
-      flavor_cluster = service_config.find_cluster_for_flavor(server_flavor) || {}
-
-      current_count = flavor_cluster["count"] || 0
-      server_count = current_count + additional_count.to_i # TODO nicer integer validation
-      say "Changing #{service_name} #{server_flavor} from #{current_count} to #{server_count}"
-      service_config.update_cluster_count_for_flavor(server_count, server_flavor)
-
-      render_system
-    end
-
-    usage "cf change deas"
-    desc "change the number/flavor of DEA servers (servers that run CF apps)"
-    option "--flavor flavor", String, "Change flavor of all DEA servers"
-    def change_deas(server_count="1")
-      confirm_system
-
-      server_count = server_count.to_i # TODO nicer integer validation
-      if server_count <= 0
-        say "Additional server count (#{server_count}) was less that 1, defaulting to 1"
-        server_count = 1
-      end
-
-      server_flavor = options[:flavor]
-      unless non_interactive?
-        unless server_flavor
-          server_flavor = ask("Flavor of server for DEAs? ") do |q|
-            q.default = default_dea_server_flavor
-          end
-        end
-      end
-      unless server_flavor && server_flavor
-        err("Must provide server count and flavor values")
-      end
-      validate_compute_flavor(server_flavor)
-
-      dea_config = Bosh::CloudFoundry::Config::DeaConfig.build_from_system_config(system_config)
-      dea_config.update_count_and_flavor(server_count, server_flavor)
-
-      render_system
     end
 
     usage "show password"
