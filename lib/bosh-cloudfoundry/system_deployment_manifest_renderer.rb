@@ -183,7 +183,7 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
           {"name"=>"vip_network", "static_ips"=>[core_ip]}],
         "persistent_disk"=>common_persistent_disk}],
      "properties"=>
-      {"domain"=>"mycompany.com",
+      {"domain"=>root_dns,
        "env"=>nil,
        "networks"=>{"apps"=>"default", "management"=>"default"},
        "router"=>
@@ -212,7 +212,7 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
            {"name"=>"uaa", "password"=>common_password, "tag"=>"uaa"}]},
        "cc"=>
         {"description"=>"Cloud Foundry",
-         "srv_api_uri"=>"http://api.mycompany.com",
+         "srv_api_uri"=>"http://api.#{root_dns}",
          "password"=>common_password,
          "token"=>"TOKEN",
          "allow_debug"=>true,
