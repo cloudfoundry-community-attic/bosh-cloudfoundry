@@ -252,7 +252,7 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
          "tmp_dir"=>"/var/vcap/service_lifecycle/tmp_dir",
          "resque"=>
           {"host"=>core_ip, "port"=>3456, "password"=>common_password},
-         "nfs_server"=>{"address"=>core_ip, "export_dir"=>"/cfsnapshot"},
+         # "nfs_server"=>{"address"=>core_ip, "export_dir"=>"/cfsnapshot"},
          "serialization_data_server"=>[core_ip]},
        "stager"=>
         {"max_staging_duration"=>120,

@@ -182,9 +182,6 @@ properties:
       host: 1.2.3.4
       port: 3456
       password: c1oudc0wc1oudc0w
-    nfs_server: 
-      address: 1.2.3.4
-      export_dir: /cfsnapshot
     serialization_data_server: 
     - 1.2.3.4
   stager: 
