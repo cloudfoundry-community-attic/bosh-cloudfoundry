@@ -181,6 +181,14 @@ module Bosh::CloudFoundry::ConfigOptions
     options[:bosh_git_repo] || common_config.bosh_git_repo
   end
 
+  def deployment_manifest(subsystem="core")
+    YAML.load_file(deployment_manifest_path(subsystem))
+  end
+
+  def deployment_manifest_path(subsystem="core")
+    File.join(system, "deployments", "#{system_name}-#{subsystem}.yml")
+  end
+
   # @return [String] Path to store BOSH systems (collections of deployments)
   def base_systems_dir
     @base_systems_dir ||= options[:base_systems_dir] || common_config.base_systems_dir || begin

@@ -202,11 +202,12 @@ describe Bosh::Cli::Command::Base do
     #   @cmd.add_service_node("redis", 2)
     # end
 
-    it "shows the common internal password" do
-      generate_new_system
-      @cmd.system_config.common_password.should == 'c1oudc0wc1oudc0w'
-      @cmd.show_password
-    end
+    it "shows the common internal password"
+    #  do
+    #   generate_new_system
+    #   @cmd.system_config.common_password.should == 'c1oudc0wc1oudc0w'
+    #   @cmd.show_password
+    # end
 
     # create some 'deployments/*.yml' files and
     # assert that bosh attempted to deploy each one:
@@ -223,5 +224,12 @@ describe Bosh::Cli::Command::Base do
       @cmd.deploy
     end
 
+    it "watches nats traffic within CF deployment" do
+      generate_new_system
+      @cmd.should_receive(:deployment_manifest_path).with("core").
+        and_return(spec_asset("deployments/aws-core-only.yml"))
+      @cmd.should_receive(:sh).with("nats-sub '*.*' -s nats://nats:c1oudc0wc1oudc0w@1.2.3.4:4222")
+      @cmd.watch_nats
+    end
   end
 end

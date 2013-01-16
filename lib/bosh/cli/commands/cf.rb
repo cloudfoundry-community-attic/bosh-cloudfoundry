@@ -141,11 +141,14 @@ module Bosh::Cli::Command
       end
     end
 
-    usage "show password"
-    desc "display the common password for internal access"
-    def show_password
-      confirm_system
-      say "Password: #{system_config.common_password}"
+    usage "cf watch nats"
+    desc "subscribe to all nats messages within CloudFoundry"
+    def watch_nats
+      nats_props = deployment_manifest("core")["properties"]["nats"]
+      user, pass = nats_props["user"], nats_props["password"]
+      host, port = nats_props["address"], nats_props["port"]
+      nats_uri = "nats://#{user}:#{pass}@#{host}:#{port}"
+      sh "nats-sub '*.*' -s #{nats_uri}"
     end
 
     # Creates initial system folder & targets that system folder
@@ -691,5 +694,6 @@ module Bosh::Cli::Command
       full_command = "bosh -n --color #{command}"
       sh full_command
     end
+
   end
 end
