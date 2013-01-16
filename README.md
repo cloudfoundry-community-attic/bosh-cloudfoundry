@@ -112,6 +112,29 @@ bosh cf upload release --edge
 Prefix each with `bosh`:
 
 ```
+cf prepare system [<name>] [--core-ip ip] [--root-dns dns] 
+                  [--core-server-flavor flavor] [--release-name name] [--release-version 
+                  version] [--stemcell-name name] [--stemcell-version version] 
+                  [--admin-emails email1,email2] [--skip-validations] 
+    create CloudFoundry system 
+    --core-ip ip                 Static IP for CloudController/router, e.g. 1.2.3.4 
+    --root-dns dns               Base DNS for CloudFoundry applications, e.g. vcap.me 
+    --core-server-flavor flavor  Flavor of the CloudFoundry Core server. Default: 'm1.large' 
+    --release-name name          Name of BOSH release within target BOSH. Default: 'appcloud' 
+    --release-version version    Version of target BOSH release within target BOSH. Default: 'latest' 
+    --stemcell-name name         Name of BOSH stemcell within target BOSH. Default: 'bosh-stemcell' 
+    --stemcell-version version   Version of BOSH stemcell within target BOSH. Default: determines latest for stemcell 
+    --admin-emails email1,email2 Admin email accounts in created CloudFoundry 
+    --skip-validations           Skip all validations 
+
+cf change deas [<server_count>] [--flavor flavor] 
+    change the number/flavor of DEA servers (servers that run CF apps) 
+    --flavor flavor Change flavor of all DEA servers 
+
+cf add service <service_name> [<additional_count>] [--flavor flavor] 
+    add additional CloudFoundry service node 
+    --flavor flavor Server flavor for additional service nodes 
+
 cf upload stemcell [--latest] [--custom] 
     download/create stemcell & upload to BOSH 
     --latest Use latest stemcell; possibly not tagged stable 
@@ -124,22 +147,8 @@ cf upload release [--edge]
 cf deploy 
     deploy CloudFoundry system or apply any changes 
 
-cf prepare system [<name>] [--core-ip ip] [--root-dns dns] 
-                 [--core-server-flavor flavor] [--cf-release name] [--skip-validations] 
-    create CloudFoundry system 
-    --core-ip ip                Static IP for CloudController/router, e.g. 1.2.3.4 
-    --root-dns dns              Base DNS for CloudFoundry applications, e.g. vcap.me 
-    --core-server-flavor flavor Flavor of the CloudFoundry Core server, e.g. m1.xlarge 
-    --cf-release name           Name of BOSH release uploaded to target BOSH 
-    --skip-validations          Skip all validations 
-
-cf add service <service_name> [<additional_count>] [--flavor flavor] 
-    add additional CloudFoundry service node 
-    --flavor flavor Flavor of new serverice server 
-
-cf change deas [<additional_count>] [--flavor flavor] 
-    change the number/flavor of DEA servers (servers that run CF apps) 
-    --flavor flavor Change flavor of all DEA servers
+cf watch nats 
+    subscribe to all nats messages within CloudFoundry
 ```
 
 ## Development

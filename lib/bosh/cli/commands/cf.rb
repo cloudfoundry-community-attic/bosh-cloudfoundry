@@ -144,6 +144,7 @@ module Bosh::Cli::Command
     usage "cf watch nats"
     desc "subscribe to all nats messages within CloudFoundry"
     def watch_nats
+      confirm_system
       nats_props = deployment_manifest("core")["properties"]["nats"]
       user, pass = nats_props["user"], nats_props["password"]
       host, port = nats_props["address"], nats_props["port"]
