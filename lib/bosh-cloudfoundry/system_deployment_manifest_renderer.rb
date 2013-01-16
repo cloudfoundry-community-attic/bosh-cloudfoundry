@@ -172,7 +172,8 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
           "health_manager",
           "cloud_controller",
           "acm",
-          "serialization_data_server",
+          # "debian_nfs_server",
+          # "serialization_data_server",
           "stager",
           "uaa",
           "vcap_redis"],
@@ -239,13 +240,13 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
          "roles"=>
           [{"tag"=>"admin", "name"=>"acm", "password"=>common_password}],
          "databases"=>[{"tag"=>"acm", "name"=>"acm"}]},
-       "serialization_data_server"=>
-        {"upload_token"=>"TOKEN",
-         "use_nginx"=>false,
-         "upload_timeout"=>10,
-         "port"=>8090,
-         "upload_file_expire_time"=>600,
-         "purge_expired_interval"=>30},
+       # "serialization_data_server"=>
+       #  {"upload_token"=>"TOKEN",
+       #   "use_nginx"=>false,
+       #   "upload_timeout"=>10,
+       #   "port"=>8090,
+       #   "upload_file_expire_time"=>600,
+       #   "purge_expired_interval"=>30},
        "service_lifecycle"=>
         {"download_url"=>core_ip,
          "mount_point"=>"/var/vcap/service_lifecycle",
@@ -253,7 +254,8 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
          "resque"=>
           {"host"=>core_ip, "port"=>3456, "password"=>common_password},
          # "nfs_server"=>{"address"=>core_ip, "export_dir"=>"/cfsnapshot"},
-         "serialization_data_server"=>[core_ip]},
+         # "serialization_data_server"=>[core_ip]
+        },
        "stager"=>
         {"max_staging_duration"=>120,
          "max_active_tasks"=>20,
