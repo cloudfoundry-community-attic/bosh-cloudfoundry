@@ -151,6 +151,36 @@ cf watch nats
     subscribe to all nats messages within CloudFoundry
 ```
 
+## Orders of easiness vs powerfulness
+
+```
+
++--------------+     +-----------------+       +---------------------+
+|              |     |                 |       |                     |
+|  CLI         |     |                 |       |                     |
+|  commands    +---->|                 |       |                     |
+|              |     |  system         |       |  deployment         |
+|              |     |  config         |       |  manifest           |
++--------------+     |  (yaml)         |       |  (yaml)             |
+                     |                 +------>|                     |
+                     |                 |       |                     |
+                     |                 |       |                     |
+                     |                 |       |                     |
+                     |                 |       |                     |
+                     +-----------------+       |                     |
+                                               |                     |
+                                               |                     |
+                                               |                     |
+                                               |                     |
+                                               |                     |
+                                               |                     |
+                                               |                     |
+                                               |                     |
+                                               |                     |
+                                               |                     |
+                                               +---------------------+
+```
+
 ## Development
 
 ```
