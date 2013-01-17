@@ -151,6 +151,41 @@ cf watch nats
     subscribe to all nats messages within CloudFoundry
 ```
 
+## Services
+
+By default your CloudFoundry deployment comes with no built-in services. Instead, you easily enable each one and allocate it resources using the `bosh cf add service NAME` command; then deploy again.
+
+```
+$ bosh cf add service postgresql
+$ bosh cf add service redis
+$ bosh deploy
+```
+
+Eventually the new service node servers will be up and running, and then the VMC client will be able to create/bind/delete these services with your CloudFoundry applications.
+
+For example:
+
+``` 
+============== System Services ==============
+ 
++------------+---------+---------------------------------------+
+| Service    | Version | Description                           |
++------------+---------+---------------------------------------+
+| postgresql | 9.0     | PostgreSQL database service (vFabric) |
+| redis      | 2.2     | Redis key-value store service         |
++------------+---------+---------------------------------------+
+ 
+=========== Provisioned Services ============
+ 
++------------------+------------+
+| Name             | Service    |
++------------------+------------+
+| postgresql-6d01e | postgresql |
+| postgresql-ff0c1 | postgresql |
+| redis-d0d3d      | redis      |
++------------------+------------+
+```
+
 ## Orders of easiness vs powerfulness
 
 ```
