@@ -37,22 +37,15 @@ resource_pools:
   cloud_properties: 
     instance_type: m1.small
   persistent_disk: 16192
-- name: postgresql_m1_xlarge_free
+- name: redis_m1_small_free
   network: default
   size: 1
   stemcell: 
     name: bosh-stemcell
     version: 0.6.4
   cloud_properties: 
-    instance_type: m1.xlarge
-- name: postgresql_m1_small_free
-  network: default
-  size: 2
-  stemcell: 
-    name: bosh-stemcell
-    version: 0.6.4
-  cloud_properties: 
     instance_type: m1.small
+  persistent_disk: 16192
 jobs: 
 - name: core
   template: 
@@ -66,7 +59,7 @@ jobs:
   - uaa
   - vcap_redis
   - dea
-  - postgresql_gateway
+  - redis_gateway
   instances: 1
   resource_pool: core
   networks: 
@@ -78,26 +71,17 @@ jobs:
     static_ips: 
     - 1.2.3.4
   persistent_disk: 16192
-- name: postgresql_m1_xlarge_free
+- name: redis_m1_small_free
   template: 
-  - postgresql_node
+  - redis_node
   instances: 1
-  resource_pool: postgresql_m1_xlarge_free
+  resource_pool: redis_m1_small_free
   networks: 
   - name: default
     default: 
     - dns
     - gateway
-- name: postgresql_m1_small_free
-  template: 
-  - postgresql_node
-  instances: 2
-  resource_pool: postgresql_m1_small_free
-  networks: 
-  - name: default
-    default: 
-    - dns
-    - gateway
+  persistent_disk: 16192
 properties: 
   domain: mycompany.com
   env: 
@@ -229,35 +213,28 @@ properties:
     password: c1oudc0wc1oudc0w
     maxmemory: 500000000
   service_plans: 
-    postgresql: 
+    redis: 
       free: 
         job_management: 
           high_water: 1400
           low_water: 100
         configuration: 
           capacity: 200
-          max_db_size: 128
-          max_long_query: 3
-          max_long_tx: 30
-          max_clients: 20
+          max_memory: 16
+          max_swap: 32
+          max_clients: 500
           backup: 
             enable: true
   dea: 
     max_memory: 512
-  postgresql_gateway: 
-    admin_user: psql_admin
-    admin_passwd_hash: 
+  redis_gateway: 
     token: TOKEN
     supported_versions: 
-    - "9.0"
+    - "2.2"
     version_aliases: 
-      current: "9.0"
-  postgresql_node: 
-    admin_user: psql_admin
-    admin_passwd_hash: 
-    available_storage: 2048
-    max_db_size: 256
-    max_long_tx: 30
+      current: "2.2"
+  redis_node: 
+    available_memory: 256
     supported_versions: 
-    - "9.0"
-    default_version: "9.0"
+    - "2.2"
+    default_version: "2.2"

@@ -190,17 +190,27 @@ describe Bosh::Cli::Command::Base do
       @cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
       @cmd.add_option(:flavor, 'm1.large')
       @cmd.add_service_node("postgresql", 4)
+
+      @cmd.system_config.postgresql.size.should == 1
+      postgresql_config = @cmd.system_config.postgresql.first
+      postgresql_config["flavor"].should == "m1.large"
+      postgresql_config["count"].should == 4
     end
 
-    # it "add 2 redis nodes" do
-    #   generate_new_system
-    # 
-    #   @cmd.should_receive(:render_system)
-    # 
-    #   @cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
-    #   @cmd.add_option(:flavor, 'm1.large')
-    #   @cmd.add_service_node("redis", 2)
-    # end
+    it "add 2 redis nodes" do
+      generate_new_system
+    
+      @cmd.should_receive(:render_system)
+    
+      @cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
+      @cmd.add_option(:flavor, 'm1.large')
+      @cmd.add_service_node("redis", 2)
+
+      @cmd.system_config.redis.size.should == 1
+      redis_config = @cmd.system_config.redis.first
+      redis_config["flavor"].should == "m1.large"
+      redis_config["count"].should == 2
+    end
 
     it "shows the common internal password"
     #  do

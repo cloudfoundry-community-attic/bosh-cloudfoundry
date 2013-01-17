@@ -68,7 +68,11 @@ describe Bosh::CloudFoundry::Config::PostgresqlServiceConfig do
     end
     it "does not add colocated job to core job" do
       subject.add_core_jobs_to_manifest(@manifest)
-      job("core").should_not be_include("postgresql")
+      job("core")["template"].should_not be_include("postgresql")
+    end
+    it "adds postgresql_gateway to core job" do
+      subject.add_core_jobs_to_manifest(@manifest)
+      job("core")["template"].should be_include("postgresql_gateway")
     end
     it "should add a resoure pool called 'postgresql'" do
       subject.add_resource_pools_to_manifest(@manifest)

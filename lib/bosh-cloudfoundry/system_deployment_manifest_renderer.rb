@@ -50,6 +50,11 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
     postgresql_service_config.add_jobs_to_manifest(manifest)
     postgresql_service_config.merge_manifest_properties(manifest)
 
+    redis_service_config.add_core_jobs_to_manifest(manifest)
+    redis_service_config.add_resource_pools_to_manifest(manifest)
+    redis_service_config.add_jobs_to_manifest(manifest)
+    redis_service_config.merge_manifest_properties(manifest)
+
     chdir system_config.system_dir do
       mkdir_p("deployments")
       File.open("deployments/#{system_config.system_name}-core.yml", "w") do |file|
@@ -92,6 +97,11 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
   def postgresql_service_config
     @postgresql_service_config ||= 
       Bosh::CloudFoundry::Config::PostgresqlServiceConfig.build_from_system_config(system_config)
+  end
+
+  def redis_service_config
+    @redis_service_config ||= 
+      Bosh::CloudFoundry::Config::RedisServiceConfig.build_from_system_config(system_config)
   end
 
   # Converts a server flavor (such as 'm1.large' on AWS) into

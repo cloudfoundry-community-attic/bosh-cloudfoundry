@@ -74,6 +74,17 @@ describe Bosh::CloudFoundry::SystemDeploymentManifestRenderer do
       end
     end
 
-    # it "renders a simple system + postgresql + redis into a deployment manifest"
+    it "renders a simple system + redis into a deployment manifest" do
+      @system_config.redis = [
+        { "count" => 1, "flavor" => "m1.small", "plan" =>"free" },
+      ]
+      @renderer.perform
+    
+      chdir(@system_config.system_dir) do
+        File.should be_exist("deployments/production-core.yml")
+        files_match("deployments/production-core.yml",
+                    spec_asset("deployments/aws-core-1-m1.small-free-redis.yml"))
+      end
+    end
   end
 end

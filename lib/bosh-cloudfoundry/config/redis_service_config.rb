@@ -2,22 +2,22 @@
 
 module Bosh; module CloudFoundry; module Config; end; end; end
 
-class Bosh::CloudFoundry::Config::PostgresqlServiceConfig
+class Bosh::CloudFoundry::Config::RedisServiceConfig
 
   def initialize(system_config)
     @system_config = system_config
   end
 
   def self.build_from_system_config(system_config)
-    system_config.postgresql ||= []
+    system_config.redis ||= []
     new(system_config)
   end
 
   def config
-    @system_config.postgresql
+    @system_config.redis
   end
 
-  # @returns [Boolean] true if there are any postgresql nodes to be provisioned
+  # @returns [Boolean] true if there are any redis nodes to be provisioned
   def any_service_nodes?
     total_service_nodes_count > 0
   end
@@ -30,6 +30,7 @@ class Bosh::CloudFoundry::Config::PostgresqlServiceConfig
     @system_config.bosh_provider
   end
 
+  # Used by the CLI cf.rb to update +system_config+
   def update_cluster_count_for_flavor(server_count, server_flavor, server_plan="free")
     if cluster = find_cluster_for_flavor(server_flavor.to_s)
       cluster["count"] = server_count
@@ -42,7 +43,7 @@ class Bosh::CloudFoundry::Config::PostgresqlServiceConfig
   # @returns [Hash] the Hash from @system_config for the requested flavor
   # nil if its not currently a requested flavor
   def find_cluster_for_flavor(server_flavor)
-    @system_config.postgresql.find { |cl| cl["flavor"] == server_flavor }
+    @system_config.redis.find { |cl| cl["flavor"] == server_flavor }
   end
 
   def save
@@ -50,26 +51,26 @@ class Bosh::CloudFoundry::Config::PostgresqlServiceConfig
   end
 
   # resource_pool name for a cluster
-  # cluster_name like 'postgresql_m1_xlarge_free'
+  # cluster_name like 'redis_m1_xlarge_free'
   def cluster_name(cluster)
     server_flavor = cluster["flavor"]
     server_plan = cluster["plan"] || "free"
-    cluster_name = "postgresql_#{server_flavor}_#{server_plan}"
+    cluster_name = "redis_#{server_flavor}_#{server_plan}"
     cluster_name.gsub!(/\W+/, '_')
     cluster_name
   end
 
-  # Adds "postgresql_gateway" to colocated "core" job
+  # Adds "redis_gateway" to colocated "core" job
   def add_core_jobs_to_manifest(manifest)
     if any_service_nodes?
       @core_job ||= manifest["jobs"].find { |job| job["name"] == "core" }
-      @core_job["template"] << "postgresql_gateway"
+      @core_job["template"] << "redis_gateway"
     end
   end
 
   # Adds resource pools to the target manifest, if server_count > 0
   #
-  # - name: postgresql
+  # - name: redis
   #   network: default
   #   size: 2
   #   stemcell: 
@@ -93,7 +94,8 @@ class Bosh::CloudFoundry::Config::PostgresqlServiceConfig
           # TODO how to create "cloud_properties" per-provider?
           "cloud_properties" => {
             "instance_type" => server_flavor
-          }
+          },
+          "persistent_disk" => @system_config.common_persistent_disk
         }
         manifest["resource_pools"] << resource_pool
       end
@@ -102,11 +104,11 @@ class Bosh::CloudFoundry::Config::PostgresqlServiceConfig
 
   # Jobs to add to the target manifest
   #
-  # - name: postgresql
+  # - name: redis
   #   template: 
-  #   - postgresql
+  #   - redis
   #   instances: 2
-  #   resource_pool: postgresql
+  #   resource_pool: redis
   #   networks: 
   #   - name: default
   #     default: 
@@ -119,14 +121,15 @@ class Bosh::CloudFoundry::Config::PostgresqlServiceConfig
         server_flavor = cluster["flavor"]
         job = {
           "name" => cluster_name(cluster),
-          "template" => ["postgresql_node"],
+          "template" => ["redis_node"],
           "instances" => server_count,
           "resource_pool" => cluster_name(cluster),
           # TODO are these AWS-specific networks?
           "networks" => [{
             "name" => "default",
             "default" => ["dns", "gateway"]
-          }]
+          }],
+          "persistent_disk" => @system_config.common_persistent_disk
         }
         manifest["jobs"] << job
       end
@@ -137,37 +140,30 @@ class Bosh::CloudFoundry::Config::PostgresqlServiceConfig
   # for the gateway, node, and service plans
   def merge_manifest_properties(manifest)
     if any_service_nodes?
-      manifest["properties"]["postgresql_gateway"] = {
-        "admin_user"=>"psql_admin",
-        "admin_passwd_hash"=>nil,
+      manifest["properties"]["redis_gateway"] = {
         "token"=>"TOKEN",
-        "supported_versions"=>["9.0"],
-        "version_aliases"=>{"current"=>"9.0"}
+        "supported_versions"=>["2.2"],
+        "version_aliases"=>{"current"=>"2.2"}
       }
-      manifest["properties"]["postgresql_node"] = {
-        "admin_user"=>"psql_admin",
-        "admin_passwd_hash"=>nil,
-        "available_storage"=>2048,
-        "max_db_size"=>256,
-        "max_long_tx"=>30,
-        "supported_versions"=>["9.0"],
-        "default_version"=>"9.0"
+      manifest["properties"]["redis_node"] = {
+        "available_memory"=>256,
+        "supported_versions"=>["2.2"],
+        "default_version"=>"2.2"
       }
-      manifest["properties"]["service_plans"]["postgresql"] = {
+      manifest["properties"]["service_plans"]["redis"] = {
         "free"=>
          {"job_management"=>{"high_water"=>1400, "low_water"=>100},
           "configuration"=>
            {"capacity"=>200,
-            "max_db_size"=>128,
-            "max_long_query"=>3,
-            "max_long_tx"=>30,
-            "max_clients"=>20,
+            "max_memory"=>16,
+            "max_swap"=>32,
+            "max_clients"=>500,
             "backup"=>{"enable"=>true}}}
       }
     end
   end
 
-  # @returns [Integer] the ballpark ram for postgresql, BOSH agent, etc
+  # @returns [Integer] the ballpark ram for redis, BOSH agent, etc
   def preallocated_ram
     300
   end
