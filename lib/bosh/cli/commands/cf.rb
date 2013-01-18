@@ -336,12 +336,12 @@ module Bosh::Cli::Command
       end
     end
 
-    # @returns [Version] BOSH version number; converts 'latest' into actual version
+    # @returns [Version String] BOSH version number; converts 'latest' into actual version
     def effective_release_version
       if release_version == "latest"
-        latest_final_release_tag_number
+        latest_final_release_tag_number.to_s
       else
-        release_version
+        release_version.to_s
       end
     end
 
