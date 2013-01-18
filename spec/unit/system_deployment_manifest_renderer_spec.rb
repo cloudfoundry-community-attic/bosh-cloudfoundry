@@ -21,7 +21,7 @@ describe Bosh::CloudFoundry::SystemDeploymentManifestRenderer do
     @system_config = Bosh::CloudFoundry::Config::SystemConfig.new(@system_dir)
     @system_config.bosh_provider = 'aws'
     @system_config.release_name = 'appcloud'
-    @system_config.release_version = 'latest'
+    @system_config.release_version = 124 # TODO restore to 'latest' when #49 fixed
     @system_config.stemcell_name = 'bosh-stemcell'
     @system_config.stemcell_version = '0.6.4'
     @system_config.core_server_flavor = 'm1.small'

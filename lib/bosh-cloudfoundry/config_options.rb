@@ -19,7 +19,7 @@ module Bosh::CloudFoundry::ConfigOptions
   DEFAULT_STEMCELLS_PATH = "/var/vcap/store/stemcells"
   DEFAULT_REPOS_PATH = "/var/vcap/store/repos"
   DEFAULT_RELEASE_NAME = "appcloud" # name of cf-release final release name
-  DEFAULT_RELEASE_VERSION = "latest"
+  DEFAULT_RELEASE_VERSION = "124" # FIXME restore to "latest" when #49 fixed
   DEFAULT_STEMCELL_NAME = "bosh-stemcell"
   DEFAULT_COMMONT_PERSISTENT_DISK = 16192
 
@@ -175,6 +175,11 @@ module Bosh::CloudFoundry::ConfigOptions
   # @return [Boolean] true if skipping validations
   def skip_validations?
     options[:no_validation] || options[:no_validations] || options[:skip_validations]
+  end
+
+  # @return [Boolean] true if release_version is 'latest'; or no system set yet
+  def use_latest_release?
+    system.nil? || release_version == "latest"
   end
 
   def bosh_git_repo

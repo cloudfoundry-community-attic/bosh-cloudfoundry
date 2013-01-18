@@ -127,7 +127,7 @@ module Bosh::Cli::Command
         create_dev_release
         upload_dev_release
       else
-        upload_latest_final_release
+        upload_final_release
       end
     end
 
@@ -462,8 +462,10 @@ module Bosh::Cli::Command
       end
     end
 
-    def upload_latest_final_release
-      release_number = latest_final_release_tag_number
+    def upload_final_release
+      release_number = use_latest_release? ? 
+        latest_final_release_tag_number :
+        release_version
       chdir(cf_release_dir) do
         bosh_cmd "upload release releases/appcloud-#{release_number}.yml"
       end
