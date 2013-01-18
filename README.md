@@ -2,8 +2,6 @@
 
 You want CloudFoundry? You can now create, scale, upgrade and patch one or more Cloud Foundry deployments using very simple, easy to learn and remember CLI commands.
 
-[![Build Status](https://travis-ci.org/StarkAndWayne/bosh-cloudfoundry.png)](https://travis-ci.org/StarkAndWayne/bosh-cloudfoundry)
-
 Currently supports AWS only. OpenStack support is coming. vSphere and vCloud support will require someone to tell me that they really want it.
 
 ## NOTE - currently requires latest edge of nearly everything
