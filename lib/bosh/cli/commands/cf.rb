@@ -253,8 +253,9 @@ module Bosh::Cli::Command
         system_config.save
       end
       say "Using BOSH release name #{release_name}".green
-      unless bosh_release_names.include?(release_name)
-        say "BOSH does not contain release #{release_name.green}, uploading...".yellow
+      unless bosh_release_names.include?(release_name) ||
+              bosh_release_versions(release_name).include?(release_version)
+        say "BOSH does not contain release #{release_name.green} #{release_version.green}, uploading...".yellow
         upload_release
       end
     end
@@ -315,12 +316,23 @@ module Bosh::Cli::Command
       end
     end
 
-    # @return [Array] BOSH releases available in target BOSH
+    # @returns [Array] BOSH releases available in target BOSH
+    # [{"name"=>"appcloud", "versions"=>["124", "126"], "in_use"=>[]}]
+    def bosh_releases
+      @bosh_releases ||= releases = director.list_releases
+    end
+
+    # @returns [Array] BOSH release names available in target BOSH
     def bosh_release_names
-      @bosh_releases ||= begin
-        # [{"name"=>"appcloud", "versions"=>["126.1-dev"], "in_use"=>[]}]
-        releases = director.list_releases
-        releases.map { |rel| rel["name"] }
+      @bosh_release_names ||= bosh_releases.map { |rel| rel["name"] }
+    end
+
+    # @returns [Array] BOSH release versions for specific release name in target BOSH
+    def bosh_release_versions(release_name)
+      if release = bosh_releases.find { |rel| rel["name"] == release_name }
+        release["versions"]
+      else
+        []
       end
     end
 

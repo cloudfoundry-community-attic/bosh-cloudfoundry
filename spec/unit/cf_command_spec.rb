@@ -241,5 +241,15 @@ describe Bosh::Cli::Command::Base do
       @cmd.should_receive(:sh).with("nats-sub '*.*' -s nats://nats:c1oudc0wc1oudc0w@1.2.3.4:4222")
       @cmd.watch_nats
     end
+
+    it "returns bosh_release_versions" do
+      @cmd.should_receive(:bosh_releases).exactly(3).times.and_return([
+        {"name"=>"appcloud", "versions"=>["124", "126"], "in_use"=>[]},
+        {"name"=>"appcloud-dev", "versions"=>["124.1-dev", "126.1-dev"], "in_use"=>[]},
+      ])
+      @cmd.bosh_release_versions("appcloud").should == ["124", "126"]
+      @cmd.bosh_release_versions("appcloud-dev").should == ["124.1-dev", "126.1-dev"]
+      @cmd.bosh_release_versions("XXX").should == []
+    end
   end
 end
