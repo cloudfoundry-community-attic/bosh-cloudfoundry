@@ -45,6 +45,7 @@ resource_pools:
     version: 0.6.4
   cloud_properties: 
     instance_type: m1.xlarge
+  persistent_disk: 16192
 - name: postgresql_m1_small_free
   network: default
   size: 2
@@ -53,6 +54,7 @@ resource_pools:
     version: 0.6.4
   cloud_properties: 
     instance_type: m1.small
+  persistent_disk: 16192
 jobs: 
 - name: core
   template: 
@@ -88,6 +90,7 @@ jobs:
     default: 
     - dns
     - gateway
+  persistent_disk: 16192
 - name: postgresql_m1_small_free
   template: 
   - postgresql_node
@@ -98,6 +101,7 @@ jobs:
     default: 
     - dns
     - gateway
+  persistent_disk: 16192
 properties: 
   domain: mycompany.com
   env: 

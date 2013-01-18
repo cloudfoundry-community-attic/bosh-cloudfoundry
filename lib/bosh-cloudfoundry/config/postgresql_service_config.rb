@@ -93,7 +93,8 @@ class Bosh::CloudFoundry::Config::PostgresqlServiceConfig
           # TODO how to create "cloud_properties" per-provider?
           "cloud_properties" => {
             "instance_type" => server_flavor
-          }
+          },
+          "persistent_disk" => 16192
         }
         manifest["resource_pools"] << resource_pool
       end
@@ -126,7 +127,8 @@ class Bosh::CloudFoundry::Config::PostgresqlServiceConfig
           "networks" => [{
             "name" => "default",
             "default" => ["dns", "gateway"]
-          }]
+          }],
+          "persistent_disk" => 16192
         }
         manifest["jobs"] << job
       end

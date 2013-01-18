@@ -227,7 +227,7 @@ describe Bosh::Cli::Command::Base do
       generate_new_system
       chdir(@cmd.system + "/deployments") do
         cp(spec_asset("deployments/aws-core-only.yml"), "aws-core-only.yml")
-        cp(spec_asset("deployments/production-redis-aws-2-m1large.yml"), "production-redis.yml")
+        cp(spec_asset("deployments/aws-core-2-m1.xlarge-dea.yml"), "deas.yml")
       end
       @cmd.should_receive(:set_deployment).exactly(2).times
       @cmd.should_receive(:sh).with("bosh -n --color deploy").exactly(2).times
