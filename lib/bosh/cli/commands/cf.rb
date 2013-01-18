@@ -252,9 +252,9 @@ module Bosh::Cli::Command
         end
         system_config.save
       end
-      say "Using BOSH release name #{release_name}".green
+      say "Using BOSH release name #{release_name} #{effective_release_version}".green
       unless bosh_release_names.include?(release_name) &&
-              bosh_release_versions(release_name).include?(release_version)
+              bosh_release_versions(release_name).include?(effective_release_version)
         say "BOSH does not contain release #{release_name.green} #{release_version.green}, uploading...".yellow
         upload_release
       end
@@ -333,6 +333,15 @@ module Bosh::Cli::Command
         release["versions"]
       else
         []
+      end
+    end
+
+    # @returns [Version] BOSH version number; converts 'latest' into actual version
+    def effective_release_version
+      if release_version == "latest"
+        latest_final_release_tag_number
+      else
+        release_version
       end
     end
 
