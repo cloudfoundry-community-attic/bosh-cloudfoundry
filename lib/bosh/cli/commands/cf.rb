@@ -253,7 +253,7 @@ module Bosh::Cli::Command
         system_config.save
       end
       say "Using BOSH release name #{release_name}".green
-      unless bosh_release_names.include?(release_name) ||
+      unless bosh_release_names.include?(release_name) &&
               bosh_release_versions(release_name).include?(release_version)
         say "BOSH does not contain release #{release_name.green} #{release_version.green}, uploading...".yellow
         upload_release

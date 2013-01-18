@@ -135,7 +135,10 @@ describe Bosh::Cli::Command::Base do
       cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
       cmd.stub!(:bosh_target_uuid).and_return("DIRECTOR_UUID")
       cmd.should_receive(:generate_random_password).and_return('c1oudc0wc1oudc0w')
-      cmd.should_receive(:bosh_release_names).and_return(['appcloud-dev', 'appcloud'])
+      cmd.should_receive(:bosh_releases).exactly(2).times.and_return([
+        {"name"=>"appcloud", "versions"=>["124", "126"], "in_use"=>[]},
+        {"name"=>"appcloud-dev", "versions"=>["124.1-dev", "126.1-dev"], "in_use"=>[]},
+      ])
       cmd.should_receive(:validate_dns_a_record).with("api.mycompany.com", '1.2.3.4').and_return(true)
       cmd.should_receive(:validate_dns_a_record).with("demoapp.mycompany.com", '1.2.3.4').and_return(true)
       cmd.should_receive(:bosh_stemcell_versions).exactly(4).times.and_return(['0.6.4'])
