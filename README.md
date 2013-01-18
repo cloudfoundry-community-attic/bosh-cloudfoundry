@@ -183,7 +183,7 @@ For example:
 | postgresql-6d01e | postgresql |
 | postgresql-ff0c1 | postgresql |
 | redis-d0d3d      | redis      |
-+------------------+------------+
++------------------+------------+g
 ```
 
 ## Orders of easiness vs powerfulness
