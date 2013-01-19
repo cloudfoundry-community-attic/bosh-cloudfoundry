@@ -3,6 +3,7 @@
 module Bosh; module CloudFoundry; module Providers; end; end; end
 
 class Bosh::CloudFoundry::Providers::AWS
+  attr_reader :fog_compute
   def initialize(fog_compute=nil)
     @fog_compute = fog_compute
   end
@@ -34,7 +35,7 @@ class Bosh::CloudFoundry::Providers::AWS
   # TODO nil if none available
   def provision_public_ip_address
     return unless fog_compute
-    address = @fog_compute.addresses.create
+    address = fog_compute.addresses.create
     address.public_ip
     # TODO catch error and return nil
   end
