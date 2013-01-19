@@ -27,7 +27,7 @@ class Bosh::CloudFoundry::Config::MicroboshConfig
   def fog_connection_properties
     if aws?
       ec2_endpoint = provider_credentials["ec2_endpoint"]
-      if ec2_endpoint =~ /ec2\.([^.+])\.amazonaws\.com/
+      if ec2_endpoint =~ /ec2\.([\w-]+)\.amazonaws\.com/
         region = $1
       else
         raise "please add support to extra 'region' from #{ec2_endpoint}"
