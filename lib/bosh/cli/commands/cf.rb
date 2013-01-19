@@ -37,8 +37,8 @@ module Bosh::Cli::Command
     option "--admin-emails email1,email2", Array, "Admin email accounts in created CloudFoundry"
     option "--skip-validations", "Skip all validations"
     def prepare_system(name=nil)
-      confirm_or_prompt_all_defaults
       setup_system_dir(name)
+      confirm_or_prompt_all_defaults
       confirm_or_prompt_for_system_requirements
       render_system
     end
