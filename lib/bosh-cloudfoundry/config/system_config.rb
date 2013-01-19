@@ -20,6 +20,8 @@ class Bosh::CloudFoundry::Config::SystemConfig < Bosh::Cli::Config
   end
 
   [
+    :bosh_target,      # e.g. http://1.2.3.4:25555
+    :bosh_target_uuid,
     :bosh_provider,    # from list 'aws', 'openstack', 'vsphere', 'vcloud'
     :system_name,      # e.g. production
     :system_dir,       # e.g. /var/vcap/store/systems/production
@@ -46,5 +48,12 @@ class Bosh::CloudFoundry::Config::SystemConfig < Bosh::Cli::Config
     define_method "#{attr}=" do |value|
       write_global(attr, value)
     end
+  end
+
+  def microbosh
+    unless bosh_target
+      raise "please set #bosh_target before requesting microbosh configuration"
+    end
+    @microbosh ||= Bosh::CloudFoundry::Config::MicroboshConfig.new(bosh_target)
   end
 end

@@ -9,8 +9,10 @@ describe Bosh::CloudFoundry::ConfigOptions do
 
   before do
     @options = {
-      :common_config => File.join(Dir.mktmpdir, "bosh_common_config.yml"),
-      :system => File.join(Dir.mktmpdir, "system"),
+      common_config: File.join(Dir.mktmpdir, "bosh_common_config.yml"),
+      system: File.join(Dir.mktmpdir, "system"),
+      bosh_target: 'http://1.2.3.4:25555',
+      bosh_target_uuid: 'UUUUUIIIIIDDDD'
     }
     mkdir_p(@options[:system])
   end

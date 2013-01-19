@@ -80,6 +80,8 @@ describe Bosh::CloudFoundry::Config::DeaConfig do
       job("dea")["instances"].should == 5
     end
     it "sets the properties.dea.max_memory for each m1.xlarge server" do
+      Bosh::CloudFoundry::Providers.should_receive(:for_bosh_provider_name).
+        and_return(Bosh::CloudFoundry::Providers::AWS.new)
       # m1.xlarge has 15G RAM
       subject.merge_manifest_properties(@manifest)
       @manifest["properties"]["dea"].should_not be_nil

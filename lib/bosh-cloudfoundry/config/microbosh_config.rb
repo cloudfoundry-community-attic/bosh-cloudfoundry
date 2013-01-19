@@ -20,6 +20,7 @@ class Bosh::CloudFoundry::Config::MicroboshConfig
   end
 
   def fog_compute
+    return nil unless valid?
     @fog_compute ||= Fog::Compute.new(fog_connection_properties)
   end
 

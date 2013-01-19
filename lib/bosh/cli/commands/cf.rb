@@ -493,6 +493,9 @@ module Bosh::Cli::Command
       @bosh_releases = nil # reset cache
     end
 
+    # FIXME why not look in releases/final.yml to get the number?
+    # then it would also work for dev_releases?
+
     # Examines the git tags of the cf-release repo and
     # finds the latest tag for a release (v126 or v119-fixed)
     # and returns the integer value (126 or 119).
@@ -718,7 +721,7 @@ module Bosh::Cli::Command
 
     # a helper object for the target BOSH provider
     def provider
-      @provider ||= Bosh::CloudFoundry::Providers.for_bosh_provider_name(bosh_provider_name)
+      @provider ||= Bosh::CloudFoundry::Providers.for_bosh_provider_name(system_config)
     end
 
     def bosh_cmd(command)

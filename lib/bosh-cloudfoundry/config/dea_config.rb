@@ -3,6 +3,7 @@
 module Bosh; module CloudFoundry; module Config; end; end; end
 
 class Bosh::CloudFoundry::Config::DeaConfig
+  attr_reader :system_config
 
   def initialize(system_config)
     @system_config = system_config
@@ -144,6 +145,6 @@ class Bosh::CloudFoundry::Config::DeaConfig
 
   # a helper object for the target BOSH provider
   def provider
-    @provider ||= Bosh::CloudFoundry::Providers.for_bosh_provider_name(bosh_provider_name)
+    @provider ||= Bosh::CloudFoundry::Providers.for_bosh_provider_name(system_config)
   end
 end

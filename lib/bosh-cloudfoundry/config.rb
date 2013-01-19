@@ -1,5 +1,6 @@
 require "bosh-cloudfoundry/config/common_config"
 require "bosh-cloudfoundry/config/system_config"
+require "bosh-cloudfoundry/config/microbosh_config"
 require "bosh-cloudfoundry/config/dea_config"
 require "bosh-cloudfoundry/config/postgresql_service_config"
 require "bosh-cloudfoundry/config/redis_service_config"

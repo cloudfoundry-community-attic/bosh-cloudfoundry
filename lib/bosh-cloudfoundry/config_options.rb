@@ -43,6 +43,8 @@ module Bosh::CloudFoundry::ConfigOptions
     end
     @system_config ||= begin
       system_config = Bosh::CloudFoundry::Config::SystemConfig.new(system)
+      system_config.bosh_target = options[:bosh_target] || config.target
+      system_config.bosh_target_uuid = options[:bosh_target_uuid] || config.target_uuid
       system_config.bosh_provider = 'aws' # TODO support other BOSH providers
       system_config.release_name ||= DEFAULT_RELEASE_NAME
       system_config.release_version ||= DEFAULT_RELEASE_VERSION
@@ -53,16 +55,6 @@ module Bosh::CloudFoundry::ConfigOptions
       system_config.save
       system_config
     end
-  end
-
-  # @return [String] BOSH target to manage CloudFoundry
-  def bosh_target
-    options[:bosh_target] || config.target
-  end
-
-  # @return [String] BOSH target director UUID
-  def bosh_target_uuid
-    options[:bosh_target_uuid] || config.target_uuid
   end
 
   # @return [String] CloudFoundry system path
@@ -115,6 +107,12 @@ module Bosh::CloudFoundry::ConfigOptions
       end
     end
   end
+
+  # @return [String] BOSH target to manage CloudFoundry
+  overriddable_config_option :bosh_target, :system_config
+
+  # @return [String] BOSH target director UUID
+  overriddable_config_option :bosh_target_uuid, :system_config
 
   # @return [String] Name of BOSH release in target BOSH
   overriddable_config_option :release_name, :system_config

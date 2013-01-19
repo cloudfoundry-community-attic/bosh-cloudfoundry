@@ -3,6 +3,10 @@
 module Bosh; module CloudFoundry; module Providers; end; end; end
 
 class Bosh::CloudFoundry::Providers::AWS
+  def initialize(fog_compute=nil)
+    @fog_compute = fog_compute
+  end
+
   # @returns [Integer] megabytes of RAM for requested flavor of server
   def ram_for_server_flavor(server_flavor_id)
     if flavor = fog_compute_flavor(server_flavor_id)
@@ -29,13 +33,10 @@ class Bosh::CloudFoundry::Providers::AWS
   # @returns [String] provisions a new public IP address in target region
   # TODO nil if none available
   def provision_public_ip_address
-    address = connection.addresses.create
+    return unless fog_compute
+    address = @fog_compute.addresses.create
     address.public_ip
     # TODO catch error and return nil
   end
 
-  # @return [Fog::Connection]
-  def connection
-    raise "not implemented yet"
-  end
 end

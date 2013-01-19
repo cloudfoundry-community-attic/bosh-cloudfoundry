@@ -50,6 +50,8 @@ describe Bosh::CloudFoundry::SystemDeploymentManifestRenderer do
       end
     end
     it "renders a simple system + DEAs into a deployment manifest" do
+      Bosh::CloudFoundry::Providers.should_receive(:for_bosh_provider_name).
+        and_return(Bosh::CloudFoundry::Providers::AWS.new)
       @system_config.dea = { "count" => 2, "flavor" => "m1.xlarge" }
       @renderer.perform
     

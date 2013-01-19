@@ -180,6 +180,6 @@ class Bosh::CloudFoundry::Config::PostgresqlServiceConfig
 
   # a helper object for the target BOSH provider
   def provider
-    @provider ||= Bosh::CloudFoundry::Providers.for_bosh_provider_name(bosh_provider_name)
+    @provider ||= Bosh::CloudFoundry::Providers.for_bosh_provider_name(system_config)
   end
 end
