@@ -270,7 +270,15 @@ module Bosh::CloudFoundry::ConfigOptions
       err "Please set core_ip configuration for non-interactive mode"
     end
 
-    system_config.core_ip = ask("Main public IP address (e.g. 10.22.22.22): ").to_s
+    if aws?
+      system_config.core_ip = ask("Main public IP address (press Enter to provision new IP): ").to_s
+    else
+      system_config.core_ip = ask("Main public IP address: ").to_s
+    end
+    if system_config.core_ip.blank?
+      say "Provisioning #{bosh_provider} public IP address..."
+      system_config.core_ip = provider.provision_public_ip_address
+    end
     system_config.save
     system_config.core_ip
   end

@@ -716,6 +716,11 @@ module Bosh::Cli::Command
       Fog::Compute::AWS::FLAVORS
     end
 
+    # a helper object for the target BOSH provider
+    def provider
+      @provider ||= Bosh::CloudFoundry::Providers.for_bosh_provider_name(bosh_provider_name)
+    end
+
     def bosh_cmd(command)
       full_command = "bosh -n --color #{command}"
       sh full_command

@@ -25,4 +25,17 @@ class Bosh::CloudFoundry::Providers::AWS
   def aws_compute_flavors
     Fog::Compute::AWS::FLAVORS
   end
+
+  # @returns [String] provisions a new public IP address in target region
+  # TODO nil if none available
+  def provision_public_ip_address
+    address = connection.addresses.create
+    address.public_ip
+    # TODO catch error and return nil
+  end
+
+  # @return [Fog::Connection]
+  def connection
+    raise "not implemented yet"
+  end
 end
