@@ -103,7 +103,10 @@ module Bosh::CloudFoundry::ConfigOptions
       if self.respond_to?(:"choose_#{config_option}")
         self.send(:"choose_#{config_option}")
       elsif self.respond_to?(:"generate_#{config_option}")
-        self.send(:"generate_#{config_option}")
+        override = self.send(:"generate_#{config_option}")
+        target_config.send(:"#{target_config_name}=", override)
+        target_config.save
+        override
       else
         nil
       end
@@ -329,15 +332,11 @@ module Bosh::CloudFoundry::ConfigOptions
   end
 
   def generate_common_password
-    system_config.common_password = pick_random_password
-    system_config.save
-    system_config.common_password
+    "c1oudc0wc1oudc0w"
   end
 
   def generate_aws_security_group
-    system_config.aws_security_group = "default"
-    system_config.save
-    system_config.aws_security_group
+    "default"
   end
 
   # List of versions of stemcell called "bosh-stemcell" that are available
@@ -353,9 +352,5 @@ module Bosh::CloudFoundry::ConfigOptions
         version_cmp(v1, v2)
       }
     end
-  end
-
-  def pick_random_password
-    'c1oudc0wc1oudc0w'
   end
 end
