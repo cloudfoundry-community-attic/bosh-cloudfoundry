@@ -145,6 +145,9 @@ describe Bosh::Cli::Command::Base do
       cmd.should_receive(:render_system)
 
       # TODO AWS#create_security_group should be called
+      provider = Bosh::CloudFoundry::Providers::AWS.new
+      provider.should_receive(:create_security_group)
+      Bosh::CloudFoundry::Providers.should_receive(:for_bosh_provider_name).and_return(provider)
 
       cmd.add_option(:core_ip, '1.2.3.4')
       cmd.add_option(:root_dns, 'mycompany.com')

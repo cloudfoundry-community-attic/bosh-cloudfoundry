@@ -249,6 +249,7 @@ module Bosh::Cli::Command
     # Assert that system configuration is available or prompt for values
     def confirm_or_prompt_for_system_requirements
       validate_root_dns_maps_to_core_ip
+      validate_security_group
       validate_compute_flavor(core_server_flavor)
       generate_generatable_options
       admin_emails
@@ -579,6 +580,12 @@ module Bosh::Cli::Command
 
       validate_dns_a_record("api.#{root_dns}", core_ip)
       validate_dns_a_record("demoapp.#{root_dns}", core_ip)
+    end
+
+    # Ensures that the security group exists
+    # and has the correct ports open
+    def validate_security_group
+      provider.create_security_group(system_config.security_group)
     end
 
     # Validates that +domain+ is an A record that resolves to +expected_ip_addresses+

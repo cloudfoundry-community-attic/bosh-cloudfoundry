@@ -31,6 +31,7 @@ describe Bosh::CloudFoundry::SystemDeploymentManifestRenderer do
     @system_config.common_password = 'c1oudc0wc1oudc0w'
     @system_config.common_persistent_disk = 16192
     @system_config.security_group = 'cloudfoundry-production'
+
     @renderer = Bosh::CloudFoundry::SystemDeploymentManifestRenderer.new(
       @system_config, @common_config, @bosh_config)
   end
