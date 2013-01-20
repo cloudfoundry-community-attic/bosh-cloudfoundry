@@ -151,7 +151,7 @@ module Bosh::CloudFoundry::ConfigOptions
   overriddable_config_option :common_password, :system_config
 
   # @returns [String] name of AWS security group being used
-  overriddable_config_option :aws_security_group, :system_config
+  overriddable_config_option :security_group, :system_config
 
   # @return [String] CloudFoundry BOSH release git URI
   def cf_release_git_repo

@@ -627,7 +627,7 @@ module Bosh::Cli::Command
     def generate_generatable_options
       common_password
       if aws?
-        aws_security_group
+        security_group
       end
     end
 
