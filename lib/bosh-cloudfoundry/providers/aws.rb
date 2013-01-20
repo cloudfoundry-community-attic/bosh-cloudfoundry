@@ -50,15 +50,15 @@ class Bosh::CloudFoundry::Providers::AWS
   #   https: 443
   # }
   def create_security_group(security_group_name, ports)
-    unless fog_compute.security_groups.get(security_group_name)
+    unless sg = fog_compute.security_groups.get(security_group_name)
       sg = fog_compute.security_groups.create(name: security_group_name, description: "microbosh")
-      puts "created security group #{security_group_name}"
+      puts "Created security group #{security_group_name}"
     else
       puts "reusing security group #{security_group_name}"
     end
     ports.each do |name, port|
       sg.authorize_port_range(port..port)
-      puts "opened #{name} port #{port} in security group #{security_group_name}"
+      puts " -> opened #{name} port #{port}"
     end
   end
 
