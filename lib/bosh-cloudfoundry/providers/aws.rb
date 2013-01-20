@@ -70,6 +70,6 @@ class Bosh::CloudFoundry::Providers::AWS
   end
 
   def port_open?(ip_permissions, port)
-    ip_permissions.find {|ip| ip["fromPort"] <= port && ip["toPort"] >= port }
+    ip_permissions && ip_permissions.find {|ip| ip["fromPort"] <= port && ip["toPort"] >= port }
   end
 end
