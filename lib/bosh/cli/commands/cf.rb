@@ -41,6 +41,7 @@ module Bosh::Cli::Command
       confirm_or_prompt_all_defaults
       confirm_or_prompt_for_system_requirements
       render_system
+      target_core_deployment_manifest
     end
 
     usage "cf change deas"
@@ -177,6 +178,12 @@ module Bosh::Cli::Command
       common_config.save
     end
 
+    def target_core_deployment_manifest
+      if deployment = Dir["#{system}/deployments/*-core.yml"].first
+        set_deployment(deployment)
+      end
+    end
+    
     # Helper to tell the CLI to target a specific deployment manifest for the "bosh deploy" command
     def set_deployment(path)
       cmd = Bosh::Cli::Command::Deployment.new
