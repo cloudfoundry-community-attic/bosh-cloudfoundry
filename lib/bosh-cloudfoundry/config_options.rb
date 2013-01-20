@@ -147,10 +147,10 @@ module Bosh::CloudFoundry::ConfigOptions
   # @return [Integer] the persistent disk size (Mb) attached to any server that wants one
   overriddable_config_option :common_persistent_disk, :system_config
 
-  # @returns [String] a strong password used throughout deployment manifests
+  # @return [String] a strong password used throughout deployment manifests
   overriddable_config_option :common_password, :system_config
 
-  # @returns [String] name of AWS security group being used
+  # @return [String] name of AWS security group being used
   overriddable_config_option :security_group, :system_config
 
   # @return [String] CloudFoundry BOSH release git URI

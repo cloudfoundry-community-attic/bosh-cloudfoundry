@@ -17,7 +17,7 @@ class Bosh::CloudFoundry::Config::PostgresqlServiceConfig
     @system_config.postgresql
   end
 
-  # @returns [Boolean] true if there are any postgresql nodes to be provisioned
+  # @return [Boolean] true if there are any postgresql nodes to be provisioned
   def any_service_nodes?
     total_service_nodes_count > 0
   end
@@ -39,7 +39,7 @@ class Bosh::CloudFoundry::Config::PostgresqlServiceConfig
     self.save
   end
 
-  # @returns [Hash] the Hash from @system_config for the requested flavor
+  # @return [Hash] the Hash from @system_config for the requested flavor
   # nil if its not currently a requested flavor
   def find_cluster_for_flavor(server_flavor)
     @system_config.postgresql.find { |cl| cl["flavor"] == server_flavor }
@@ -169,7 +169,7 @@ class Bosh::CloudFoundry::Config::PostgresqlServiceConfig
     end
   end
 
-  # @returns [Integer] the ballpark ram for postgresql, BOSH agent, etc
+  # @return [Integer] the ballpark ram for postgresql, BOSH agent, etc
   def preallocated_ram
     300
   end

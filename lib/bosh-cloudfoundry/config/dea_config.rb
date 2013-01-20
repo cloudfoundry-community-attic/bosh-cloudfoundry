@@ -129,12 +129,12 @@ class Bosh::CloudFoundry::Config::DeaConfig
     end
   end
 
-  # @returns [Integer] available ram for running CloudFoundry apps
+  # @return [Integer] available ram for running CloudFoundry apps
   def max_memory_for_dedicated_dea
     ram_for_server_flavor - preallocated_ram
   end
 
-  # @returns [Integer] the ballpark ram for DEA, BOSH agent, etc
+  # @return [Integer] the ballpark ram for DEA, BOSH agent, etc
   def preallocated_ram
     300
   end

@@ -8,7 +8,7 @@ class Bosh::CloudFoundry::Providers::AWS
     @fog_compute = fog_compute
   end
 
-  # @returns [Integer] megabytes of RAM for requested flavor of server
+  # @return [Integer] megabytes of RAM for requested flavor of server
   def ram_for_server_flavor(server_flavor_id)
     if flavor = fog_compute_flavor(server_flavor_id)
       flavor[:ram]
@@ -17,7 +17,7 @@ class Bosh::CloudFoundry::Providers::AWS
     end
   end
 
-  # @returns [Hash] e.g. { :bits => 0, :cores => 2, :disk => 0, 
+  # @return [Hash] e.g. { :bits => 0, :cores => 2, :disk => 0, 
   #   :id => 't1.micro', :name => 'Micro Instance', :ram => 613}
   # or nil if +server_flavor_id+ is not a supported flavor ID
   def fog_compute_flavor(server_flavor_id)
@@ -31,7 +31,7 @@ class Bosh::CloudFoundry::Providers::AWS
     Fog::Compute::AWS::FLAVORS
   end
 
-  # @returns [String] provisions a new public IP address in target region
+  # @return [String] provisions a new public IP address in target region
   # TODO nil if none available
   def provision_public_ip_address
     return unless fog_compute

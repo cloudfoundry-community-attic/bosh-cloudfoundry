@@ -332,18 +332,18 @@ module Bosh::Cli::Command
       end
     end
 
-    # @returns [Array] BOSH releases available in target BOSH
+    # @return [Array] BOSH releases available in target BOSH
     # [{"name"=>"appcloud", "versions"=>["124", "126"], "in_use"=>[]}]
     def bosh_releases
       @bosh_releases ||= releases = director.list_releases
     end
 
-    # @returns [Array] BOSH release names available in target BOSH
+    # @return [Array] BOSH release names available in target BOSH
     def bosh_release_names
       @bosh_release_names ||= bosh_releases.map { |rel| rel["name"] }
     end
 
-    # @returns [Array] BOSH release versions for specific release name in target BOSH
+    # @return [Array] BOSH release versions for specific release name in target BOSH
     def bosh_release_versions(release_name)
       if release = bosh_releases.find { |rel| rel["name"] == release_name }
         release["versions"]
@@ -352,7 +352,7 @@ module Bosh::Cli::Command
       end
     end
 
-    # @returns [Version String] BOSH version number; converts 'latest' into actual version
+    # @return [Version String] BOSH version number; converts 'latest' into actual version
     def effective_release_version
       if release_version == "latest"
         latest_final_release_tag_number.to_s
