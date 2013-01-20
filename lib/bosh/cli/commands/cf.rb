@@ -248,10 +248,10 @@ module Bosh::Cli::Command
 
     # Assert that system configuration is available or prompt for values
     def confirm_or_prompt_for_system_requirements
-      validate_root_dns_maps_to_core_ip
-      validate_security_group
-      validate_compute_flavor(core_server_flavor)
       generate_generatable_options
+      validate_root_dns_maps_to_core_ip
+      ensure_security_group_prepared
+      validate_compute_flavor(core_server_flavor)
       admin_emails
       confirm_or_upload_release
       confirm_or_upload_stemcell
@@ -584,8 +584,23 @@ module Bosh::Cli::Command
 
     # Ensures that the security group exists
     # and has the correct ports open
-    def validate_security_group
-      provider.create_security_group(system_config.security_group)
+    def ensure_security_group_prepared
+      provider.create_security_group(system_config.security_group, required_public_ports)
+    end
+
+    # TODO this could change based on jobs being included
+    def required_public_ports
+      {
+        ssh: 22,
+        http: 80,
+        https: 433,
+        postgres: 2544,
+        resque: 3456,
+        nats: 4222,
+        router: 8080,
+        # TODO serialization_data_server: 8090, - if NFS enabled
+        uaa: 8100
+      }
     end
 
     # Validates that +domain+ is an A record that resolves to +expected_ip_addresses+

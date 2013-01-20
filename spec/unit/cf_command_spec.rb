@@ -144,9 +144,13 @@ describe Bosh::Cli::Command::Base do
       cmd.should_receive(:bosh_stemcell_versions).exactly(4).times.and_return(['0.6.4'])
       cmd.should_receive(:render_system)
 
-      # TODO AWS#create_security_group should be called
       provider = Bosh::CloudFoundry::Providers::AWS.new
-      provider.should_receive(:create_security_group)
+      ports = {
+        ssh: 22, http: 80, https: 433,
+        postgres: 2544, resque: 3456,
+        nats: 4222, router: 8080, uaa: 8100
+      }
+      provider.should_receive(:create_security_group).with("cloudfoundry-production", ports)
       Bosh::CloudFoundry::Providers.should_receive(:for_bosh_provider_name).and_return(provider)
 
       cmd.add_option(:core_ip, '1.2.3.4')
