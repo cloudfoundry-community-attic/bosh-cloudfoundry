@@ -134,7 +134,7 @@ describe Bosh::Cli::Command::Base do
 
       cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
       cmd.stub!(:bosh_target_uuid).and_return("DIRECTOR_UUID")
-      cmd.should_receive(:generate_random_password).and_return('c1oudc0wc1oudc0w')
+      cmd.should_receive(:pick_random_password).and_return('c1oudc0wc1oudc0w')
       cmd.should_receive(:bosh_releases).exactly(2).times.and_return([
         {"name"=>"appcloud", "versions"=>["124", "126"], "in_use"=>[]},
         {"name"=>"appcloud-dev", "versions"=>["124.1-dev", "126.1-dev"], "in_use"=>[]},
@@ -163,6 +163,11 @@ describe Bosh::Cli::Command::Base do
     it "creates new system" do
       generate_new_system(@cmd)
       File.basename(@cmd.system).should == "production"
+    end
+
+    it "new system has common random password" do
+      generate_new_system(@cmd)
+      @cmd.system_config.common_password.should == "c1oudc0wc1oudc0w"
     end
 
     it "sets 3 x m1.large dea server" do

@@ -243,6 +243,7 @@ module Bosh::Cli::Command
     def confirm_or_prompt_for_system_requirements
       validate_root_dns_maps_to_core_ip
       validate_compute_flavor(core_server_flavor)
+      generate_generatable_options
       admin_emails
       confirm_or_upload_release
       confirm_or_upload_stemcell
@@ -611,6 +612,15 @@ module Bosh::Cli::Command
         end
       else
         err("Please implemenet cf.rb's validate_compute_flavor for this IaaS")
+      end
+    end
+
+    # If any system_config values that are needed are not provided,
+    # then ensure that a generated value is stored
+    def generate_generatable_options
+      common_password
+      if aws?
+        aws_security_group
       end
     end
 

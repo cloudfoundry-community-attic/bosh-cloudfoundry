@@ -49,9 +49,7 @@ module Bosh::CloudFoundry::ConfigOptions
       system_config.release_name ||= DEFAULT_RELEASE_NAME
       system_config.release_version ||= DEFAULT_RELEASE_VERSION
       system_config.stemcell_name ||= DEFAULT_STEMCELL_NAME
-      system_config.common_password = generate_random_password
       system_config.common_persistent_disk = DEFAULT_COMMONT_PERSISTENT_DISK
-      system_config.aws_security_group = "default" # TODO create one with right ports
       system_config.save
       system_config
     end
@@ -88,7 +86,9 @@ module Bosh::CloudFoundry::ConfigOptions
     #       system_config.save
     #     end
     #     return system_config.release_name if system_config.release_name
-    #     choose_release_name # if it exists
+    #     choose_release_name # if it exists; OR
+    #     generate_release_name # if it exists; OR
+    #     nil
     #   end
     define_method config_option do
       # convert :system_config into the instance of SystemConfig
@@ -102,6 +102,8 @@ module Bosh::CloudFoundry::ConfigOptions
       return config_value if config_value
       if self.respond_to?(:"choose_#{config_option}")
         self.send(:"choose_#{config_option}")
+      elsif self.respond_to?(:"generate_#{config_option}")
+        self.send(:"generate_#{config_option}")
       else
         nil
       end
@@ -140,6 +142,12 @@ module Bosh::CloudFoundry::ConfigOptions
 
   # @return [Integer] the persistent disk size (Mb) attached to any server that wants one
   overriddable_config_option :common_persistent_disk, :system_config
+
+  # @returns [String] a strong password used throughout deployment manifests
+  overriddable_config_option :common_password, :system_config
+
+  # @returns [String] name of AWS security group being used
+  overriddable_config_option :aws_security_group, :system_config
 
   # @return [String] CloudFoundry BOSH release git URI
   def cf_release_git_repo
@@ -320,8 +328,16 @@ module Bosh::CloudFoundry::ConfigOptions
     system_config.admin_emails
   end
 
-  def generate_random_password
-    'c1oudc0wc1oudc0w'
+  def generate_common_password
+    system_config.common_password = pick_random_password
+    system_config.save
+    system_config.common_password
+  end
+
+  def generate_aws_security_group
+    system_config.aws_security_group = "default"
+    system_config.save
+    system_config.aws_security_group
   end
 
   # List of versions of stemcell called "bosh-stemcell" that are available
@@ -339,4 +355,7 @@ module Bosh::CloudFoundry::ConfigOptions
     end
   end
 
+  def pick_random_password
+    'c1oudc0wc1oudc0w'
+  end
 end
