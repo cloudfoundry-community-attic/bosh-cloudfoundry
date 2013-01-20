@@ -53,13 +53,7 @@ describe Bosh::CloudFoundry::ConfigOptions do
     end
 
     it "common_password is 16 characters long" do
-      p generate_common_password
-      p generate_common_password
-      p generate_common_password
-      p generate_common_password
-      password = generate_common_password
-      p password
-      password.size.should == 16
+      generate_common_password.size.should == 16
     end
   end
 end
