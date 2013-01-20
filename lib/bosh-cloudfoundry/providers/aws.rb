@@ -54,12 +54,22 @@ class Bosh::CloudFoundry::Providers::AWS
       sg = fog_compute.security_groups.create(name: security_group_name, description: "microbosh")
       puts "Created security group #{security_group_name}"
     else
-      puts "reusing security group #{security_group_name}"
+      puts "Reusing security group #{security_group_name}"
     end
+    ip_permissions = sg.ip_permissions
+    ports_opened = 0
     ports.each do |name, port|
-      sg.authorize_port_range(port..port)
-      puts " -> opened #{name} port #{port}"
+      unless port_open?(ip_permissions, port)
+        sg.authorize_port_range(port..port)
+        puts " -> opened #{name} port #{port}"
+        ports_opened += 1
+      end
     end
+    puts " -> no additional ports opened" if ports_opened == 0
+    true
   end
 
+  def port_open?(ip_permissions, port)
+    ip_permissions.find {|ip| ip["fromPort"] <= port && ip["toPort"] >= port }
+  end
 end
