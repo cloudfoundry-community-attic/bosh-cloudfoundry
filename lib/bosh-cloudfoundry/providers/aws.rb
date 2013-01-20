@@ -40,4 +40,26 @@ class Bosh::CloudFoundry::Providers::AWS
     # TODO catch error and return nil
   end
 
+  # Creates or reuses an AWS security group and opens ports.
+  # 
+  # +security_group_name+ is the name to be created or reused
+  # +ports+ is a hash of name/port for ports to open, for example:
+  # {
+  #   ssh: 22,
+  #   http: 80,
+  #   https: 443
+  # }
+  def create_security_group(security_group_name, ports)
+    unless fog_compute.security_groups.get(security_group_name)
+      sg = fog_compute.security_groups.create(name: security_group_name, description: "microbosh")
+      puts "created security group #{security_group_name}"
+    else
+      puts "reusing security group #{security_group_name}"
+    end
+    ports.each do |name, port|
+      sg.authorize_port_range(port..port)
+      puts "opened #{name} port #{port} in security group #{security_group_name}"
+    end
+  end
+
 end

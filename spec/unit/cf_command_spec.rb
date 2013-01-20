@@ -144,6 +144,8 @@ describe Bosh::Cli::Command::Base do
       cmd.should_receive(:bosh_stemcell_versions).exactly(4).times.and_return(['0.6.4'])
       cmd.should_receive(:render_system)
 
+      # TODO AWS#create_security_group should be called
+
       cmd.add_option(:core_ip, '1.2.3.4')
       cmd.add_option(:root_dns, 'mycompany.com')
       cmd.add_option(:cf_release, 'appcloud')

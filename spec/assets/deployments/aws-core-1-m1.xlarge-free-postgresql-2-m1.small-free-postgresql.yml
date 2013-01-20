@@ -21,12 +21,12 @@ networks:
   type: dynamic
   cloud_properties: 
     security_groups: 
-    - default
+    - cloudfoundry-production
 - name: vip_network
   type: vip
   cloud_properties: 
     security_groups: 
-    - default
+    - cloudfoundry-production
 resource_pools: 
 - name: core
   network: default

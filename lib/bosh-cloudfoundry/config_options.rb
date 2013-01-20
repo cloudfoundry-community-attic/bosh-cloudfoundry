@@ -337,8 +337,8 @@ module Bosh::CloudFoundry::ConfigOptions
     OpenSSL::Random.random_bytes(size).unpack("H*")[0][0..size-1]
   end
 
-  def generate_aws_security_group
-    "default"
+  def generate_security_group
+    "cloudfoundry-#{system_name}"
   end
 
   # List of versions of stemcell called "bosh-stemcell" that are available

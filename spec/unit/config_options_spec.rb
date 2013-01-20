@@ -10,7 +10,7 @@ describe Bosh::CloudFoundry::ConfigOptions do
   before do
     @options = {
       common_config: File.join(Dir.mktmpdir, "bosh_common_config.yml"),
-      system: File.join(Dir.mktmpdir, "system"),
+      system: File.join(Dir.mktmpdir, "systems", "production"),
       bosh_target: 'http://1.2.3.4:25555',
       bosh_target_uuid: 'UUUUUIIIIIDDDD'
     }
@@ -54,6 +54,11 @@ describe Bosh::CloudFoundry::ConfigOptions do
 
     it "common_password is 16 characters long" do
       generate_common_password.size.should == 16
+    end
+
+    it "generate_security_group includes system name" do
+      security_group.should == "cloudfoundry-production"
+      generate_security_group.should == "cloudfoundry-production"
     end
   end
 end
