@@ -7,6 +7,9 @@ require "common/common"
 require "common/thread_formatter"
 require "cli"
 
+# for generating password
+require 'openssl'
+
 # for the #sh helper
 require "rake"
 require "rake/file_utils"

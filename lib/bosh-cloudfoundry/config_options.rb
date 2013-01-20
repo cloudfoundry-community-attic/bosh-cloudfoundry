@@ -22,6 +22,7 @@ module Bosh::CloudFoundry::ConfigOptions
   DEFAULT_RELEASE_VERSION = "124" # FIXME restore to "latest" when #49 fixed
   DEFAULT_STEMCELL_NAME = "bosh-stemcell"
   DEFAULT_COMMONT_PERSISTENT_DISK = 16192
+  COMMON_PASSWORD_SIZE = 16 # characters; the min for the CC password
 
   # @return [Bosh::CloudFoundry::Config:: CommonConfig] Current common CF configuration
   def common_config
@@ -331,8 +332,9 @@ module Bosh::CloudFoundry::ConfigOptions
     system_config.admin_emails
   end
 
-  def generate_common_password
-    "c1oudc0wc1oudc0w"
+  # generates a password of a specific length; defaults to size +COMMON_PASSWORD_SIZE+
+  def generate_common_password(size=COMMON_PASSWORD_SIZE)
+    OpenSSL::Random.random_bytes(size).unpack("H*")[0][0..size-1]
   end
 
   def generate_aws_security_group

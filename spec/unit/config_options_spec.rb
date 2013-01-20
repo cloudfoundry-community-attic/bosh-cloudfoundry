@@ -51,5 +51,15 @@ describe Bosh::CloudFoundry::ConfigOptions do
       core_server_flavor.should == "CHANGED"
       system_config.core_server_flavor.should == "CHANGED"
     end
+
+    it "common_password is 16 characters long" do
+      p generate_common_password
+      p generate_common_password
+      p generate_common_password
+      p generate_common_password
+      password = generate_common_password
+      p password
+      password.size.should == 16
+    end
   end
 end
