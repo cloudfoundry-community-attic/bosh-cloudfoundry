@@ -220,12 +220,11 @@ describe Bosh::Cli::Command::Base do
       redis_config["count"].should == 2
     end
 
-    it "shows the common internal password"
-    #  do
-    #   generate_new_system
-    #   @cmd.system_config.common_password.should == 'c1oudc0wc1oudc0w'
-    #   @cmd.show_password
-    # end
+    it "shows the common internal password" do
+      generate_new_system
+      @cmd.system_config.common_password.should == 'c1oudc0wc1oudc0w'
+      @cmd.show_password
+    end
 
     # create some 'deployments/*.yml' files and
     # assert that bosh attempted to deploy each one:

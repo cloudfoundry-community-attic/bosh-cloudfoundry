@@ -153,6 +153,13 @@ module Bosh::Cli::Command
       sh "nats-sub '*.*' -s #{nats_uri}"
     end
 
+    usage "cf show password"
+    desc "displays the common password for internal access"
+    def show_password
+      confirm_system
+      say system_config.common_password
+    end
+
     # Creates initial system folder & targets that system folder
     # The +system_config+ configuration does not work until
     # a system folder is created and targeted so that a
