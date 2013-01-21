@@ -23,7 +23,9 @@ require 'net/dns'
 require "fog"
 require 'fog/aws/models/compute/flavors'
 
+# CLI mixins
 require "bosh-cloudfoundry/config_options"
+require "bosh-cloudfoundry/bosh_release_manager"
 
 require "bosh-cloudfoundry/config"
 require "bosh-cloudfoundry/providers"
