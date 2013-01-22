@@ -262,17 +262,10 @@ module Bosh::Cli::Command
     # already uploaded to BOSH, else
     # proceeds to upload the release
     def confirm_or_upload_release
-      unless release_name
-        system_config.release_name = DEFAULT_RELEASE_NAME
-        if options[:edge]
-          system_config.release_name += "-dev"
-        end
-        system_config.save
-      end
-      say "Using BOSH release name #{release_name} #{effective_release_version}".green
-      unless bosh_release_names.include?(release_name) &&
-              bosh_release_versions(release_name).include?(effective_release_version)
-        say "BOSH does not contain release #{release_name.green} #{effective_release_version.green}, uploading...".yellow
+      switch_to_development_release if options[:edge] || options[:custom]
+      say "Using BOSH release name #{release_name_version} (#{effective_release_version})".green
+      unless bosh_release_names.include?(release_name)
+        say "BOSH does not contain release #{release_name.green}, uploading...".yellow
         upload_release
       end
     end

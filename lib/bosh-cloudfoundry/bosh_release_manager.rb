@@ -2,6 +2,9 @@
 
 module Bosh; module CloudFoundry; end; end
 
+# There are two concepts of "latest".
+# * for upload: "latest" is the highest release in cf-release
+# * for manifest creation: "latest" is the highest release already uploaded to the BOSH
 module Bosh::CloudFoundry::BoshReleaseManager
   
   # @return [Array] BOSH releases available in target BOSH
@@ -24,6 +27,10 @@ module Bosh::CloudFoundry::BoshReleaseManager
     end
   end
 
+  def release_name_version
+    "#{release_name}/#{release_version}"
+  end
+
   # @return [Version String] BOSH version number; converts 'latest' into actual version
   def effective_release_version
     if release_version == "latest"
@@ -33,6 +40,7 @@ module Bosh::CloudFoundry::BoshReleaseManager
     end
   end
 
+  # for upload, "latest" is the newest release in cf-release
   def upload_final_release
     release_number = use_latest_release? ? 
       latest_final_release_tag_number :
@@ -80,6 +88,31 @@ module Bosh::CloudFoundry::BoshReleaseManager
         err("Please raise an issue with https://github.com/StarkAndWayne/bosh-cloudfoundry/issues")
       end
     end
+  end
+
+  # Looks at the last line of releases/index.yml in cf-release 
+  # for the latest release number that could be uploaded
+  # @returns [String] a number such as "126"
+  def latest_uploadable_final_release_number
+    chdir(cf_release_dir) do
+      `tail -n 1 releases/index.yml | awk '{print $2}'`.strip
+    end
+  end
+
+  # Looks at the last line of releases/index.yml in cf-release 
+  # for the latest release number that could be uploaded
+  # @returns [String] a dev release code such as "126.8-dev"
+  def latest_uploadable_dev_release_number
+    chdir(cf_release_dir) do
+      `tail -n 1 dev_releases/index.yml | awk '{print $2}'`.strip
+    end
+  end
+
+  # @returns [String] absolute path to latest release to be uploaded
+  def latest_dev_release_filename
+    dev_release_number = latest_uploadable_dev_release_number
+    return nil unless dev_release_number.size > 0
+    File.join(cf_release_dir, "#{release_name}-#{dev_release_number}.yml")
   end
 
   def create_dev_release(release_name="appcloud-dev")
@@ -132,5 +165,19 @@ module Bosh::CloudFoundry::BoshReleaseManager
     end
   end
 
+  def default_release_name
+    "appcloud"
+  end
 
+  def switch_to_development_release
+    system_config.release_name = default_release_name + "-dev"
+    system_config.release_version = "latest"
+    system_config.save
+  end
+
+  def switch_to_final_release
+    system_config.release_name = default_release_name
+    system_config.release_version = "latest"
+    system_config.save
+  end
 end
