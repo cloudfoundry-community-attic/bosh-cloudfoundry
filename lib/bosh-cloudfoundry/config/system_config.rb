@@ -27,6 +27,7 @@ class Bosh::CloudFoundry::Config::SystemConfig < Bosh::Cli::Config
     :system_dir,       # e.g. /var/vcap/store/systems/production
     :release_name,     # e.g. 'appcloud'
     :release_version,  # e.g. 'latest'
+    :gerrit_changes,   # e.g. ['84/13084/4', '37/13137/4']
     :stemcell_name,    # e.g. 'bosh-stemcell'
     :stemcell_version, # e.g. '0.6.7'
     :core_ip,          # Static IP for Core CF server (router, cc) e.g. '1.2.3.4'

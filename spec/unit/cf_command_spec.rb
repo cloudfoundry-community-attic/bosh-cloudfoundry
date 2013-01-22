@@ -258,6 +258,15 @@ describe Bosh::Cli::Command::Base do
       @cmd.watch_nats
     end
 
+    it "merges gerrit patches" do
+      generate_new_system
+      @cmd.should_receive(:create_and_change_into_patches_branch)
+      @cmd.should_receive(:sh).
+        with("git pull http://reviews.cloudfoundry.org/cf-release refs/changes/84/13084/4")
+      @cmd.should_receive(:create_and_upload_dev_release)
+      @cmd.merge_gerrit("refs/changes/84/13084/4")
+    end
+
     it "returns bosh_release_versions" do
       @cmd.should_receive(:bosh_releases).exactly(3).times.and_return([
         {"name"=>"appcloud", "versions"=>["124", "126"], "in_use"=>[]},

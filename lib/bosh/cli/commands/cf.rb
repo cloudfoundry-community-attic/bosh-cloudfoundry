@@ -8,6 +8,7 @@ module Bosh::Cli::Command
     include Bosh::Cli::VersionCalc
     include Bosh::CloudFoundry::ConfigOptions
     include Bosh::CloudFoundry::BoshReleaseManager
+    include Bosh::CloudFoundry::GerritPatchesHelper
     include FileUtils
 
     usage "cf"
@@ -128,6 +129,28 @@ module Bosh::Cli::Command
         create_and_upload_dev_release
       else
         upload_final_release
+      end
+    end
+
+    usage "cf merge gerrit"
+    desc "create development release including one or more gerrit patches"
+    def merge_gerrit(gerrit_change)
+      # gerrit_change might be:
+      # * refs/changes/84/13084/4
+      # * 84/13084/4
+      # * 'git pull http://reviews.cloudfoundry.org/cf-release refs/changes/84/13084/4'
+      if refs_change = extract_refs_change(gerrit_change)
+        add_gerrit_refs_change(refs_change)
+        apply_gerrit_patches
+        create_and_upload_dev_release
+      else
+        say "Please provide the gerrit change information in one of the following formats:".red
+        say " -> bosh cf merge gerrit refs/changes/84/13084/4"
+        say " -> bosh cf merge gerrit 84/13084/4"
+        say " -> bosh cf merge gerrit 'git pull http://reviews.cloudfoundry.org/cf-release refs/changes/84/13084/4'"
+        say ""
+        say "Please re-run the command again with the change reference formatted as above.".red
+        exit 1
       end
     end
 
