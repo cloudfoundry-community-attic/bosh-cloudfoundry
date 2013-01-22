@@ -27,7 +27,7 @@ module Bosh::CloudFoundry::GerritPatchesHelper
     # is the gerrit setup necessary; or can use anonymous HTTP?
     # confirm_gerrit_username # http://reviews.cloudfoundry.org/#/settings/
     # confirm_user_added_vcap_ssh_keys_to_gerrit # http://reviews.cloudfoundry.org/#/settings/ssh-keys
-    # confirm_ssh_access # ssh -p 29418 drnic@reviews.cloudfoundry.org 2&>1 | grep "Permission denied"
+    # confirm_ssh_access # ssh -p 29418 drnic@reviews.cloudfoundry.org 2>&1 | grep "Permission denied"
     ssh_uri = "http://reviews.cloudfoundry.org/cf-release"
     chdir(cf_release_dir) do
       create_and_change_into_patches_branch
@@ -39,7 +39,7 @@ module Bosh::CloudFoundry::GerritPatchesHelper
 
   def create_and_change_into_patches_branch
     sh "git checkout master"
-    sh "git branch -D patches 2&>1 /dev/null"
+    sh "git branch -D patches 2>&1"
     sh "git checkout -b patches"
   end
 end
