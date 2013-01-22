@@ -17,8 +17,10 @@ module Bosh::CloudFoundry::GerritPatchesHelper
 
   def add_gerrit_refs_change(refs_change)
     system_config.gerrit_changes ||= []
-    system_config.gerrit_changes << refs_change
-    system_config.save
+    unless system_config.gerrit_changes.include?(refs_change)
+      system_config.gerrit_changes << refs_change
+      system_config.save
+    end
   end
   
   def apply_gerrit_patches
