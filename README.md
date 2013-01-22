@@ -29,7 +29,7 @@ rake install
 
 export TMPDIR=/var/vcap/store/tmp
 bosh cf upload stemcell --custom
-bosh cf upload release --edge
+bosh cf upload release --dev
 
 bosh cf prepare system production --release-name appcloud-dev
 # prompts for a DNS host for your CloudFoundry, such as mycompany.com
@@ -102,7 +102,7 @@ You can upload a more recent final BOSH release of CloudFoundry, or create a non
 
 ```
 bosh cf upload release
-bosh cf upload release --edge
+bosh cf upload release --dev
 ```
 
 ### All available commands
@@ -138,9 +138,9 @@ cf upload stemcell [--latest] [--custom]
     --latest Use latest stemcell; possibly not tagged stable 
     --custom Create custom stemcell from BOSH git source 
 
-cf upload release [--edge] 
+cf upload release [--dev] 
     fetch & upload public cloudfoundry release to BOSH 
-    --edge Create development release from very latest cf-release commits 
+    --dev Create development release from very latest cf-release commits 
 
 cf deploy 
     deploy CloudFoundry system or apply any changes 

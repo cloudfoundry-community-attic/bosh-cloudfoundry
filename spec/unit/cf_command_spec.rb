@@ -91,8 +91,8 @@ describe Bosh::Cli::Command::Base do
       @cmd.should_receive(:sh).with("sed -i 's#git@github.com:#https://github.com/#g' .gitmodules")
       @cmd.should_receive(:sh).with("sed -i 's#git://github.com#https://github.com#g' .gitmodules")
       @cmd.should_receive(:sh).with("git submodule update --init")
-      @cmd.should_receive(:`).with("git log --tags --simplify-by-decoration --pretty='%d' | head -n 1").
-        and_return(" (v126, origin/built)\n")
+      @cmd.should_receive(:`).with("tail -n 1 releases/index.yml | awk '{print $2}'").
+        and_return("126")
       @cmd.should_receive(:sh).with("bosh -n --color upload release releases/appcloud-126.yml")
       @cmd.upload_release
     end
@@ -101,7 +101,7 @@ describe Bosh::Cli::Command::Base do
       cf_release_dir = File.join(@releases_dir, "cf-release")
       FileUtils.mkdir_p(cf_release_dir)
       @cmd.common_config.cf_release_dir = cf_release_dir
-      @cmd.add_option(:edge, true)
+      @cmd.add_option(:dev, true)
 
       @cmd.should_receive(:sh).with("git pull origin master")
       script = <<-BASH.gsub(/^      /, '')

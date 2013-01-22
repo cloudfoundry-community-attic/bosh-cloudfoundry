@@ -120,14 +120,12 @@ module Bosh::Cli::Command
     end
 
     usage "cf upload release"
-    desc "fetch & upload public cloudfoundry release to BOSH"
-    option "--edge", "Create development release from very latest cf-release commits"
+    desc "fetch & upload latest public cloudfoundry release to BOSH"
+    option "--dev", "Create development release from very latest cf-release commits"
     def upload_release
-      create_edge_development_release = options[:edge]
       clone_or_update_cf_release
-      if create_edge_development_release
-        create_dev_release
-        upload_dev_release
+      if options.delete(:dev)
+        create_and_upload_dev_release
       else
         upload_final_release
       end
@@ -262,7 +260,7 @@ module Bosh::Cli::Command
     # already uploaded to BOSH, else
     # proceeds to upload the release
     def confirm_or_upload_release
-      switch_to_development_release if options[:edge] || options[:custom]
+      switch_to_development_release if options.delete(:edge) || options.delete(:custom) || options.delete(:dev)
       say "Using BOSH release name #{release_name_version} (#{effective_release_version})".green
       unless bosh_release_names.include?(release_name)
         say "BOSH does not contain release #{release_name.green}, uploading...".yellow
