@@ -28,9 +28,9 @@ module Bosh::CloudFoundry::GerritPatchesHelper
     # confirm_gerrit_username # http://reviews.cloudfoundry.org/#/settings/
     # confirm_user_added_vcap_ssh_keys_to_gerrit # http://reviews.cloudfoundry.org/#/settings/ssh-keys
     # confirm_ssh_access # ssh -p 29418 drnic@reviews.cloudfoundry.org 2>&1 | grep "Permission denied"
+    create_and_change_into_patches_branch
     ssh_uri = "http://reviews.cloudfoundry.org/cf-release"
     chdir(cf_release_dir) do
-      create_and_change_into_patches_branch
       system_config.gerrit_changes.each do |refs_change|
         sh "git pull #{ssh_uri} refs/changes/#{refs_change}"
       end
@@ -38,8 +38,10 @@ module Bosh::CloudFoundry::GerritPatchesHelper
   end
 
   def create_and_change_into_patches_branch
-    sh "git checkout master"
-    sh "git branch -D patches 2>&1"
-    sh "git checkout -b patches"
+    chdir(cf_release_dir) do
+      sh "git checkout master"
+      sh "git branch -f patches" # force create
+      sh "git checkout patches"
+    end
   end
 end
