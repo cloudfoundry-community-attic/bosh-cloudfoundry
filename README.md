@@ -29,7 +29,7 @@ rake install
 
 export TMPDIR=/var/vcap/store/tmp
 bosh cf upload stemcell --custom
-bosh cf upload release --dev
+bosh cf merge gerrit 37/13137/4 84/13084/4
 
 bosh cf prepare system production --release-name appcloud-dev
 # prompts for a DNS host for your CloudFoundry, such as mycompany.com
