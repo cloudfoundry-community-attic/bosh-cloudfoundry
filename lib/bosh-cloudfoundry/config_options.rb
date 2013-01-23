@@ -288,6 +288,10 @@ module Bosh::CloudFoundry::ConfigOptions
     if system_config.core_ip.blank?
       say "Provisioning #{bosh_provider} public IP address..."
       system_config.core_ip = provider.provision_public_ip_address
+      if system_config.core_ip.blank?
+        say "Hmmm, I wasn't able to get a public IP at the moment. Perhaps try again or provision it manually?".red
+        exit 1
+      end
     end
     system_config.save
     system_config.core_ip
