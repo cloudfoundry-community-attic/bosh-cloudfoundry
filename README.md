@@ -28,13 +28,23 @@ bundle
 rake install
 
 export TMPDIR=/var/vcap/store/tmp
+bosh cf upload release --dev
+
+bosh cf prepare system production
+# prompts for a DNS host for your CloudFoundry, such as mycompany.com
+# will generate a new IP address
+# now setup your DNS for *.mycompany.com => new IP address
+# the re-run:
+bosh cf prepare system production
+
 bosh cf upload stemcell --custom
 bosh cf merge gerrit 37/13137/4 84/13084/4
+bosh deploy
 
-bosh cf prepare system production --release-name appcloud-dev
-# prompts for a DNS host for your CloudFoundry, such as mycompany.com
+# now we can grow our single VM deployment
+
 bosh cf change deas 1
-bosh cf add service postgresql 1
+bosh cf add service postgresql
 bosh deploy
 ```
 
