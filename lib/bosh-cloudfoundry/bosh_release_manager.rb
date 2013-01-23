@@ -115,7 +115,7 @@ module Bosh::CloudFoundry::BoshReleaseManager
       # Date 2012-12-06
       sh "sed -i 's#git@github.com:#https://github.com/#g' .gitmodules"
       sh "sed -i 's#git://github.com#https://github.com#g' .gitmodules"
-      sh "git submodule update --init"
+      sh "git submodule update --init --recursive"
     end
   end
 

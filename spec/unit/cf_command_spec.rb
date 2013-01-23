@@ -90,7 +90,7 @@ describe Bosh::Cli::Command::Base do
       BASH
       @cmd.should_receive(:sh).with("sed -i 's#git@github.com:#https://github.com/#g' .gitmodules")
       @cmd.should_receive(:sh).with("sed -i 's#git://github.com#https://github.com#g' .gitmodules")
-      @cmd.should_receive(:sh).with("git submodule update --init")
+      @cmd.should_receive(:sh).with("git submodule update --init --recursive")
       @cmd.should_receive(:`).with("tail -n 1 releases/index.yml | awk '{print $2}'").
         and_return("126")
       @cmd.should_receive(:sh).with("bosh -n --color upload release releases/appcloud-126.yml")
@@ -114,7 +114,7 @@ describe Bosh::Cli::Command::Base do
       BASH
       @cmd.should_receive(:sh).with("sed -i 's#git@github.com:#https://github.com/#g' .gitmodules")
       @cmd.should_receive(:sh).with("sed -i 's#git://github.com#https://github.com#g' .gitmodules")
-      @cmd.should_receive(:sh).with("git submodule update --init")
+      @cmd.should_receive(:sh).with("git submodule update --init --recursive")
       @cmd.should_receive(:write_dev_config_file).with("appcloud-dev")
       @cmd.should_receive(:sh).with("bosh create release --with-tarball --force")
       @cmd.should_receive(:sh).with("bosh -n --color upload release")
