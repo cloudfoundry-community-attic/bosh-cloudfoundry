@@ -30,7 +30,7 @@ rake install
 export TMPDIR=/var/vcap/store/tmp
 bosh cf upload release --dev
 
-bosh cf prepare system production
+bosh cf prepare system production --release-name appcloud-dev
 # prompts for a DNS host for your CloudFoundry, such as mycompany.com
 # will generate a new IP address
 # now setup your DNS for *.mycompany.com => new IP address
