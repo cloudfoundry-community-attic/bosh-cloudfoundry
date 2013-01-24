@@ -181,7 +181,6 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
           "router",
           "health_manager",
           "cloud_controller",
-          "acm",
           # "debian_nfs_server",
           # "serialization_data_server",
           "stager",
@@ -215,11 +214,9 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
          "port"=>2544,
          "databases"=>
           [{"tag"=>"cc", "name"=>"appcloud"},
-           {"tag"=>"acm", "name"=>"acm"},
            {"tag"=>"uaa", "name"=>"uaa"}],
          "roles"=>
           [{"name"=>"root", "password"=>common_password, "tag"=>"admin"},
-           {"name"=>"acm", "password"=>common_password, "tag"=>"acm"},
            {"name"=>"uaa", "password"=>common_password, "tag"=>"uaa"}]},
        "cc"=>
         {"description"=>"Cloud Foundry",
@@ -243,13 +240,6 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
          "service_extension"=>{"service_lifecycle"=>{"max_upload_size"=>5}},
          "use_nginx"=>false},
        "postgresql_server"=>{"max_connections"=>30, "listen_address"=>"0.0.0.0"},
-       "acm"=>{"user"=>"acm", "password"=>common_password},
-       "acmdb"=>
-        {"address"=>core_ip,
-         "port"=>2544,
-         "roles"=>
-          [{"tag"=>"admin", "name"=>"acm", "password"=>common_password}],
-         "databases"=>[{"tag"=>"acm", "name"=>"acm"}]},
        # "serialization_data_server"=>
        #  {"upload_token"=>"TOKEN",
        #   "use_nginx"=>false,

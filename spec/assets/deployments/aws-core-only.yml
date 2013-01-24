@@ -45,7 +45,6 @@ jobs:
   - router
   - health_manager
   - cloud_controller
-  - acm
   - stager
   - uaa
   - vcap_redis
@@ -88,17 +87,12 @@ properties:
     databases: 
     - tag: cc
       name: appcloud
-    - tag: acm
-      name: acm
     - tag: uaa
       name: uaa
     roles: 
     - name: root
       password: c1oudc0wc1oudc0w
       tag: admin
-    - name: acm
-      password: c1oudc0wc1oudc0w
-      tag: acm
     - name: uaa
       password: c1oudc0wc1oudc0w
       tag: uaa
@@ -136,19 +130,6 @@ properties:
   postgresql_server: 
     max_connections: 30
     listen_address: 0.0.0.0
-  acm: 
-    user: acm
-    password: c1oudc0wc1oudc0w
-  acmdb: 
-    address: 1.2.3.4
-    port: 2544
-    roles: 
-    - tag: admin
-      name: acm
-      password: c1oudc0wc1oudc0w
-    databases: 
-    - tag: acm
-      name: acm
   service_lifecycle: 
     download_url: 1.2.3.4
     mount_point: /var/vcap/service_lifecycle
