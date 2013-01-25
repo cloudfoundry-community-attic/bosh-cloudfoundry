@@ -37,7 +37,7 @@ bosh cf prepare system production --release-name appcloud-dev
 # the re-run:
 bosh cf prepare system production
 
-bosh cf upload stemcell --custom
+bosh cf upload stemcell --latest
 bosh cf merge gerrit 37/13137/4 84/13084/4
 bosh deploy
 
