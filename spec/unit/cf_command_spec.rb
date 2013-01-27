@@ -60,7 +60,7 @@ describe Bosh::Cli::Command::Base do
       @cmd.stub!(:bosh_target_uuid).and_return("DIRECTOR_UUID")
       @cmd.should_receive(:sh).with("git pull origin master")
       @cmd.should_receive(:sh).with("bundle install --without development test")
-      @cmd.should_receive(:sh).with("sudo bundle exec rake stemcell2:basic['aws']")
+      @cmd.should_receive(:sh).with("sudo bundle exec rake stemcell:basic['aws']")
       @cmd.should_receive(:sh).with("sudo chown -R vcap:vcap /var/tmp/bosh/agent-*")
       @cmd.should_receive(:validate_stemcell_created_successfully)
       @cmd.should_receive(:move_and_return_created_stemcell).

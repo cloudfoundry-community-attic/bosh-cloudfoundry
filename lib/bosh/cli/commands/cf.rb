@@ -389,9 +389,9 @@ module Bosh::Cli::Command
         say "Creating new stemcell for '#{bosh_provider.green}'..."
         chdir(repos_dir) do
           clone_or_update_repository("bosh", bosh_git_repo)
-          chdir("bosh/agent") do
+          chdir("bosh") do
             sh "bundle install --without development test"
-            sh "sudo bundle exec rake stemcell2:basic['#{bosh_provider}']"
+            sh "sudo bundle exec rake stemcell:basic['#{bosh_provider}']"
             sh "sudo chown -R vcap:vcap /var/tmp/bosh/agent-*"
           end
         end
