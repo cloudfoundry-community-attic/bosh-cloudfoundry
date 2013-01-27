@@ -26,6 +26,7 @@ git clone git://github.com/StarkAndWayne/bosh-cloudfoundry.git
 cd bosh-cloudfoundry
 bundle
 rake install
+sudo gem install pkg/bosh-cloudfoundry-0.0.1.gem
 
 export TMPDIR=/var/vcap/store/tmp
 bosh cf upload release --dev
