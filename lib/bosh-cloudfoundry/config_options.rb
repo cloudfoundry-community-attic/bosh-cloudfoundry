@@ -19,7 +19,7 @@ module Bosh::CloudFoundry::ConfigOptions
   DEFAULT_STEMCELLS_PATH = "/var/vcap/store/stemcells"
   DEFAULT_REPOS_PATH = "/var/vcap/store/repos"
   DEFAULT_RELEASE_NAME = "appcloud" # name of cf-release final release name
-  DEFAULT_RELEASE_VERSION = "124" # FIXME restore to "latest" when #49 fixed
+  DEFAULT_RELEASE_VERSION = "latest"
   DEFAULT_STEMCELL_NAME = "bosh-stemcell"
   DEFAULT_COMMONT_PERSISTENT_DISK = 16192
   COMMON_PASSWORD_SIZE = 16 # characters; the min for the CC password
