@@ -4,7 +4,7 @@ You want CloudFoundry? You can now create, scale, upgrade and patch one or more 
 
 Currently supports AWS only. OpenStack support is coming. vSphere and vCloud support will require someone to tell me that they really want it.
 
-## NOTE - currently requires latest edge of nearly everything
+## NOTE - currently requires latest edge of many things
 
 This tool currently requires the latest merged patches. The readme below, from "Usage" onward, is written for when there are public stemcells and final releases.
 
@@ -12,21 +12,13 @@ Today, to get everything running:
 
 ```
 # on your laptop
-git clone git://github.com/StarkAndWayne/bosh-bootstrap.git
-cd bosh-bootstrap
-bundle
-rake install
-
+gem install bosh-bootstrap
 bosh-bootstrap deploy --latest-stemcell
+
 bosh-bootstrap ssh
 
 # now on the inception VM
-cd /var/vcap/store/repos
-git clone git://github.com/StarkAndWayne/bosh-cloudfoundry.git
-cd bosh-cloudfoundry
-bundle
-gem build *.gemspec && mv *.gem pkg/
-sudo gem install pkg/*.gem --no-ri --no-rdoc
+sudo gem install bosh-cloudfoundry
 
 export TMPDIR=/var/vcap/store/tmp
 bosh cf upload release --dev
