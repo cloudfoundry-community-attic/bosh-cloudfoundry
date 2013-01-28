@@ -3,7 +3,7 @@ name: production-core
 director_uuid: DIRECTOR_UUID
 release: 
   name: appcloud
-  version: 124
+  version: latest
 compilation: 
   workers: 10
   network: default
