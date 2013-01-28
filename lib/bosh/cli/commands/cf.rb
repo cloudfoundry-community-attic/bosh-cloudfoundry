@@ -166,7 +166,7 @@ module Bosh::Cli::Command
       end
       email = system_config.admin_emails.first
       password = system_config.common_password
-      sh "sudo gem install vmc" unless system_initialized?
+      sh "sudo gem install vmc --no-ri --no-rdoc" unless system_initialized?
       sh "vmc target http://api.#{root_dns}"
       sh "vmc register #{email} --password #{password} --verify #{password}" unless system_initialized?
       system_initialized!
