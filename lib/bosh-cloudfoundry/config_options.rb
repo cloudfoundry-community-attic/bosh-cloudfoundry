@@ -223,6 +223,15 @@ module Bosh::CloudFoundry::ConfigOptions
     end
   end
 
+  def system_initialized?
+    system_config.system_initialized
+  end
+
+  def system_initialized!
+    system_config.system_initialized = true
+    system_config.save
+  end
+
   def choose_releases_dir
     if non_interactive?
       err "Please set releases_dir configuration for non-interactive mode"

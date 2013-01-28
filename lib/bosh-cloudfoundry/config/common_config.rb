@@ -1,5 +1,7 @@
 # Copyright (c) 2012-2013 Stark & Wayne, LLC
 
+require "cli"
+
 module Bosh; module CloudFoundry; module Config; end; end; end
 
 module Bosh::CloudFoundry::Config

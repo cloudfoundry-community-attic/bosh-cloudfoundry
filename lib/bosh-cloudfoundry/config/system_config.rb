@@ -40,7 +40,8 @@ class Bosh::CloudFoundry::Config::SystemConfig < Bosh::Cli::Config
     :dea,              # e.g. { "count" => 2, "flavor" => "m1.large" }
     :postgresql,       # e.g. [{ "count" => 2, "flavor" => "m1.large", "plan" => "free" }]
     :redis,            # e.g. [{ "count" => 2, "flavor" => "m1.large", "plan" => "free" }]
-    :security_group    # e.g. "cloudfoundry-production"
+    :security_group,   # e.g. "cloudfoundry-production"
+    :system_initialized,  # e.g. true / false
   ].each do |attr|
     define_method attr do
       read(attr, false)

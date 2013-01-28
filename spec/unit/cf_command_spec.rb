@@ -247,6 +247,10 @@ describe Bosh::Cli::Command::Base do
       end
       @cmd.should_receive(:set_deployment).exactly(2).times
       @cmd.should_receive(:sh).with("bosh -n --color deploy").exactly(2).times
+      @cmd.should_receive(:sh).with("gem install vmc")
+      @cmd.should_receive(:sh).with("vmc target http://api.mycompany.com")
+      @cmd.should_receive(:sh).with(
+        "vmc register drnic@starkandwayne.com --password c1oudc0wc1oudc0w --verify c1oudc0wc1oudc0w")
       @cmd.deploy
     end
 

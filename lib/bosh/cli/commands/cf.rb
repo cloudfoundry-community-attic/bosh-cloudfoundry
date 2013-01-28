@@ -164,6 +164,12 @@ module Bosh::Cli::Command
         set_deployment(deployment)
         bosh_cmd "deploy"
       end
+      email = system_config.admin_emails.first
+      password = system_config.common_password
+      sh "gem install vmc" unless system_initialized?
+      sh "vmc target http://api.#{root_dns}"
+      sh "vmc register #{email} --password #{password} --verify #{password}" unless system_initialized?
+      system_initialized!
     end
 
     usage "cf watch nats"
