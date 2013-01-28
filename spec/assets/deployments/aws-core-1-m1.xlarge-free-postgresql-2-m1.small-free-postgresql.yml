@@ -228,7 +228,7 @@ properties:
           backup: 
             enable: true
   dea: 
-    max_memory: 512
+    max_memory: 1440.8
   postgresql_gateway: 
     admin_user: psql_admin
     admin_passwd_hash: 

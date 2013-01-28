@@ -175,4 +175,4 @@ properties:
   service_plans: {}
 
   dea: 
-    max_memory: 512
+    max_memory: 1440.8

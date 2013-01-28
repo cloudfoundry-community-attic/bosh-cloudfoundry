@@ -121,11 +121,14 @@ class Bosh::CloudFoundry::Config::DeaConfig
     }
   end
 
+  # The RAM for a dedicated DEA node
+  # else the RAM of the core/0 VM
+  # minus the +preallocated_ram+.
   def max_memory
     if dea_server_count > 0
       max_memory_for_dedicated_dea
     else
-      512
+      dea_ram_for_core_vm_flavor
     end
   end
 
@@ -137,6 +140,14 @@ class Bosh::CloudFoundry::Config::DeaConfig
   # @return [Integer] the ballpark ram for DEA, BOSH agent, etc
   def preallocated_ram
     300
+  end
+
+  def dea_ram_for_core_vm_flavor
+    ram_for_core_vm_flavor - preallocated_ram
+  end
+
+  def ram_for_core_vm_flavor
+    provider.ram_for_server_flavor(system_config.core_server_flavor)
   end
 
   def ram_for_server_flavor

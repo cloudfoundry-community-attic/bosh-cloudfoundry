@@ -19,6 +19,8 @@ describe Bosh::CloudFoundry::SystemDeploymentManifestRenderer do
     @system_dir = File.join(@systems_dir, "production")
     mkdir_p(@system_dir)
     @system_config = Bosh::CloudFoundry::Config::SystemConfig.new(@system_dir)
+    @system_config.bosh_target = "http://6.7.8.9:25555"
+    @system_config.bosh_target_uuid = "DIRECTOR_UUID"
     @system_config.bosh_provider = 'aws'
     @system_config.release_name = 'appcloud'
     @system_config.release_version = 'latest'
@@ -34,6 +36,12 @@ describe Bosh::CloudFoundry::SystemDeploymentManifestRenderer do
 
     @renderer = Bosh::CloudFoundry::SystemDeploymentManifestRenderer.new(
       @system_config, @common_config, @bosh_config)
+
+    Bosh::CloudFoundry::Providers.should_receive(:for_bosh_provider_name).
+      and_return(Bosh::CloudFoundry::Providers::AWS.new)
+    # 
+    # @dea_config = @renderer.dea_config
+    # @dea_config.should_receive(:ram_for_server_flavor).and_return(1700)
   end
 
   after(:each) do
@@ -51,8 +59,6 @@ describe Bosh::CloudFoundry::SystemDeploymentManifestRenderer do
       end
     end
     it "renders a simple system + DEAs into a deployment manifest" do
-      Bosh::CloudFoundry::Providers.should_receive(:for_bosh_provider_name).
-        and_return(Bosh::CloudFoundry::Providers::AWS.new)
       @system_config.dea = { "count" => 2, "flavor" => "m1.xlarge" }
       @renderer.perform
     

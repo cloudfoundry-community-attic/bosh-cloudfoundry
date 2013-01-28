@@ -12,7 +12,10 @@ describe Bosh::CloudFoundry::Config::DeaConfig do
     @system_dir = File.join(@systems_dir, "production")
     mkdir_p(@system_dir)
     @system_config = Bosh::CloudFoundry::Config::SystemConfig.new(@system_dir)
+    @system_config.bosh_target = "http://6.7.8.9:25555"
+    @system_config.bosh_target_uuid = "DIRECTOR_UUID"
     @system_config.bosh_provider = "aws"
+    @system_config.core_server_flavor = "m1.large"
     @manifest = YAML.load_file(spec_asset("deployments/aws-core-only.yml"))
   end
 
@@ -48,7 +51,7 @@ describe Bosh::CloudFoundry::Config::DeaConfig do
       subject.merge_manifest_properties(@manifest)
       @manifest["properties"]["dea"].should_not be_nil
       @manifest["properties"]["dea"]["max_memory"].should_not be_nil
-      @manifest["properties"]["dea"]["max_memory"].should == 512
+      @manifest["properties"]["dea"]["max_memory"].should == 7380
     end
   end
   describe "5 x m1.xlarge deas on AWS" do

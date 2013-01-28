@@ -207,7 +207,7 @@ properties:
           backup: 
             enable: true
   dea: 
-    max_memory: 512
+    max_memory: 1440.8
   redis_gateway: 
     token: TOKEN
     supported_versions: 

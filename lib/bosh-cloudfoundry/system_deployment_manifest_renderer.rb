@@ -280,7 +280,7 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
          "password"=>common_password,
          "maxmemory"=>500000000},
        "service_plans"=>{},
-       "dea"=>{"max_memory"=>512}}}
+       "dea"=>{"max_memory"=>4096}}}
   end
 
 end
