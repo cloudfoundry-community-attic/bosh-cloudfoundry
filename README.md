@@ -32,13 +32,13 @@ bosh cf prepare system production
 
 bosh cf upload stemcell --latest
 bosh cf merge gerrit 37/13137/4 84/13084/4 83/13583/1 09/13609/2
-bosh deploy
+bosh cf deploy
 
 # now we can grow our single VM deployment
 
 bosh cf change deas 1
 bosh cf add service postgresql
-bosh deploy
+bosh cf deploy
 ```
 
 Overtime, as you add more DEAs and other service nodes, your set of VMs might look like:
@@ -87,7 +87,7 @@ bosh cf prepare system production
 # prompts for a DNS host for your CloudFoundry, such as mycompany.com
 bosh cf change deas 1
 bosh cf add service postgresql 1
-bosh deploy
+bosh cf deploy
 ```
 
 During `bosh cf prepare system production`, it will automatically upload the latest release of CloudFoundry (the latest final [BOSH release](http://github.com/cloudfoundry/cf-release)) and the latest stable stemcell (becomes the base AMI for AWS, for example).
