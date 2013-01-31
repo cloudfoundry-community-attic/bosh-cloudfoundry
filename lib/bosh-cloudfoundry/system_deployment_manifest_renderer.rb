@@ -111,6 +111,8 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
   def cloud_properties_for_server_flavor(server_flavor)
     if aws?
       { "instance_type" => server_flavor }
+    elsif openstack?
+      { "instance_type" => server_flavor }
     else
       raise 'Please implement #{self.class}#cloud_properties_for_server_flavor'
     end
@@ -118,6 +120,10 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
 
   def aws?
     system_config.bosh_provider == "aws"
+  end
+
+  def openstack?
+    system_config.bosh_provider == "openstack"
   end
 
   # 

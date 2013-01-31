@@ -38,6 +38,15 @@ class Bosh::CloudFoundry::Config::MicroboshConfig
         aws_access_key_id: provider_credentials["access_key_id"],
         aws_secret_access_key: provider_credentials["secret_access_key"]
       }
+    elsif openstack?
+      {
+        provider: "openstack",
+        openstack_username: provider_credentials["username"],
+        openstack_api_key: provider_credentials["api_key"],
+        openstack_tenant: provider_credentials["tenant"],
+        openstack_auth_url: provider_credentials["auth_url"],
+        openstack_region: provider_credentials["region"]
+      }
     else
       raise "please implement #fog_credentials for #{bosh_provider}"
     end
@@ -53,6 +62,10 @@ class Bosh::CloudFoundry::Config::MicroboshConfig
 
   def aws?
     bosh_provider == "aws"
+  end
+
+  def openstack?
+    bosh_provider == "openstack"
   end
 
   # micro_bosh.yml looks like:

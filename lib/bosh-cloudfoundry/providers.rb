@@ -10,6 +10,8 @@ module Bosh::CloudFoundry::Providers
     case system_config.bosh_provider.to_sym
     when :aws
       Bosh::CloudFoundry::Providers::AWS.new(system_config.microbosh.fog_compute)
+    when :openstack
+      Bosh::CloudFoundry::Providers::OpenStack.new(system_config.microbosh.fog_compute)
     else
       raise "please support #{system_config.bosh_provider} provider"
     end
@@ -17,3 +19,4 @@ module Bosh::CloudFoundry::Providers
 end
 
 require "bosh-cloudfoundry/providers/aws"
+require "bosh-cloudfoundry/providers/openstack"

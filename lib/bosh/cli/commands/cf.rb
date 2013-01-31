@@ -258,6 +258,8 @@ module Bosh::Cli::Command
     def bosh_provider
       if aws?
         "aws"
+      elsif openstack?
+        "openstack"
       else
         err("Please implement cf.rb's bosh_provider for this IaaS")
       end
@@ -265,9 +267,14 @@ module Bosh::Cli::Command
 
     # Deploying CloudFoundry to AWS?
     # Is the target BOSH's IaaS using the AWS CPI?
-    # FIXME Currently only AWS is supported so its always AWS
     def aws?
-      true
+      system_config.bosh_provider == "aws"
+    end
+
+    # Deploying CloudFoundry to OpenStack?
+    # Is the target BOSH's IaaS using the OpenStack CPI?
+    def openstack?
+      system_config.bosh_provider == "openstack"
     end
 
     # User is prompted for common values at the
@@ -447,7 +454,7 @@ module Bosh::Cli::Command
     # | bosh-stemcell-aws-0.6.7.tgz             | aws                    |
     def bosh_stemcell_name(stemcell_type)
       tags = [bosh_provider]
-      tags << "stable" if stemcell_type == "stable"
+      tags << "stable" if stemcell_type == "stable" unless openstack?
       bosh_stemcells_cmd = "bosh public stemcells --tags #{tags.join(',')}"
       say "Locating bosh stemcell, running '#{bosh_stemcells_cmd}'..."
       `#{bosh_stemcells_cmd} | grep ' bosh-stemcell-' | awk '{ print $2 }' | sort -r | head -n 1`.strip
@@ -538,6 +545,10 @@ module Bosh::Cli::Command
         unless aws_compute_flavors.select { |flavor| flavor[:id] == flavor }
           err("Server flavor '#{flavor}' is not a valid AWS compute flavor")
         end
+      elsif openstack?
+        unless provider.fog_compute_flavor(flavor)
+          err("Server flavor '#{flavor}' is not a valid OpenStack compute flavor")
+        end
       else
         err("Please implemenet cf.rb's validate_compute_flavor for this IaaS")
       end
@@ -547,9 +558,7 @@ module Bosh::Cli::Command
     # then ensure that a generated value is stored
     def generate_generatable_options
       common_password
-      if aws?
-        security_group
-      end
+      security_group
     end
 
     # Renders the +SystemConfig+ model (+system_config+) into the system's
@@ -636,6 +645,8 @@ module Bosh::Cli::Command
     def default_core_server_flavor
       if aws?
         "m1.large"
+      elsif openstack?
+        "m1.large"
       else
         err("Please implement cf.rb's default_core_server_flavor for this IaaS")
       end
@@ -644,6 +655,8 @@ module Bosh::Cli::Command
     def default_dea_server_flavor
       if aws?
         "m1.large"
+      elsif openstack?
+        "m1.large"
       else
         err("Please implement cf.rb's default_server_flavor for this IaaS")
       end
@@ -651,6 +664,8 @@ module Bosh::Cli::Command
 
     def default_service_server_flavor(service_name)
       if aws?
+        "m1.xlarge"
+      elsif openstack?
         "m1.xlarge"
       else
         err("Please implement cf.rb's default_service_server_flavor for this IaaS")
