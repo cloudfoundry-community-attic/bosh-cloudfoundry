@@ -293,13 +293,13 @@ module Bosh::CloudFoundry::ConfigOptions
       err "Please set core_ip configuration for non-interactive mode"
     end
 
-    if aws?
+    if aws? || openstack?
       system_config.core_ip = ask("Main public IP address (press Enter to provision new IP): ").to_s
     else
       system_config.core_ip = ask("Main public IP address: ").to_s
     end
     if system_config.core_ip.blank?
-      say "Provisioning #{bosh_provider} public IP address..."
+      say "Provisioning #{system_config.bosh_provider} public IP address..."
       system_config.core_ip = provider.provision_public_ip_address
       if system_config.core_ip.blank?
         say "Hmmm, I wasn't able to get a public IP at the moment. Perhaps try again or provision it manually?".red

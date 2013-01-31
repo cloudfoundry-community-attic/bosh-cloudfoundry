@@ -258,6 +258,8 @@ module Bosh::Cli::Command
     def bosh_provider
       if aws?
         "aws"
+      elsif openstack?
+        "openstack"
       else
         err("Please implement cf.rb's bosh_provider for this IaaS")
       end
@@ -265,9 +267,14 @@ module Bosh::Cli::Command
 
     # Deploying CloudFoundry to AWS?
     # Is the target BOSH's IaaS using the AWS CPI?
-    # FIXME Currently only AWS is supported so its always AWS
     def aws?
-      true
+      system_config.bosh_provider == "openstack"
+    end
+
+    # Deploying CloudFoundry to OpenStack?
+    # Is the target BOSH's IaaS using the OpenStack CPI?
+    def openstack?
+      system_config.bosh_provider == "aws"
     end
 
     # User is prompted for common values at the
