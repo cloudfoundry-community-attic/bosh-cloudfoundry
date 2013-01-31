@@ -547,9 +547,7 @@ module Bosh::Cli::Command
     # then ensure that a generated value is stored
     def generate_generatable_options
       common_password
-      if aws?
-        security_group
-      end
+      security_group
     end
 
     # Renders the +SystemConfig+ model (+system_config+) into the system's
