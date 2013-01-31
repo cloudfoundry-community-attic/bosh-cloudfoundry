@@ -16,6 +16,19 @@ class Bosh::CloudFoundry::Providers::OpenStack
     # TODO catch error and return nil
   end
 
+  # @return [Integer] megabytes of RAM for requested flavor of server
+  def ram_for_server_flavor(server_flavor)
+    if flavor = fog_compute_flavor(server_flavor)
+      flavor.ram
+    else
+      raise "Unknown OpenStack flavor '#{server_flavor}'"
+    end
+  end
+
+  def fog_compute_flavor(server_flavor)
+    compute_flavors.find { |f| f.name == server_flavor }
+  end
+
   def compute_flavors
     fog_compute.flavors
   end

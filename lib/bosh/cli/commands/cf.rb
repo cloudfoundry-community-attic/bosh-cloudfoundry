@@ -546,7 +546,7 @@ module Bosh::Cli::Command
           err("Server flavor '#{flavor}' is not a valid AWS compute flavor")
         end
       elsif openstack?
-        unless provider.compute_flavors.select { |f| f.name == flavor }
+        unless provider.fog_compute_flavor(flavor)
           err("Server flavor '#{flavor}' is not a valid OpenStack compute flavor")
         end
       else
