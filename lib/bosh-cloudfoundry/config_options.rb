@@ -46,7 +46,7 @@ module Bosh::CloudFoundry::ConfigOptions
       system_config = Bosh::CloudFoundry::Config::SystemConfig.new(system)
       system_config.bosh_target = options[:bosh_target] || config.target
       system_config.bosh_target_uuid = options[:bosh_target_uuid] || config.target_uuid
-      system_config.bosh_provider = 'aws' # TODO support other BOSH providers
+      system_config.bosh_provider = options[:bosh_provider] || bosh_cpi
       system_config.release_name ||= DEFAULT_RELEASE_NAME
       system_config.release_version ||= DEFAULT_RELEASE_VERSION
       system_config.stemcell_name ||= DEFAULT_STEMCELL_NAME
@@ -194,6 +194,10 @@ module Bosh::CloudFoundry::ConfigOptions
 
   def bosh_git_repo
     options[:bosh_git_repo] || common_config.bosh_git_repo
+  end
+
+  def bosh_cpi
+    `bosh status | grep CPI | awk '{ print $2 }'`.strip
   end
 
   def deployment_manifest(subsystem="core")
