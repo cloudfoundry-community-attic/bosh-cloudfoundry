@@ -268,13 +268,13 @@ module Bosh::Cli::Command
     # Deploying CloudFoundry to AWS?
     # Is the target BOSH's IaaS using the AWS CPI?
     def aws?
-      system_config.bosh_provider == "openstack"
+      system_config.bosh_provider == "aws"
     end
 
     # Deploying CloudFoundry to OpenStack?
     # Is the target BOSH's IaaS using the OpenStack CPI?
     def openstack?
-      system_config.bosh_provider == "aws"
+      system_config.bosh_provider == "openstack"
     end
 
     # User is prompted for common values at the
