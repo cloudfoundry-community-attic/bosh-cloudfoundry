@@ -16,6 +16,10 @@ class Bosh::CloudFoundry::Providers::OpenStack
     # TODO catch error and return nil
   end
 
+  def compute_flavors
+    fog_compute.flavors
+  end
+
   # Creates or reuses an OpenStack security group and opens ports.
   #
   # +security_group_name+ is the name to be created or reused

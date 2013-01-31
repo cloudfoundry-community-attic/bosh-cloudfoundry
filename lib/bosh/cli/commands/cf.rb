@@ -545,6 +545,10 @@ module Bosh::Cli::Command
         unless aws_compute_flavors.select { |flavor| flavor[:id] == flavor }
           err("Server flavor '#{flavor}' is not a valid AWS compute flavor")
         end
+      elsif openstack?
+        unless provider.compute_flavors.select { |f| f.name == flavor }
+          err("Server flavor '#{flavor}' is not a valid OpenStack compute flavor")
+        end
       else
         err("Please implemenet cf.rb's validate_compute_flavor for this IaaS")
       end
@@ -641,6 +645,8 @@ module Bosh::Cli::Command
     def default_core_server_flavor
       if aws?
         "m1.large"
+      elsif openstack?
+        "m1.large"
       else
         err("Please implement cf.rb's default_core_server_flavor for this IaaS")
       end
@@ -649,6 +655,8 @@ module Bosh::Cli::Command
     def default_dea_server_flavor
       if aws?
         "m1.large"
+      elsif openstack?
+        "m1.large"
       else
         err("Please implement cf.rb's default_server_flavor for this IaaS")
       end
@@ -656,6 +664,8 @@ module Bosh::Cli::Command
 
     def default_service_server_flavor(service_name)
       if aws?
+        "m1.xlarge"
+      elsif openstack?
         "m1.xlarge"
       else
         err("Please implement cf.rb's default_service_server_flavor for this IaaS")
