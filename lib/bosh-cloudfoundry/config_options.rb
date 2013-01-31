@@ -46,7 +46,7 @@ module Bosh::CloudFoundry::ConfigOptions
       system_config = Bosh::CloudFoundry::Config::SystemConfig.new(system)
       system_config.bosh_target = options[:bosh_target] || config.target
       system_config.bosh_target_uuid = options[:bosh_target_uuid] || config.target_uuid
-      system_config.bosh_provider = 'aws' # TODO support other BOSH providers
+      system_config.bosh_provider = options[:bosh_provider] || bosh_cpi
       system_config.release_name ||= DEFAULT_RELEASE_NAME
       system_config.release_version ||= DEFAULT_RELEASE_VERSION
       system_config.stemcell_name ||= DEFAULT_STEMCELL_NAME
@@ -196,6 +196,10 @@ module Bosh::CloudFoundry::ConfigOptions
     options[:bosh_git_repo] || common_config.bosh_git_repo
   end
 
+  def bosh_cpi
+    `bosh status | grep CPI | awk '{ print $2 }'`.strip
+  end
+
   def deployment_manifest(subsystem="core")
     YAML.load_file(deployment_manifest_path(subsystem))
   end
@@ -289,13 +293,13 @@ module Bosh::CloudFoundry::ConfigOptions
       err "Please set core_ip configuration for non-interactive mode"
     end
 
-    if aws?
+    if aws? || openstack?
       system_config.core_ip = ask("Main public IP address (press Enter to provision new IP): ").to_s
     else
       system_config.core_ip = ask("Main public IP address: ").to_s
     end
     if system_config.core_ip.blank?
-      say "Provisioning #{bosh_provider} public IP address..."
+      say "Provisioning #{system_config.bosh_provider} public IP address..."
       system_config.core_ip = provider.provision_public_ip_address
       if system_config.core_ip.blank?
         say "Hmmm, I wasn't able to get a public IP at the moment. Perhaps try again or provision it manually?".red
