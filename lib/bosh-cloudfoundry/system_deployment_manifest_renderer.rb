@@ -185,7 +185,7 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
          ["postgres",
           "nats",
           "router",
-          "health_manager",
+          "health_manager_next",
           "cloud_controller",
           # "debian_nfs_server",
           # "serialization_data_server",

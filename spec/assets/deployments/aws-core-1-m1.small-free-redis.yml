@@ -52,7 +52,7 @@ jobs:
   - postgres
   - nats
   - router
-  - health_manager
+  - health_manager_next
   - cloud_controller
   - stager
   - uaa
