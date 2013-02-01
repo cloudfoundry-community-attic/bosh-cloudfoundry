@@ -56,6 +56,10 @@ module Bosh::CloudFoundry::ConfigOptions
     end
   end
 
+  def system_config_setup?
+    system
+  end
+
   # @return [String] CloudFoundry system path
   def system
     options[:system] || common_config.target_system

@@ -41,6 +41,7 @@ describe Bosh::Cli::Command::Base do
     it "downloads stemcell and uploads it" do
       @cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
       @cmd.stub!(:bosh_target_uuid).and_return("DIRECTOR_UUID")
+      @cmd.stub!(:bosh_cpi).and_return("aws")
       @cmd.should_receive(:`).
         with("bosh public stemcells --tags aws,stable | grep ' bosh-stemcell-' | awk '{ print $2 }' | sort -r | head -n 1").
         and_return("bosh-stemcell-aws-0.6.7.tgz")
@@ -58,6 +59,7 @@ describe Bosh::Cli::Command::Base do
       mkdir_p(File.join(@repos_dir, "bosh", "agent"))
       @cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
       @cmd.stub!(:bosh_target_uuid).and_return("DIRECTOR_UUID")
+      @cmd.stub!(:bosh_cpi).and_return("aws")
       @cmd.should_receive(:sh).with("git pull origin master")
       @cmd.should_receive(:sh).with("bundle install --without development test")
       @cmd.should_receive(:sh).with("sudo bundle exec rake stemcell:basic['aws']")
@@ -134,6 +136,7 @@ describe Bosh::Cli::Command::Base do
 
       cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
       cmd.stub!(:bosh_target_uuid).and_return("DIRECTOR_UUID")
+      cmd.stub!(:bosh_cpi).and_return("aws")
       cmd.should_receive(:generate_common_password).and_return('c1oudc0wc1oudc0w')
       cmd.should_receive(:bosh_releases).exactly(1).times.and_return([
         {"name"=>"appcloud", "versions"=>["124", "126"], "in_use"=>[]},

@@ -249,32 +249,20 @@ module Bosh::Cli::Command
     end
 
     # @return [String] label for the CPI being used by the target BOSH
-    # * "aws" - AWS
-    # 
-    # Yet to be supported by bosh-cloudfoundry:
-    # * "openstack" - VMWare vSphere
-    # * "vsphere" - VMWare vSphere
-    # * "vcloud" - VMWare vCloud
     def bosh_provider
-      if aws?
-        "aws"
-      elsif openstack?
-        "openstack"
-      else
-        err("Please implement cf.rb's bosh_provider for this IaaS")
-      end
+      system_config_setup? ? system_config.bosh_provider : bosh_cpi
     end
 
     # Deploying CloudFoundry to AWS?
     # Is the target BOSH's IaaS using the AWS CPI?
     def aws?
-      system_config.bosh_provider == "aws"
+      bosh_provider == "aws"
     end
 
     # Deploying CloudFoundry to OpenStack?
     # Is the target BOSH's IaaS using the OpenStack CPI?
     def openstack?
-      system_config.bosh_provider == "openstack"
+      bosh_provider == "openstack"
     end
 
     # User is prompted for common values at the
