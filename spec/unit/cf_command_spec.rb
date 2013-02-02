@@ -187,6 +187,7 @@ describe Bosh::Cli::Command::Base do
 
       @cmd.should_receive(:render_system)
 
+      @cmd.stub!(:bosh_cpi).and_return("aws")
       @cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
       @cmd.add_option(:flavor, 'm1.xlarge')
       @cmd.change_deas(3)
@@ -207,6 +208,7 @@ describe Bosh::Cli::Command::Base do
 
       @cmd.should_receive(:render_system)
 
+      @cmd.stub!(:bosh_cpi).and_return("aws")
       @cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
       @cmd.add_option(:flavor, 'm1.large')
       @cmd.add_service_node("postgresql", 4)
@@ -222,6 +224,7 @@ describe Bosh::Cli::Command::Base do
     
       @cmd.should_receive(:render_system)
     
+      @cmd.stub!(:bosh_cpi).and_return("aws")
       @cmd.stub!(:bosh_target).and_return("http://9.8.7.6:25555")
       @cmd.add_option(:flavor, 'm1.large')
       @cmd.add_service_node("redis", 2)

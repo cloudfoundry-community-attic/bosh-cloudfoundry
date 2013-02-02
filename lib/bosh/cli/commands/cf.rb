@@ -538,7 +538,7 @@ module Bosh::Cli::Command
           err("Server flavor '#{flavor}' is not a valid OpenStack compute flavor")
         end
       else
-        err("Please implemenet cf.rb's validate_compute_flavor for this IaaS")
+        err("Please implemenet cf.rb's validate_compute_flavor for #{bosh_provider.inspect}")
       end
     end
 
