@@ -19,15 +19,7 @@ bosh-bootstrap ssh
 
 # now on the inception VM
 
-# TODO - restore gem installation when rubygem security issue resolved
-# sudo gem install bosh-cloudfoundry
-
-cd /var/vcap/store/repos
-git clone git://github.com/StarkAndWayne/bosh-cloudfoundry.git
-cd bosh-cloudfoundry
-git checkout -b v0.3
-git pull origin v0.3
-rake install
+sudo gem install bosh-cloudfoundry
 
 export TMPDIR=/var/vcap/store/tmp
 bosh cf upload release --dev
