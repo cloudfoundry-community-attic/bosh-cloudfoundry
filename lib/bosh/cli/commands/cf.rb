@@ -115,12 +115,13 @@ module Bosh::Cli::Command
 
     usage "cf upload stemcell"
     desc "download/create stemcell & upload to BOSH"
-    option "--latest", "Use latest stemcell; possibly not tagged stable"
+    # option "--stable", "Use latest stemcell; possibly not tagged stable"
+    option "--latest", "Use latest stemcell; possibly not tagged stable [default]"
     option "--custom", "Create custom stemcell from BOSH git source"
     def upload_stemcell
-      stemcell_type = "stable"
-      stemcell_type = "latest" if options[:latest]
+      stemcell_type = "stable" if options[:stable]
       stemcell_type = "custom" if options[:custom]
+      stemcell_type ||= "latest"
       create_or_download_stemcell_then_upload(stemcell_type)
     end
 

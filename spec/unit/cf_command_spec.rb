@@ -43,8 +43,12 @@ describe Bosh::Cli::Command::Base do
       @cmd.stub!(:bosh_target_uuid).and_return("DIRECTOR_UUID")
       @cmd.stub!(:bosh_cpi).and_return("aws")
       @cmd.should_receive(:`).
-        with("bosh public stemcells --tags aws,stable | grep ' bosh-stemcell-' | awk '{ print $2 }' | sort -r | head -n 1").
+        with("bosh public stemcells --tags aws | grep ' bosh-stemcell-' | awk '{ print $2 }' | sort -r | head -n 1").
         and_return("bosh-stemcell-aws-0.6.7.tgz")
+      # FIXME default to stable stemcells when 0.8.1 is marked stable
+      # @cmd.should_receive(:`).
+      #   with("bosh public stemcells --tags aws,stable | grep ' bosh-stemcell-' | awk '{ print $2 }' | sort -r | head -n 1").
+      #   and_return("bosh-stemcell-aws-0.6.7.tgz")
       @cmd.should_receive(:sh).
         with("bosh -n --color download public stemcell bosh-stemcell-aws-0.6.7.tgz")
       @cmd.should_receive(:sh).
