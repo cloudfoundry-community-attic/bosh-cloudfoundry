@@ -126,13 +126,18 @@ module Bosh::Cli::Command
 
     usage "cf upload release"
     desc "fetch & upload latest public cloudfoundry release to BOSH"
-    option "--dev", "Create development release from very latest cf-release commits"
+    # option "--dev", "Create development release from very latest cf-release commits & specific patches"
+    option "--final", "Upload latest final release from very latest cf-release commits"
     def upload_release
       clone_or_update_cf_release
-      if options.delete(:dev)
-        create_and_upload_dev_release
-      else
+      if options.delete(:final)
         upload_final_release
+      else
+        # FUTURE once all patches from https://github.com/StarkAndWayne/bosh-cloudfoundry/issues/42
+        # are merged into cf-release, then no more gerrit merging required
+        options[:dev] = true
+        merge_gerrit(*%w[37/13137/4 84/13084/4 09/13609/2])
+        # create_and_upload_dev_release
       end
     end
 
@@ -157,7 +162,7 @@ module Bosh::Cli::Command
         end
       end
       apply_gerrit_patches
-      create_and_upload_dev_release
+      create_and_upload_dev_release(release_name)
     end
 
     usage "cf deploy"
