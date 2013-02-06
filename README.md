@@ -13,33 +13,30 @@ Today, to get everything running:
 ```
 # on your laptop
 gem install bosh-bootstrap
-bosh-bootstrap deploy --latest-stemcell
+bosh-bootstrap deploy
+# prompts for AWS/OpenStack credentials
+# and some other fields that you can
+# just press Enter for.
 
+# SSH into inception VM
 bosh-bootstrap ssh
 
-# now on the inception VM
-
 sudo gem install bosh-cloudfoundry
-
 export TMPDIR=/var/vcap/store/tmp
-bosh cf upload release --dev
-
-bosh cf prepare system production --release-name appcloud-dev
+bosh cf prepare system production
 # prompts for a DNS host for your CloudFoundry, such as mycompany.com
 # will generate a new IP address
 # now setup your DNS for *.mycompany.com => new IP address
 # the re-run:
 bosh cf prepare system production
 
-bosh cf upload stemcell --latest
-bosh cf merge gerrit 37/13137/4 84/13084/4 09/13609/2
-bosh cf deploy
+bosh deploy
 
 # now we can grow our single VM deployment
 
 bosh cf change deas 1
 bosh cf add service postgresql
-bosh cf deploy
+bosh deploy
 ```
 
 Overtime, as you add more DEAs and other service nodes, your set of VMs might look like:
