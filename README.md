@@ -32,7 +32,7 @@ bosh cf prepare system production --release-name appcloud-dev
 bosh cf prepare system production
 
 bosh cf upload stemcell --latest
-bosh cf merge gerrit 37/13137/4 84/13084/4 83/13583/1 09/13609/2
+bosh cf merge gerrit 37/13137/4 84/13084/4 09/13609/2
 bosh cf deploy
 
 # now we can grow our single VM deployment
