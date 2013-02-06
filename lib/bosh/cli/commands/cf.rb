@@ -557,31 +557,6 @@ module Bosh::Cli::Command
       renderer.perform
     end
 
-    def generate_dea_servers(server_count, server_flavor)
-      director_uuid = "DIRECTOR_UUID"
-      release_name = "appcloud"
-      stemcell_version = "0.6.4"
-      if aws?
-        resource_pool_cloud_properties = "instance_type: #{server_flavor}"
-      else
-        err("Please implemenet cf.rb's generate_dea_servers for this IaaS")
-      end
-      dea_max_memory = 2048 # FIXME a value based on server flavor RAM?
-      nats_password = "mynats1234"
-      system_dir = File.join(base_systems_dir, system_name)
-      mkdir_p(system_dir)
-      chdir system_dir do
-        require 'bosh-cloudfoundry/generators/dea_generator'
-        Bosh::CloudFoundry::Generators::DeaGenerator.start([
-          system_name,
-          server_count, server_flavor,
-          director_uuid, release_name, stemcell_version,
-          resource_pool_cloud_properties,
-          dea_max_memory,
-          nats_password])
-      end
-    end
-
     # Valdiate that +service_name+ is a known, supported service name
     def validate_service_name(service_name)
       return true if skip_validations?
@@ -603,30 +578,6 @@ module Bosh::Cli::Command
         Bosh::CloudFoundry::Config::RedisServiceConfig.build_from_system_config(system_config)
       else
         raise "please add #{service_name} support to #service_config method"
-      end
-    end
-
-    def generate_service_servers(service_name, server_count, server_flavor)
-      director_uuid = "DIRECTOR_UUID"
-      release_name = "appcloud"
-      stemcell_version = "0.6.4"
-      if aws?
-        resource_pool_cloud_properties = "instance_type: #{server_flavor}"
-      else
-        err("Please implemenet cf.rb's generate_service_servers for this IaaS")
-      end
-      persistent_disk = 16192
-      nats_password = "mynats1234"
-      system_dir = File.join(base_systems_dir, system_name)
-      mkdir_p(system_dir)
-      chdir system_dir do
-        require 'bosh-cloudfoundry/generators/service_generator'
-        Bosh::CloudFoundry::Generators::ServiceGenerator.start([
-          system_name,
-          service_name, server_count, server_flavor,
-          director_uuid, release_name, stemcell_version,
-          resource_pool_cloud_properties, persistent_disk,
-          nats_password])
       end
     end
 
