@@ -1,14 +1,14 @@
 # Bosh::CloudFoundry
 
-You want CloudFoundry? You can now create, scale, upgrade and patch one or more Cloud Foundry deployments using very simple, easy to learn and remember CLI commands.
+You want Cloud Foundry? You can now create, scale, upgrade and patch one or more Cloud Foundry deployments using very simple, easy to learn and remember CLI commands.
 
-Currently supports AWS only. OpenStack support is coming. vSphere and vCloud support will require someone to tell me that they really want it.
+Currently supports AWS and OpenStack only. vSphere and vCloud support will require someone to tell me that they really want it.
 
-## NOTE - currently requires latest edge of many things
+## Zero to Cloud Foundry in a few hours
 
-This tool currently requires the latest merged patches. The readme below, from "Usage" onward, is written for when there are public stemcells and final releases.
+If you have an AWS or OpenStack account then you can deploy a running Cloud Foundry VM by following this very simple tutorial. It first uses the very powerful [bosh-bootstrap](https://github.com/StarkAndWayne/bosh-bootstrap) tool to deploy a BOSH, and then using this project (a plugin for the BOSH CLI) it will do everything necessary to deploy Cloud Foundry via your shiny new, empty BOSH.
 
-Today, to get everything running:
+**You should not need to know anything before running this tutorial.** If you do this tutorial and you feel it was too complex or you needed to know something additional, please [create a ticket](https://github.com/StarkAndWayne/bosh-cloudfoundry/issues).
 
 ```
 # on your laptop
@@ -59,6 +59,7 @@ $ bosh vms
 
 * Ruby 1.9
 * BOSH running on AWS (other CPIs coming)
+* Unix-based local system (Windows support for bosh-bootstrap is a priority)
 
 ## Usage
 
