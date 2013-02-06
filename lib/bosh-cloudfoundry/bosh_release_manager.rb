@@ -77,7 +77,7 @@ module Bosh::CloudFoundry::BoshReleaseManager
   def create_and_upload_dev_release(release_name=default_dev_release_name)
     chdir(cf_release_dir) do
       write_dev_config_file(release_name)
-      sh "bosh -n create release --with-tarball --force"
+      sh "bosh -n --color create release --with-tarball --force"
       sh "bosh -n --color upload release"
     end
     @bosh_releases = nil # reset cache
