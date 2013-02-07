@@ -33,7 +33,8 @@ bosh cf prepare system production
 # the re-run:
 bosh cf prepare system production
 
-bosh deploy
+# use special "cf deploy" to install VMC & create initial VMC user
+bosh cf deploy
 
 # now we can grow our single VM deployment
 
