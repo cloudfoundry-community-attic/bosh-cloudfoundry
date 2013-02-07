@@ -21,6 +21,9 @@ bosh-bootstrap deploy
 # SSH into inception VM
 bosh-bootstrap ssh
 
+git config --global user.email "you@example.com"
+git config --global user.name "Your Name"
+
 sudo gem install bosh-cloudfoundry
 export TMPDIR=/var/vcap/store/tmp
 bosh cf prepare system production
