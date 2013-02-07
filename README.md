@@ -13,7 +13,7 @@ If you have an AWS or OpenStack account then you can deploy a running Cloud Foun
 ```
 # on your laptop
 gem install bosh-bootstrap
-bosh-bootstrap deploy
+bosh-bootstrap deploy --edge-deployer
 # prompts for AWS/OpenStack credentials
 # and some other fields that you can
 # just press Enter for.
