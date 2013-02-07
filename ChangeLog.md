@@ -4,6 +4,10 @@
 
 Defaults to patched dev release (since a cf-release final release doesn't work).
 
+### v0.4.1
+
+Workaround for cf-release HEAD change - providing `properties.uaa.scim` property now.
+
 ## v0.3
 
 Additions:
