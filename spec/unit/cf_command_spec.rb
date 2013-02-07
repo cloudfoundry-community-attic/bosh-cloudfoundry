@@ -152,7 +152,7 @@ describe Bosh::Cli::Command::Base do
       if needs_initial_release_uploaded
         cmd.should_receive(:bosh_releases).exactly(1).times.and_return([])
         cmd.should_receive(:clone_or_update_cf_release)
-        cmd.should_receive(:merge_gerrit).with(*%w[37/13137/4 84/13084/4 09/13609/2])
+        cmd.should_receive(:merge_gerrit).with(*%w[37/13137/4 84/13084/4])
       else
         cmd.should_receive(:bosh_releases).exactly(1).times.and_return([
           {"name"=>"appcloud", "versions"=>["124", "126"], "in_use"=>[]},
