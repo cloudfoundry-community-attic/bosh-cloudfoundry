@@ -137,7 +137,7 @@ module Bosh::Cli::Command
         # FUTURE once all patches from https://github.com/StarkAndWayne/bosh-cloudfoundry/issues/42
         # are merged into cf-release, then no more gerrit merging required
         options[:dev] = true
-        merge_gerrit(*%w[37/13137/4 84/13084/4 09/13609/2])
+        merge_gerrit(*%w[37/13137/4 84/13084/4])
         # create_and_upload_dev_release
       end
     end
