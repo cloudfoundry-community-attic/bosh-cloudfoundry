@@ -1,5 +1,9 @@
 # Change Log
 
+## v0.4
+
+Defaults to patched dev release (since a cf-release final release doesn't work).
+
 ## v0.3
 
 Additions:
