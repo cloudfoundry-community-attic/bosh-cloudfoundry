@@ -9,7 +9,12 @@ Gem::Specification.new do |gem|
   gem.authors       = ["Dr Nic Williams"]
   gem.email         = ["drnicwilliams@gmail.com"]
   gem.description   = %q{Create and manage your Cloud Foundry deployments}
-  gem.summary       = %q{Create and manage your Cloud Foundry deployments via the BOSH CLI}
+  gem.summary       = <<-EOS
+Create and manage your Cloud Foundry deployments on AWS and OpenStack
+with a simple command line tool (a plugin for BOSH CLI in fact).
+Start small, grow big, and constantly upgrade your various Cloud Foundry
+deployments.
+  EOS
   gem.homepage      = "https://github.com/StarkAndWayne/bosh-cloudfoundry"
   gem.license       = "MIT"
 
