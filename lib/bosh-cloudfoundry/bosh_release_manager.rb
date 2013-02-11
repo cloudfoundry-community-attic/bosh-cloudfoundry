@@ -123,8 +123,9 @@ module Bosh::CloudFoundry::BoshReleaseManager
     "appcloud"
   end
 
-  def default_dev_release_name
-    default_release_name + "-dev"
+  def default_dev_release_name(branch_name=nil)
+    suffix = "-#{branch_name || 'dev'}"
+    default_release_name + suffix
   end
 
   def switch_to_development_release
