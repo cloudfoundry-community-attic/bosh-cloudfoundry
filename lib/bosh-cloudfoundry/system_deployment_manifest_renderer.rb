@@ -274,6 +274,9 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
          "port"=>8100,
          "catalina_opts"=>"-Xmx128m -Xms30m -XX:MaxPermSize=128m",
          "no_ssl"=>true,
+         "client"=>{
+           "autoapprove"=>[]
+         },
          "scim"=>{}},
        "uaadb"=>
         {"address"=>core_ip,
