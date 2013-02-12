@@ -74,7 +74,8 @@ module Bosh::CloudFoundry::BoshReleaseManager
     File.join(cf_release_dir, "#{release_name}-#{dev_release_number}.yml")
   end
 
-  def create_and_upload_dev_release(release_name=default_dev_release_name)
+  def create_and_upload_dev_release
+    release_name = default_dev_release_name
     chdir(cf_release_dir) do
       write_dev_config_file(release_name)
       sh "bosh -n --color create release --with-tarball --force"
@@ -94,22 +95,29 @@ module Bosh::CloudFoundry::BoshReleaseManager
     File.open(dev_config_file, "w") { |file| file << dev_config.to_yaml }
   end
 
-  # assume unchanged config/final.yml
+  # clones or updates cf-release for a specific branch
+  # For all defaults, clones into:
+  # * /var/vcap/store/releases/cf-release/master (cf_release_branch_dir)
+  #
+  # Uses:
+  # * releases_dir (e.g. '/var/vcap/store/releases')
+  # * cf_release_branch (e.g. 'staging')
+  # * cf_release_branch_dir (e.g. '/var/vcap/store/releases/cf-release/staging')
   def clone_or_update_cf_release
-    cf_release_dirname = File.basename(cf_release_dir)
-    if File.directory?(cf_release_dir)
-      chdir(cf_release_dir) do
-        sh "git pull origin master"
+    raise "invoke #set_cf_release_branch(branch) first" unless cf_release_branch_dir
+    if File.directory?(cf_release_branch_dir)
+      chdir(cf_release_branch_dir) do
+        sh "git pull origin #{cf_release_branch} --no-recurse-submodules" # recursive is below
       end
     else
       chdir(releases_dir) do
-        sh "git clone #{cf_release_git_repo} #{cf_release_dirname}"
-        chdir(cf_release_dirname) do
+        sh "git clone #{cf_release_git_repo} #{cf_release_branch_dir}"
+        chdir(cf_release_branch_dir) do
           sh "git update-index --assume-unchanged config/final.yml 2>/dev/null"
         end
       end
     end
-    chdir(cf_release_dir) do
+    chdir(cf_release_branch_dir) do
       say "Rewriting all git:// & git@ to https:// ..."
       # Snippet written by Mike Reeves <swampfoxmr@gmail.com> on bosh-users mailing list
       # Date 2012-12-06
@@ -123,13 +131,13 @@ module Bosh::CloudFoundry::BoshReleaseManager
     "appcloud"
   end
 
-  def default_dev_release_name(branch_name=nil)
+  def default_dev_release_name(branch_name=cf_release_branch)
     suffix = "-#{branch_name || 'dev'}"
     default_release_name + suffix
   end
 
   def switch_to_development_release
-    system_config.release_name = default_dev_release_name
+    system_config.release_name = default_dev_release_name(cf_release_branch)
     system_config.release_version = "latest"
     system_config.save
   end

@@ -127,43 +127,20 @@ module Bosh::Cli::Command
 
     usage "cf upload release"
     desc "fetch & upload latest public cloudfoundry release to BOSH"
-    # option "--dev", "Create development release from very latest cf-release commits & specific patches"
+    option "--branch", String, "Create development release from branch of cf-release [default: staging]"
     option "--final", "Upload latest final release from very latest cf-release commits"
     def upload_release
-      clone_or_update_cf_release
       if options.delete(:final)
+        clone_or_update_cf_release
         upload_final_release
       else
         # FUTURE once all patches from https://github.com/StarkAndWayne/bosh-cloudfoundry/issues/42
         # are merged into cf-release, then no more gerrit merging required
-        options[:dev] = true
-        merge_gerrit(*%w[37/13137/4 84/13084/4])
-        # create_and_upload_dev_release
+        branch = options[:branch] || "staging"
+        set_cf_release_branch(branch)
+        clone_or_update_cf_release
+        create_and_upload_dev_release
       end
-    end
-
-    usage "cf merge gerrit"
-    desc "create development release including one or more gerrit patches"
-    def merge_gerrit(*gerrit_changes)
-      # gerrit_change might be:
-      # * refs/changes/84/13084/4
-      # * 84/13084/4
-      # * 'git pull http://reviews.cloudfoundry.org/cf-release refs/changes/84/13084/4'
-      gerrit_changes.each do |gerrit_change|
-        if refs_change = extract_refs_change(gerrit_change)
-          add_gerrit_refs_change(refs_change)
-        else
-          say "Please provide the gerrit change information in one of the following formats:".red
-          say " -> bosh cf merge gerrit refs/changes/84/13084/4"
-          say " -> bosh cf merge gerrit 84/13084/4"
-          say " -> bosh cf merge gerrit 'git pull http://reviews.cloudfoundry.org/cf-release refs/changes/84/13084/4'"
-          say ""
-          say "Please re-run the command again with the change reference formatted as above.".red
-          exit 1
-        end
-      end
-      apply_gerrit_patches
-      create_and_upload_dev_release(release_name)
     end
 
     usage "cf deploy"
