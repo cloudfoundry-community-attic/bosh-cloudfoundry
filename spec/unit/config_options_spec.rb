@@ -17,10 +17,6 @@ describe Bosh::CloudFoundry::ConfigOptions do
     mkdir_p(@options[:system])
   end
 
-  describe "common_config attribute" do
-    
-  end
-
   describe "system_config attribute" do
     it "release_name can be overridden but is stored in system_config" do
       options[:release_name] = "CHANGED"
