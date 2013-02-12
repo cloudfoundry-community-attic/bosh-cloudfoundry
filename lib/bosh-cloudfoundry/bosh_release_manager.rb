@@ -43,7 +43,7 @@ module Bosh::CloudFoundry::BoshReleaseManager
     release_number = use_latest_release? ? 
       latest_uploadable_final_release_number :
       release_version
-    chdir(cf_release_dir) do
+    chdir(cf_release_branch_dir) do
       bosh_cmd "upload release releases/appcloud-#{release_number}.yml"
     end
     @bosh_releases = nil # reset cache
@@ -53,7 +53,7 @@ module Bosh::CloudFoundry::BoshReleaseManager
   # for the latest release number that could be uploaded
   # @returns [String] a number such as "126"
   def latest_uploadable_final_release_number
-    chdir(cf_release_dir) do
+    chdir(cf_release_branch_dir) do
       return `tail -n 1 releases/index.yml | awk '{print $2}'`.strip
     end
   end
@@ -62,7 +62,7 @@ module Bosh::CloudFoundry::BoshReleaseManager
   # for the latest release number that could be uploaded
   # @returns [String] a dev release code such as "126.8-dev"
   def latest_uploadable_dev_release_number
-    chdir(cf_release_dir) do
+    chdir(cf_release_branch_dir) do
       return `tail -n 1 dev_releases/index.yml | awk '{print $2}'`.strip
     end
   end
@@ -76,7 +76,7 @@ module Bosh::CloudFoundry::BoshReleaseManager
 
   def create_and_upload_dev_release
     release_name = default_dev_release_name
-    chdir(cf_release_dir) do
+    chdir(cf_release_branch_dir) do
       write_dev_config_file(release_name)
       sh "bosh -n --color create release --with-tarball --force"
       sh "bosh -n --color upload release"
