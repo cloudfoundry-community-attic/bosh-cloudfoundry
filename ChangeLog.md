@@ -12,6 +12,10 @@ In future, when cf-release eventually merges all the required patches into maste
 
 And finally, the big requirement for going v1.0, is for all the required patches to be included in a final release of cf-release.
 
+### v0.5.1
+
+Fixes a bug in creating dev releases of cf-release based on branches that aren't "master". It now correctly clones each staging branch into its own repository, built solely off the targeted branch.
+
 ## v0.4
 
 Defaults to patched dev release (since a cf-release final release doesn't work).
