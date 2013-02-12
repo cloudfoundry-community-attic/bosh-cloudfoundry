@@ -107,7 +107,7 @@ module Bosh::CloudFoundry::BoshReleaseManager
     raise "invoke #set_cf_release_branch(branch) first" unless cf_release_branch_dir
     if File.directory?(cf_release_branch_dir)
       chdir(cf_release_branch_dir) do
-        sh "git pull origin #{cf_release_branch} --no-recurse-submodules" # recursive is below
+        sh "git pull origin #{cf_release_branch}" # recursive is below
       end
     else
       chdir(releases_dir) do

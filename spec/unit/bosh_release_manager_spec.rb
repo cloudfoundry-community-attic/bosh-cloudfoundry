@@ -22,7 +22,7 @@ describe Bosh::CloudFoundry::BoshReleaseManager do
     self.cf_release_branch     = "master"
     self.cf_release_branch_dir = File.join(cf_release_dir, "master")
     mkdir_p(cf_release_branch_dir)
-    should_receive(:sh).with("git pull origin master --no-recurse-submodules")
+    should_receive(:sh).with("git pull origin master")
     should_receive(:sh).with("sed -i 's#git@github.com:#https://github.com/#g' .gitmodules")
     should_receive(:sh).with("sed -i 's#git://github.com#https://github.com#g' .gitmodules")
     should_receive(:sh).with("git submodule update --init --recursive")
@@ -33,7 +33,7 @@ describe Bosh::CloudFoundry::BoshReleaseManager do
     self.cf_release_branch     = "staging"
     self.cf_release_branch_dir = File.join(cf_release_dir, "staging")
     mkdir_p(cf_release_branch_dir)
-    should_receive(:sh).with("git pull origin staging --no-recurse-submodules")
+    should_receive(:sh).with("git pull origin staging")
     should_receive(:sh).with("sed -i 's#git@github.com:#https://github.com/#g' .gitmodules")
     should_receive(:sh).with("sed -i 's#git://github.com#https://github.com#g' .gitmodules")
     should_receive(:sh).with("git submodule update --init --recursive")
