@@ -29,7 +29,6 @@ module Bosh::CloudFoundry::ConfigOptions
     @common_config ||= begin
       config_file = options[:common_config] || DEFAULT_CONFIG_PATH
       common_config = Bosh::CloudFoundry::Config:: CommonConfig.new(config_file)
-      common_config.cf_release_git_repo ||= DEFAULT_CF_RELEASE_GIT_REPO
       common_config.bosh_git_repo ||= DEFAULT_BOSH_GIT_REPO
       common_config.save
       common_config
@@ -47,6 +46,7 @@ module Bosh::CloudFoundry::ConfigOptions
       system_config.bosh_target = options[:bosh_target] || config.target
       system_config.bosh_target_uuid = options[:bosh_target_uuid] || config.target_uuid
       system_config.bosh_provider = options[:bosh_provider] || bosh_cpi
+      system_config.cf_release_git_repo ||= DEFAULT_CF_RELEASE_GIT_REPO
       system_config.release_name ||= DEFAULT_RELEASE_NAME
       system_config.release_version ||= DEFAULT_RELEASE_VERSION
       system_config.stemcell_name ||= DEFAULT_STEMCELL_NAME
@@ -124,6 +124,13 @@ module Bosh::CloudFoundry::ConfigOptions
   # @return [String] BOSH target director UUID
   overriddable_config_option :bosh_target_uuid, :system_config
 
+  # @return [String] name of git branch to use to build/upload releases, e.g. "staging"
+  overriddable_config_option :cf_release_branch, :system_config
+
+  # @return [String] path to where git branch is cloned locally
+  # e.g. /var/vcap/store/releases/cf-release/staging
+  overriddable_config_option :cf_release_branch_dir, :system_config
+
   # @return [String] Name of BOSH release in target BOSH
   overriddable_config_option :release_name, :system_config
 
@@ -159,7 +166,7 @@ module Bosh::CloudFoundry::ConfigOptions
 
   # @return [String] CloudFoundry BOSH release git URI
   def cf_release_git_repo
-    options[:cf_release_git_repo] || common_config.cf_release_git_repo
+    options[:cf_release_git_repo] || system_config.cf_release_git_repo
   end
 
   # @return [String] Path to store BOSH release projects
@@ -169,11 +176,18 @@ module Bosh::CloudFoundry::ConfigOptions
 
   # @return [String] Path to cf-release BOSH release
   def cf_release_dir
-    options[:cf_release_dir] || common_config.cf_release_dir || begin
-      common_config.cf_release_dir = File.join(releases_dir, "cf-release")
-      common_config.save
-      common_config.cf_release_dir
+    options[:cf_release_dir] || system_config.cf_release_dir || begin
+      system_config.cf_release_dir = File.join(releases_dir, "cf-release")
+      system_config.save
+      system_config.cf_release_dir
     end
+  end
+
+  # Switch to a different branch (and ultimately a different folder)
+  def set_cf_release_branch(branch)
+    system_config.cf_release_branch     = branch
+    system_config.cf_release_branch_dir = File.join(cf_release_dir, branch)
+    system_config.save
   end
 
   # @return [String] Path to store stemcells locally

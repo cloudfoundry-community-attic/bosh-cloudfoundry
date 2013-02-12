@@ -25,6 +25,10 @@ class Bosh::CloudFoundry::Config::SystemConfig < Bosh::Cli::Config
     :bosh_provider,    # from list 'aws', 'openstack', 'vsphere', 'vcloud'
     :system_name,      # e.g. production
     :system_dir,       # e.g. /var/vcap/store/systems/production
+    :cf_release_git_repo, # e.g. "git://github.com/cloudfoundry/cf-release.git"
+    :cf_release_dir,   # e.g. /var/vcap/store/releases/cf-release
+    :cf_release_branch,     # e.g. staging
+    :cf_release_branch_dir, # e.g. /var/vcap/store/releases/cf-release/staging
     :release_name,     # e.g. 'appcloud'
     :release_version,  # e.g. 'latest'
     :gerrit_changes,   # e.g. ['84/13084/4', '37/13137/4']

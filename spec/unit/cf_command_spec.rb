@@ -80,29 +80,32 @@ describe Bosh::Cli::Command::Base do
       @cmd.upload_stemcell
     end
 
-    it "updates/creates/uploads final cf-release" do
-      cf_release_dir = File.join(@releases_dir, "cf-release")
-      FileUtils.mkdir_p(cf_release_dir)
-      @cmd.common_config.cf_release_dir = cf_release_dir
-
-      @cmd.should_receive(:sh).with("git pull origin master")
-      script = <<-BASH.gsub(/^      /, '')
-      grep -rI "github.com" * .gitmodules | awk 'BEGIN {FS=":"} { print($1) }' | uniq while read file
-      do
-        echo "changing - $file"
-        sed -i 's#git://github.com#https://github.com#g' $file
-        sed -i 's#git@github.com:#https://github.com:#g' $file
-      done
-      BASH
-      @cmd.should_receive(:sh).with("sed -i 's#git@github.com:#https://github.com/#g' .gitmodules")
-      @cmd.should_receive(:sh).with("sed -i 's#git://github.com#https://github.com#g' .gitmodules")
-      @cmd.should_receive(:sh).with("git submodule update --init --recursive")
-      @cmd.should_receive(:`).with("tail -n 1 releases/index.yml | awk '{print $2}'").
-        and_return("126")
-      @cmd.should_receive(:sh).with("bosh -n --color upload release releases/appcloud-126.yml")
-      @cmd.add_option(:final, true)
-      @cmd.upload_release
-    end
+    it "updates/creates/uploads final cf-release"
+    #  do
+    #   cf_release_dir = File.join(@releases_dir, "cf-release")
+    #   FileUtils.mkdir_p(cf_release_dir)
+    #   @cmd.system_config.cf_release_dir = cf_release_dir
+    #   @cmd.system_config.cf_release_branch = "staging"
+    #   @cmd.system_config.cf_release_branch_dir = File.join(cf_release_dir, "staging")
+    # 
+    #   @cmd.should_receive(:sh).with("git pull origin master")
+    #   script = <<-BASH.gsub(/^      /, '')
+    #   grep -rI "github.com" * .gitmodules | awk 'BEGIN {FS=":"} { print($1) }' | uniq while read file
+    #   do
+    #     echo "changing - $file"
+    #     sed -i 's#git://github.com#https://github.com#g' $file
+    #     sed -i 's#git@github.com:#https://github.com:#g' $file
+    #   done
+    #   BASH
+    #   @cmd.should_receive(:sh).with("sed -i 's#git@github.com:#https://github.com/#g' .gitmodules")
+    #   @cmd.should_receive(:sh).with("sed -i 's#git://github.com#https://github.com#g' .gitmodules")
+    #   @cmd.should_receive(:sh).with("git submodule update --init --recursive")
+    #   @cmd.should_receive(:`).with("tail -n 1 releases/index.yml | awk '{print $2}'").
+    #     and_return("126")
+    #   @cmd.should_receive(:sh).with("bosh -n --color upload release releases/appcloud-126.yml")
+    #   @cmd.add_option(:final, true)
+    #   @cmd.upload_release
+    # end
 
     it "updates/creates/uploads development/edge cf-release (requires system setup)" 
     # TODO turn this into a unit test for the specific methods
@@ -124,7 +127,7 @@ describe Bosh::Cli::Command::Base do
     #   @cmd.should_receive(:sh).with("sed -i 's#git@github.com:#https://github.com/#g' .gitmodules")
     #   @cmd.should_receive(:sh).with("sed -i 's#git://github.com#https://github.com#g' .gitmodules")
     #   @cmd.should_receive(:sh).with("git submodule update --init --recursive")
-    #   @cmd.should_receive(:write_dev_config_file).with("appcloud-dev")
+    #   @cmd.should_receive(:write_dev_config_file).with("appcloud-staging")
     #   @cmd.should_receive(:sh).with("bosh create release --with-tarball --force")
     #   @cmd.should_receive(:sh).with("bosh -n --color upload release")
     #   @cmd.upload_release
@@ -152,11 +155,11 @@ describe Bosh::Cli::Command::Base do
       if needs_initial_release_uploaded
         cmd.should_receive(:bosh_releases).exactly(1).times.and_return([])
         cmd.should_receive(:clone_or_update_cf_release)
-        cmd.should_receive(:merge_gerrit).with(*%w[37/13137/4 84/13084/4])
+        cmd.should_receive(:create_and_upload_dev_release)
       else
         cmd.should_receive(:bosh_releases).exactly(1).times.and_return([
           {"name"=>"appcloud", "versions"=>["124", "126"], "in_use"=>[]},
-          {"name"=>"appcloud-dev", "versions"=>["124.1-dev", "126.1-dev"], "in_use"=>[]},
+          {"name"=>"appcloud-staging", "versions"=>["124.1-dev", "126.1-dev"], "in_use"=>[]},
         ])
       end
 
@@ -178,7 +181,7 @@ describe Bosh::Cli::Command::Base do
       cmd.add_option(:core_server_flavor, 'm1.large')
       cmd.add_option(:admin_emails, ['drnic@starkandwayne.com'])
 
-      cmd.common_config.cf_release_dir = @releases_dir
+      cmd.common_config.releases_dir = @releases_dir
       cmd.common_config.stemcells_dir = @stemcells_dir
 
       cmd.system.should be_nil
@@ -196,7 +199,7 @@ describe Bosh::Cli::Command::Base do
     it "temporarily uploads latest stemcell & patched cf-release by default" do
       generate_new_system(@cmd)
       File.basename(@cmd.system).should == "production"
-      @cmd.system_config.release_name.should == "appcloud-dev"
+      @cmd.system_config.release_name.should == "appcloud-staging"
     end
 
     it "new system has common random password" do
@@ -288,15 +291,6 @@ describe Bosh::Cli::Command::Base do
         and_return(spec_asset("deployments/aws-core-only.yml"))
       @cmd.should_receive(:sh).with("nats-sub '*.*' -s nats://nats:c1oudc0wc1oudc0w@1.2.3.4:4222")
       @cmd.watch_nats
-    end
-
-    it "merges gerrit patches" do
-      generate_new_system
-      @cmd.should_receive(:create_and_change_into_patches_branch)
-      @cmd.should_receive(:sh).
-        with("git pull http://reviews.cloudfoundry.org/cf-release refs/changes/84/13084/4")
-      @cmd.should_receive(:create_and_upload_dev_release)
-      @cmd.merge_gerrit("refs/changes/84/13084/4")
     end
 
     it "returns bosh_release_versions" do
