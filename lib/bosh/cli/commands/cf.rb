@@ -8,7 +8,6 @@ module Bosh::Cli::Command
     include Bosh::Cli::VersionCalc
     include Bosh::CloudFoundry::ConfigOptions
     include Bosh::CloudFoundry::BoshReleaseManager
-    include Bosh::CloudFoundry::GerritPatchesHelper
     include FileUtils
 
     usage "cf"
