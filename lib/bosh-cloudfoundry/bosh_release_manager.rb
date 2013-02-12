@@ -111,7 +111,7 @@ module Bosh::CloudFoundry::BoshReleaseManager
       end
     else
       chdir(releases_dir) do
-        sh "git clone #{cf_release_git_repo} #{cf_release_branch_dir}"
+        sh "git clone -b #{cf_release_branch} #{cf_release_git_repo} #{cf_release_branch_dir}"
         chdir(cf_release_branch_dir) do
           sh "git update-index --assume-unchanged config/final.yml 2>/dev/null"
         end
