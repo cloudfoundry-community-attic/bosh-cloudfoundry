@@ -1,5 +1,17 @@
 # Change Log
 
+## v0.5
+
+Gerrit is dead. Long live gerrit. This release is for everyone who is getting started or wants to upgrade. Gerrit is dead.
+
+A few days ago the core Cloud Foundry team shut down the gerrit hosting of cf-release and several patches that we needed to run Cloud Foundry on AWS and/or OpenStack. Fortunately, all the patches have been merged into the staging branch of the cf-release on github. This new release of bosh-cloudfoundry defaults to creating a development (non-final) release of cf-release from its staging branch.
+
+The `bosh cf upload release` command now has a `--branch BRANCH` for uploading a release based on a different branch. It currently defaults to `staging`.
+
+In future, when cf-release eventually merges all the required patches into master branch, we will switch to defaulting to `master`.
+
+And finally, the big requirement for going v1.0, is for all the required patches to be included in a final release of cf-release.
+
 ## v0.4
 
 Defaults to patched dev release (since a cf-release final release doesn't work).
