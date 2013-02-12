@@ -127,7 +127,7 @@ describe Bosh::Cli::Command::Base do
     #   @cmd.should_receive(:sh).with("sed -i 's#git@github.com:#https://github.com/#g' .gitmodules")
     #   @cmd.should_receive(:sh).with("sed -i 's#git://github.com#https://github.com#g' .gitmodules")
     #   @cmd.should_receive(:sh).with("git submodule update --init --recursive")
-    #   @cmd.should_receive(:write_dev_config_file).with("appcloud-dev")
+    #   @cmd.should_receive(:write_dev_config_file).with("appcloud-staging")
     #   @cmd.should_receive(:sh).with("bosh create release --with-tarball --force")
     #   @cmd.should_receive(:sh).with("bosh -n --color upload release")
     #   @cmd.upload_release
@@ -199,7 +199,7 @@ describe Bosh::Cli::Command::Base do
     it "temporarily uploads latest stemcell & patched cf-release by default" do
       generate_new_system(@cmd)
       File.basename(@cmd.system).should == "production"
-      @cmd.system_config.release_name.should == "appcloud-dev"
+      @cmd.system_config.release_name.should == "appcloud-staging"
     end
 
     it "new system has common random password" do

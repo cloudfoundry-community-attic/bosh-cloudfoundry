@@ -127,7 +127,7 @@ module Bosh::Cli::Command
 
     usage "cf upload release"
     desc "fetch & upload latest public cloudfoundry release to BOSH"
-    option "--branch", String, "Create development release from branch of cf-release [default: staging]"
+    option "--branch branch", String, "Create development release from branch of cf-release [default: staging]"
     option "--final", "Upload latest final release from very latest cf-release commits"
     def upload_release
       if options.delete(:final)
@@ -136,8 +136,9 @@ module Bosh::Cli::Command
       else
         # FUTURE once all patches from https://github.com/StarkAndWayne/bosh-cloudfoundry/issues/42
         # are merged into cf-release, then no more gerrit merging required
-        branch = options[:branch] || "staging"
-        set_cf_release_branch(branch)
+        if new_branch = options.delete(:branch)
+          set_cf_release_branch(new_branch)
+        end
         clone_or_update_cf_release
         create_and_upload_dev_release
       end
@@ -534,6 +535,8 @@ module Bosh::Cli::Command
     def generate_generatable_options
       common_password
       security_group
+
+      set_cf_release_branch("staging")
     end
 
     # Renders the +SystemConfig+ model (+system_config+) into the system's
