@@ -4,6 +4,8 @@ You want Cloud Foundry? You can now create, scale, upgrade and patch one or more
 
 Currently supports AWS and OpenStack only. vSphere and vCloud support will require someone to tell me that they really want it.
 
+[![Build Status](https://travis-ci.org/StarkAndWayne/bosh-cloudfoundry.png?branch=master)](https://travis-ci.org/StarkAndWayne/bosh-cloudfoundry) [![Code Climate](https://codeclimate.com/github/StarkAndWayne/bosh-cloudfoundry.png)](https://codeclimate.com/github/StarkAndWayne/bosh-cloudfoundry)
+
 ## Zero to Cloud Foundry in a few hours
 
 If you have an AWS or OpenStack account then you can deploy a running Cloud Foundry VM by following this very simple tutorial. It first uses the very powerful [bosh-bootstrap](https://github.com/StarkAndWayne/bosh-bootstrap) tool to deploy a BOSH, and then using this project (a plugin for the BOSH CLI) it will do everything necessary to deploy Cloud Foundry via your shiny new, empty BOSH.
