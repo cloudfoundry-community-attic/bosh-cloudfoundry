@@ -28,7 +28,7 @@ module Bosh::CloudFoundry::ConfigOptions
   def common_config
     @common_config ||= begin
       config_file = options[:common_config] || DEFAULT_CONFIG_PATH
-      common_config = Bosh::CloudFoundry::Config:: CommonConfig.new(config_file)
+      common_config = Bosh::CloudFoundry::Config::CommonConfig.new(config_file)
       common_config.bosh_git_repo ||= DEFAULT_BOSH_GIT_REPO
       common_config.save
       common_config
