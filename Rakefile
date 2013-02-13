@@ -18,7 +18,7 @@ if defined?(RSpec)
     desc "Run Unit Tests"
     unit_rspec_task = RSpec::Core::RakeTask.new(:unit) do |t|
       t.pattern = "spec/unit/**/*_spec.rb"
-      t.rspec_opts = %w(--format progress --color -d)
+      t.rspec_opts = %w(--format progress --color)
     end
 
     desc "Run Integration Tests"
@@ -31,3 +31,5 @@ if defined?(RSpec)
   desc "Install dependencies and run tests"
   task :spec => %w(spec:unit spec:functional)
 end
+
+task :default => :spec
