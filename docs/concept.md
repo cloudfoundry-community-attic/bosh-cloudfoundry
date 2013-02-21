@@ -80,10 +80,11 @@ If you take a look at the job named "core" before you do the adding of DEAs you 
 * You might need to reduce the number og compile nodes to avoid Amazon API errors. Check [this bug.](https://github.com/StarkAndWayne/bosh-cloudfoundry/issues/111)
 * If you're having problems with ```vmc push``` check out [this bug.](https://github.com/StarkAndWayne/bosh-cloudfoundry/issues/49)
 
-# Questions
+# TODO/Questions
 * Is the BOSH controller a MicroBosh? Another name?
 * What is a microbosh?
 * Is the BOSH controller a part of BOSH, or something that just controls it?
 * Does the core Cloud Foundry nodes scale out?
 * How do you enable HA for the core?
 * You run BOSH commands on the Inception VM, not BOSH Controller. Is it meant to be run on your computer? Is network the reason it isn't?
+* Add some nice to know commands
