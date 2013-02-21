@@ -1,6 +1,7 @@
 If you're new to BOSH, CloudFoundry and PaaS in general you might find this as confusing as I did. So I'll try to explain some of the concepts.
 
 # Some resources
+* [CloudFoundry documentation](http://cloudfoundry.github.com/)
 * [BOSH users Mailinglist](https://groups.google.com/a/cloudfoundry.org/forum/#!forum/bosh-users)
 * [CloudFoundry Mailinglist](https://groups.google.com/a/cloudfoundry.org/forum/#!forum/vcap-dev)
 
@@ -79,6 +80,7 @@ If you take a look at the job named "core" before you do the adding of DEAs you 
 * If you want to scale out by adding more nodes you need to tweak the FW rules. Check [this bug.](https://github.com/StarkAndWayne/bosh-cloudfoundry/issues/112)
 * You might need to reduce the number og compile nodes to avoid Amazon API errors. Check [this bug.](https://github.com/StarkAndWayne/bosh-cloudfoundry/issues/111)
 * If you're having problems with ```vmc push``` check out [this bug.](https://github.com/StarkAndWayne/bosh-cloudfoundry/issues/49)
+* Once you're up and running [test your setup with a simple Sinatra application](http://docs.cloudfoundry.com/tools/vmc/installing-vmc.html#creating-a-simple-sinatra-application).
 
 # TODO/Questions
 * Is the BOSH controller a MicroBosh? Another name?
