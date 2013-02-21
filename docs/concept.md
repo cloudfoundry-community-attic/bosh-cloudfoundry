@@ -88,3 +88,5 @@ If you take a look at the job named "core" before you do the adding of DEAs you 
 * How do you enable HA for the core?
 * You run BOSH commands on the Inception VM, not BOSH Controller. Is it meant to be run on your computer? Is network the reason it isn't?
 * Add some nice to know commands
+* How can we lock this to a certain "release"?
+* Can we describe how the source is fetched and what happens to it?
