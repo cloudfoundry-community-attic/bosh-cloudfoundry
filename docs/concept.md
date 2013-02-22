@@ -13,7 +13,8 @@ There are several parts in action here.
 [CloudFoundry](http://cloudfoundry.org) is VMWares's Open Source PaaS solution. It is available as a public cloud at [http://cloudfoundry.com](http://cloudfoundry.com) or as something you can bring in-house.
 
 * __Cloud Controller__ is the main component in CloudFoundry and the server you point your vmc command to. It can be split up into separate VMs, but this bootstrap keeps it all on one node.
-* __DEA__ is the compute nodes. In the initial setup the Cloud Controller is also a DEA. But you can basically view it as VMs that will handle and serve your applications. 
+* __DEA__ is the compute nodes. In the initial setup the Cloud Controller is also a DEA. But you can basically view it as VMs that will handle and serve your applications.
+* __Service__ is the concept CloudFoundry uses to describe added functionality to your application like Postgres or MongoDB.
 
 
 ## BOSH
@@ -21,6 +22,8 @@ There are several parts in action here.
 
 * __Job__ is BOSH's concept of grouping functionality together. In the normal instance you can think of a Job as a composition of services that a virtual machine will have. So two virtual machines with the same Job attachet will be identical.
 * __Template__ is BOSH's concept for defining a service. CloudController is one such template, and dea is another one.
+* __Stemcell__ is BOSH's concept for a virtual machine image. For Amazon it equals and AMI. It is a template that is booted and becoms an instance of an virtual machine.
+* __Resource Pool__ is basically a collection of virtual machines, that you can reference/assign jobs to. The have the same stemcell and configuration (eg. AWS size).
 
 ## Inception VM
 Inception VM is a Virtual Machine used for bootstrapping BOSH.
@@ -44,7 +47,14 @@ Now if the above description was crystal clear, you'll know where the scaling ha
 
 ![BOSH-CF scaled deploy](BOSH-cf-scaled.png)
 
-You can also scale out the Cloud Controller. The way BOSH handles this is with separate pools, so increasing the pool for core will scale that part out. It is the responsibility of the separate application to handle clustering and communication between the nodes.
+In the case above we have three resource pools. They are called core, DEA and postgres. This is that standard way that the BOSH cf plugin does it. The following has been done here:
+
+* ```bosh cf change deas 3``` creates a pool with 3 virtual machines and assigns the DEA job to them. It also removes the DEA template from the core job.
+* ```bosh cf add service postgresql 2``` creates a pool with 2 virtual machines and assigns the postgresql job to them.
+
+With BOSH it is possible to allocate the postgres templates on the already existing DEA nodes and thus save costs on Amazon. It all comes down to what kind of scale you need, and also separation from load issues.
+
+It is the responsibility of the separate application to handle clustering and communication between the nodes.
 
 ## Implementation
 
