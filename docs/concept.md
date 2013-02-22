@@ -2,18 +2,36 @@ If you're new to BOSH, CloudFoundry and PaaS in general you might find this as c
 
 # Some resources
 * [CloudFoundry documentation](http://cloudfoundry.github.com/)
+* [CloudFoundry public cloud (commercial version) docs](http://docs.cloudfoundry.com/getting-started.html)
+* [CloudFoundry community wiki](https://github.com/mrdavidlaing/cf-docs-contrib/wiki)
 * [BOSH users Mailinglist](https://groups.google.com/a/cloudfoundry.org/forum/#!forum/bosh-users)
 * [CloudFoundry Mailinglist](https://groups.google.com/a/cloudfoundry.org/forum/#!forum/vcap-dev)
 
-# Names
-* [__CloudFoundry__](http://cloudfoundry.org) is VMWares's Open Source PaaS solution. It is available as a public cloud at [http://cloudfoundry.com](http://cloudfoundry.com) or as something you can bring in-house.
-    * __Cloud Controller__ is the main component in CloudFoundry and the server you point your vmc command to. It can be split up into separate VMs, but this bootstrap keeps it all on one node.
-    * __DEA__ is the compute nodes. In the initial setup the Cloud Controller is also a DEA. But you can basically view it as VMs that will handle and serve your applications. 
-* [__BOSH__](https://github.com/cloudfoundry/bosh) is VMWare's cloud abstraction for deploying and releasing applications. It abstracts away the underlying IaaS solution (AWS, OpenStack, VMWare) and handles requests for new nodes etc. It is a general purpose tool that packages applications and handles the distribution of "Jobs" to the nodes in the BOSH setup.
-* __Inception VM__ is a Virtual Machine used for bootstrapping BOSH.
+# The parts
+There are several parts in action here.
 
-# The steps
-This Bootstrap launches BOSH which then is used to deploy CloudFoundry. BOSH is the only officially supported way of deploying CloudFoundry, even though Chef scripts is maintained by the community.
+## CloudFoundry
+[CloudFoundry](http://cloudfoundry.org) is VMWares's Open Source PaaS solution. It is available as a public cloud at [http://cloudfoundry.com](http://cloudfoundry.com) or as something you can bring in-house.
+
+* __Cloud Controller__ is the main component in CloudFoundry and the server you point your vmc command to. It can be split up into separate VMs, but this bootstrap keeps it all on one node.
+* __DEA__ is the compute nodes. In the initial setup the Cloud Controller is also a DEA. But you can basically view it as VMs that will handle and serve your applications.
+* __Service__ is the concept CloudFoundry uses to describe added functionality to your application like Postgres or MongoDB.
+
+
+## BOSH
+[BOSH](https://github.com/cloudfoundry/bosh) is VMWare's cloud abstraction for deploying and releasing applications. It abstracts away the underlying IaaS solution (AWS, OpenStack, VMWare) and handles requests for new nodes etc. It is a general purpose tool that packages applications and handles the distribution of "Jobs" to the nodes in the BOSH setup. In some ways you can say that it eliminates the need for Puppet/Chef, but it uses some different concepts. It also covers more, like provisioning of virtual machines.
+
+* __Job__ is BOSH's concept of grouping functionality together. In the normal instance you can think of a Job as a composition of services that a virtual machine will have. So two virtual machines with the same Job attachet will be identical.
+* __Template__ is BOSH's concept for defining a service. CloudController is one such template, and dea is another one.
+* __Stemcell__ is BOSH's concept for a virtual machine image. For Amazon it equals and AMI. It is a template that is booted and becoms an instance of an virtual machine.
+* __Resource Pool__ is basically a collection of virtual machines, that you can reference/assign jobs to. The have the same stemcell and configuration (eg. AWS size).
+* __Compilation nodes__ is nodes that BOSH uses when deploying a new part. At first it is used to compile everything that is needed for VCAP and DEA. If you add a service like Postgres you'll see that it compiles the components used for that. I think this is something that resembles rpm or deb packages, and that they get compiled on your Stemcells to ensure compatibility when running on your cloud.
+
+## Inception VM
+Inception VM is a Virtual Machine used for bootstrapping BOSH.
+
+# Building a runnable CloudFoundry
+This Bootstrap takes you throug the steps needed to have CloudFoundry running and serving requests. It launches BOSH which then is used to deploy CloudFoundry. BOSH is the only officially supported way of deploying CloudFoundry, even though Chef scripts is maintained by the community.
 
 The way it operates is illustrated in the figure below:
 
@@ -24,14 +42,22 @@ The way it operates is illustrated in the figure below:
 3. The BOSH controller creates nodes for CloudFoundry
 4. The BOSH controller deploys Jobs to the separate nodes
 
-In the initial configuration the Cloud Controller acts as both a controller and a compute node where you'r applications run.
+In the initial configuration the Cloud Controller acts as both a controller and a compute node where your applications run.
 
 # Scaling
 Now if the above description was crystal clear, you'll know where the scaling happens. ;) It happens to the far right. The figure below shows how everything looks when I've added a couple of compute nodes.
 
 ![BOSH-CF scaled deploy](BOSH-cf-scaled.png)
 
-You can also scale out the Cloud Controller. The way BOSH handles this is with separate pools, so increasing the pool for core will scale that part out. It is the responsibility of the separate application to handle clustering and communication between the nodes.
+In the case above we have three resource pools. They are called core, DEA and postgres. This is that standard way that the BOSH cf plugin does it. The following has been done here:
+
+* ```bosh cf change deas 3``` creates a pool with 3 virtual machines and assigns the DEA job to them. It also removes the DEA template from the core job.
+* ```bosh cf add service postgresql 2``` creates a pool with 2 virtual machines and assigns the postgresql job to them.
+* The dotted boxes above are compile instances that BOSH will create temporarily to compile the necessary components. See the BOSH description above.
+
+With BOSH it is possible to allocate the postgres templates on the already existing DEA nodes and thus save costs on Amazon. It all comes down to what kind of scale you need, and also separation from load issues.
+
+It is the responsibility of the separate application to handle clustering and communication between the nodes.
 
 ## Implementation
 
@@ -71,12 +97,12 @@ The instances setting tells it to use two instances in the dea resource pool. Fo
 
 After the changes has been done a ```bosh deploy``` will perform the needed changes to your BOSH setup.
 
-### Templates
+### Using your Cloud Controller as a compute node
 If you take a look at the job named "core" before you do the adding of DEAs you will see that it has a template named dea. If you leave that in the list your Cloud Controller will also be a compute node serving deployed applications.
 
 # Tips
 * Provision an Elastic IP from Amazon as early as possible and assign a DNS entry with wildcard. Example: *.cf.mydomain.com . It will take some time for the DNS to propagate (actually your old *.mydomain.com record to time out if you have one).
-* If you're deploying to a different region than us-east-1 check out [this bug.](https://github.com/StarkAndWayne/bosh-cloudfoundry/issues/100)
+* If you're deploying to a different region than us-east-1 check out [this bug.](https://github.com/StarkAndWayne/bosh-cloudfoundry/issues/100) Make the changes to the configuration just before you do ```bosh deploy```.
 * If you want to scale out by adding more nodes you need to tweak the FW rules. Check [this bug.](https://github.com/StarkAndWayne/bosh-cloudfoundry/issues/112)
 * You might need to reduce the number og compile nodes to avoid Amazon API errors. Check [this bug.](https://github.com/StarkAndWayne/bosh-cloudfoundry/issues/111)
 * If you're having problems with ```vmc push``` check out [this bug.](https://github.com/StarkAndWayne/bosh-cloudfoundry/issues/49)
