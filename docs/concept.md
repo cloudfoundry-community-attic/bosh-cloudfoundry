@@ -9,7 +9,7 @@ If you're new to BOSH, CloudFoundry and PaaS in general you might find this as c
 * [__CloudFoundry__](http://cloudfoundry.org) is VMWares's Open Source PaaS solution. It is available as a public cloud at [http://cloudfoundry.com](http://cloudfoundry.com) or as something you can bring in-house.
     * __Cloud Controller__ is the main component in CloudFoundry and the server you point your vmc command to. It can be split up into separate VMs, but this bootstrap keeps it all on one node.
     * __DEA__ is the compute nodes. In the initial setup the Cloud Controller is also a DEA. But you can basically view it as VMs that will handle and serve your applications. 
-* [__BOSH__](https://github.com/cloudfoundry/bosh) is VMWare's cloud abstraction for deploying and releasing applications. It abstracts away the underlying IaaS solution (AWS, OpenStack, VMWare) and handles requests for new nodes etc. It is a general purpose tool that packages applications and handles the distribution of "Jobs" to the nodes in the BOSH setup.
+* [__BOSH__](https://github.com/cloudfoundry/bosh) is VMWare's cloud abstraction for deploying and releasing applications. It abstracts away the underlying IaaS solution (AWS, OpenStack, VMWare) and handles requests for new nodes etc. It is a general purpose tool that packages applications and handles the distribution of "Jobs" to the nodes in the BOSH setup. In some ways you can say that it eliminates the need for Puppet/Chef, but it uses some different concepts. It also covers more, like provisioning of virtual machines.
 * __Inception VM__ is a Virtual Machine used for bootstrapping BOSH.
 
 # The steps
