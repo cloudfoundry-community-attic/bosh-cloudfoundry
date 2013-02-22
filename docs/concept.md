@@ -4,8 +4,9 @@ If you're new to BOSH, CloudFoundry and PaaS in general you might find this as c
 * [CloudFoundry documentation](http://cloudfoundry.github.com/)
 * [BOSH users Mailinglist](https://groups.google.com/a/cloudfoundry.org/forum/#!forum/bosh-users)
 * [CloudFoundry Mailinglist](https://groups.google.com/a/cloudfoundry.org/forum/#!forum/vcap-dev)
+* [CloudFoundry public cloud docs](http://docs.cloudfoundry.com/getting-started.html)
 
-# Names
+# The parts
 There are several parts in action here.
 
 ## CloudFoundry
