@@ -1,24 +1,7 @@
 If you're new to BOSH, Cloud Foundry and PaaS in general you might find this as confusing as I did. So I'll try to explain some of the concepts.
 
-# Some resources
-Use these for some pointers for in depth understanding. The rest of the document will try to explain the basic concepts without getting into the really deep details.
-
-## Documentation
-* [Cloud Foundry documentation](http://cloudfoundry.github.com/)
-* [Cloud Foundry public cloud (commercial version) docs](http://docs.cloudfoundry.com/getting-started.html)
-* [Cloud Foundry community wiki](https://github.com/mrdavidlaing/cf-docs-contrib/wiki)
-
-## Community
-* [BOSH users Mailinglist](https://groups.google.com/a/cloudfoundry.org/forum/#!forum/bosh-users)
-* [Cloud Foundry Mailinglist](https://groups.google.com/a/cloudfoundry.org/forum/#!forum/vcap-dev)
-
-## Source code
-* [Cloud Foundry release](https://github.com/cloudfoundry/cf-release)
-* [Cloud Foundry jobs (within the release repo)](https://github.com/cloudfoundry/cf-release/tree/master/jobs)
-* [Cloud Foundry VCAP (core component)](https://github.com/cloudfoundry/vcap)
-
 # The parts
-There are several parts in action here.
+There are several parts in action here. Let me take you for a quick tour.
 
 ## Cloud Foundry
 
@@ -89,6 +72,7 @@ It adds a resource pool:
     availability_zone: eu-west-1b
     instance_type: m1.large
 ```
+
 Size 2 specifies to launch two virtual machines for this pool.
 
 It then sets up a job:
@@ -105,14 +89,17 @@ It then sets up a job:
     - dns
     - gateway
 ```
+
 The instances setting tells it to use two instances in the dea resource pool. For our case this matches the size of the pool exactly.    
 
 After the changes has been done a ```bosh deploy``` will perform the needed changes to your BOSH setup.
 
 ### Using your Cloud Controller as a compute instance
+
 If you take a look at the job named "core" before you do the adding of DEAs you will see that it has a template named dea. If you leave that in the list your Cloud Controller will also be a compute instance serving deployed applications.
 
 # Tips
+
 * Provision an Elastic IP from Amazon as early as possible and assign a DNS entry with wildcard. Example: *.cf.mydomain.com . It will take some time for the DNS to propagate (actually your old *.mydomain.com record to time out if you have one).
 * If you're deploying to a different region than us-east-1 check out [this bug.](https://github.com/StarkAndWayne/bosh-cloudfoundry/issues/100) Make the changes to the configuration just before you do ```bosh deploy```.
 * If you want to scale out by adding more instances you need to tweak the FW rules. Check [this bug.](https://github.com/StarkAndWayne/bosh-cloudfoundry/issues/112)
@@ -120,7 +107,29 @@ If you take a look at the job named "core" before you do the adding of DEAs you 
 * If you're having problems with ```vmc push``` check out [this bug.](https://github.com/StarkAndWayne/bosh-cloudfoundry/issues/49)
 * Once you're up and running [test your setup with a simple Sinatra application](http://docs.cloudfoundry.com/tools/vmc/installing-vmc.html#creating-a-simple-sinatra-application).
 
+# Some resources
+
+Use these for some pointers for in depth understanding. The rest of this document tries to explain the basic concepts without getting into the really deep details.
+
+## Documentation
+
+* [Cloud Foundry documentation](http://cloudfoundry.github.com/)
+* [Cloud Foundry public cloud (commercial version) docs](http://docs.cloudfoundry.com/getting-started.html)
+* [Cloud Foundry community wiki](https://github.com/mrdavidlaing/cf-docs-contrib/wiki)
+
+## Community
+
+* [BOSH users Mailinglist](https://groups.google.com/a/cloudfoundry.org/forum/#!forum/bosh-users)
+* [Cloud Foundry Mailinglist](https://groups.google.com/a/cloudfoundry.org/forum/#!forum/vcap-dev)
+
+## Source code
+
+* [Cloud Foundry release](https://github.com/cloudfoundry/cf-release)
+* [Cloud Foundry jobs (within the release repo)](https://github.com/cloudfoundry/cf-release/tree/master/jobs)
+* [Cloud Foundry VCAP (core component)](https://github.com/cloudfoundry/vcap)
+
 # TODO/Questions
+
 * Is the BOSH controller a MicroBosh? Another name?
 * What is a microbosh?
 * Is the BOSH controller a part of BOSH, or something that just controls it?
