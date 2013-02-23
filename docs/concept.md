@@ -1,27 +1,37 @@
-If you're new to BOSH, CloudFoundry and PaaS in general you might find this as confusing as I did. So I'll try to explain some of the concepts.
+If you're new to BOSH, Cloud Foundry and PaaS in general you might find this as confusing as I did. So I'll try to explain some of the concepts.
 
 # Some resources
-* [CloudFoundry documentation](http://cloudfoundry.github.com/)
-* [CloudFoundry public cloud (commercial version) docs](http://docs.cloudfoundry.com/getting-started.html)
-* [CloudFoundry community wiki](https://github.com/mrdavidlaing/cf-docs-contrib/wiki)
+Use these for some pointers for in depth understanding. The rest of the document will try to explain the basic concepts without getting into the really deep details.
+
+## Documentation
+* [Cloud Foundry documentation](http://cloudfoundry.github.com/)
+* [Cloud Foundry public cloud (commercial version) docs](http://docs.cloudfoundry.com/getting-started.html)
+* [Cloud Foundry community wiki](https://github.com/mrdavidlaing/cf-docs-contrib/wiki)
+
+## Community
 * [BOSH users Mailinglist](https://groups.google.com/a/cloudfoundry.org/forum/#!forum/bosh-users)
-* [CloudFoundry Mailinglist](https://groups.google.com/a/cloudfoundry.org/forum/#!forum/vcap-dev)
+* [Cloud Foundry Mailinglist](https://groups.google.com/a/cloudfoundry.org/forum/#!forum/vcap-dev)
+
+## Source code
+* [Cloud Foundry release](https://github.com/cloudfoundry/cf-release)
+* [Cloud Foundry jobs (within the release repo)](https://github.com/cloudfoundry/cf-release/tree/master/jobs)
+* [Cloud Foundry VCAP (core component)](https://github.com/cloudfoundry/vcap)
 
 # The parts
 There are several parts in action here.
 
-## CloudFoundry
+## Cloud Foundry
 
-[CloudFoundry](http://cloudfoundry.org) is VMWares's Open Source PaaS solution. It is available as a public cloud at [http://cloudfoundry.com](http://cloudfoundry.com) or as something you can bring in-house.
+[Cloud Foundry](http://cloudfoundry.org) is a Open Source PaaS solution. It is available as a public cloud at [http://cloudfoundry.com](http://cloudfoundry.com) operated by VMWare, but it is also a solution you can bring in-house and install on your own servers, or even operate on Amazon like [AppFog](http://appfog.com) does.
 
-* __Cloud Controller__ is the main component in CloudFoundry and the server you point your vmc command to. It can be split up into separate VMs, but this bootstrap keeps it all on one instance.
+* __Cloud Controller__ is the main component in Cloud Foundry and the server you point your vmc command to. It can be split up into separate VMs, but this bootstrap keeps it all on one instance.
 * __DEA__ is the compute instance. In the initial setup the Cloud Controller is also a DEA. But you can basically view it as VMs that will handle and serve your applications.
-* __Service__ is the concept CloudFoundry uses to describe added functionality to your application like Postgres or MongoDB.
+* __Service__ is the concept Cloud Foundry uses to describe added functionality to your application like Postgres or MongoDB.
 
 
 ## BOSH 
 
-[BOSH](https://github.com/cloudfoundry/bosh) is VMWare's cloud abstraction for deploying and releasing applications. It abstracts away the underlying IaaS solution (AWS, OpenStack, VMWare) and handles requests for new virtual machines etc. It is a general purpose tool that packages applications and handles the distribution of "Jobs" to the virtual machines in the BOSH setup. In some ways you can say that it eliminates the need for Puppet/Chef, but it uses some different concepts. It also covers more, like provisioning of virtual machines.
+[BOSH](https://github.com/cloudfoundry/bosh) is a cloud oriented tool chain for releasing, deployment and lifecycle management of applications. It abstracts away the underlying IaaS solution (AWS, OpenStack, VMWare) and performs requests for new virtual machines etc. It also handles the distribution of "Jobs" to the virtual machines in the BOSH setup. In some ways you can say that it eliminates the need for Puppet/Chef, but it uses some different concepts. It also covers more, like the provisioning of virtual machines.
 
 * __Job__ is BOSH's concept of grouping functionality together. In the normal instance you can think of a Job as a composition of installed software and configuration that a virtual machine will have. So two virtual machines with the same Job attached will be identical.
 * __Template__ is BOSH's concept for defining a software setup. CloudController is one such template, and dea is another one.
@@ -32,8 +42,8 @@ There are several parts in action here.
 ## Inception VM
 Inception VM is a Virtual Machine used for bootstrapping BOSH.
 
-# Building a runnable CloudFoundry
-This Bootstrap takes you throug the steps needed to have CloudFoundry running and serving requests. It launches BOSH which then is used to deploy CloudFoundry. BOSH is the only officially supported way of deploying CloudFoundry, even though Chef scripts is maintained by the community.
+# Building a runnable Cloud Foundry
+This Bootstrap takes you throug the steps needed to have Cloud Foundry running and serving requests. It launches BOSH which then is used to deploy Cloud Foundry. BOSH is the only officially supported way of deploying Cloud Foundry, even though Chef scripts is maintained by the community.
 
 The way it operates is illustrated in the figure below:
 
@@ -41,7 +51,7 @@ The way it operates is illustrated in the figure below:
 
 1. The bosh-bootstrap gem on "My Computer" creates an Inception virtual machine from an Ubuntu image.
 2. The Inception VM creates the BOSH controller
-3. The BOSH controller creates virtual machines for CloudFoundry
+3. The BOSH controller creates virtual machines for Cloud Foundry
 4. The BOSH controller deploys Jobs to the separate instances
 
 In the initial configuration the Cloud Controller acts as both a controller and a compute instance where your applications run.
