@@ -42,17 +42,17 @@ describe Bosh::CloudFoundry::BoshReleaseManager do
 
   describe "switch release types" do
     it "from final to dev" do
-      self.cf_release_branch     = "staging"
+      self.cf_release_branch     = "master"
       @system_config.release_name = "appcloud"
       @system_config.release_version = "latest"
       @system_config.save
       switch_to_development_release
-      @system_config.release_name.should == "appcloud-staging"
+      @system_config.release_name.should == "appcloud-master"
       @system_config.release_version.should == "latest"
     end
 
     it "from dev to final" do
-      @system_config.release_name = "appcloud-staging"
+      @system_config.release_name = "appcloud-master"
       @system_config.release_version = "latest"
       @system_config.save
       switch_to_final_release
