@@ -1,5 +1,9 @@
 # Change Log
 
+## HEAD
+
+A write up of [the concepts](/docs/concept.md) and constructs being deployed from Anders Sveen!
+
 ## v0.5
 
 Gerrit is dead. Long live gerrit. This release is for everyone who is getting started or wants to upgrade. Gerrit is dead.
