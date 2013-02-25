@@ -30,6 +30,7 @@ class Bosh::CloudFoundry::Config::SystemConfig < Bosh::Cli::Config
     :cf_release_branch,     # e.g. staging
     :cf_release_branch_dir, # e.g. /var/vcap/store/releases/cf-release/staging
     :release_name,     # e.g. 'appcloud'
+    :release_type,     # either 'final' or 'dev'
     :release_version,  # e.g. 'latest'
     :gerrit_changes,   # e.g. ['84/13084/4', '37/13137/4']
     :stemcell_name,    # e.g. 'bosh-stemcell'
