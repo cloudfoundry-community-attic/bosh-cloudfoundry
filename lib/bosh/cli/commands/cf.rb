@@ -27,14 +27,6 @@ module Bosh::Cli::Command
     option "--root-dns dns", String, "Base DNS for CloudFoundry applications, e.g. vcap.me"
     option "--core-server-flavor flavor", String,
       "Flavor of the CloudFoundry Core server. Default: 'm1.large'"
-    option "--release-name name", String,
-      "Name of BOSH release within target BOSH. Default: 'appcloud'"
-    option "--release-version version", String,
-      "Version of target BOSH release within target BOSH. Default: 'latest'"
-    option "--stemcell-name name", String,
-      "Name of BOSH stemcell within target BOSH. Default: 'bosh-stemcell'"
-    option "--stemcell-version version", String,
-      "Version of BOSH stemcell within target BOSH. Default: determines latest for stemcell"
     option "--admin-emails email1,email2", Array, "Admin email accounts in created CloudFoundry"
     option "--skip-validations", "Skip all validations"
     def prepare_system(name=nil)
