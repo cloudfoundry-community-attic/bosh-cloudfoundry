@@ -128,6 +128,7 @@ module Bosh::Cli::Command
       if new_branch = options.delete(:branch)
         set_cf_release_branch(new_branch)
         clone_or_update_cf_release
+        prepare_cf_release_for_dev_release
         create_and_upload_dev_release
       else
         clone_or_update_cf_release
@@ -269,7 +270,15 @@ module Bosh::Cli::Command
     # already uploaded to BOSH, else
     # proceeds to upload the release
     def confirm_or_upload_release
-      switch_to_development_release if options.delete(:edge) || options.delete(:custom) || options.delete(:dev)
+      # if flags overriding the current final/dev
+      if options.delete(:edge) || options.delete(:custom) || options.delete(:dev)
+        switch_to_development_release
+      elsif options.delete(:final)
+        switch_to_final_release
+      end
+      # default to final release
+      switch_to_final_release unless system_config.release_type
+
       say "Using BOSH release name #{release_name_version} (#{effective_release_version})".green
       unless bosh_release_names.include?(release_name)
         say "BOSH does not contain release #{release_name.green}, uploading...".yellow

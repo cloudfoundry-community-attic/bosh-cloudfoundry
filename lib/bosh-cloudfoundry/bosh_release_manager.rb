@@ -117,6 +117,10 @@ module Bosh::CloudFoundry::BoshReleaseManager
         end
       end
     end
+  end
+
+  # when creating a dev release, need to pull down submodules
+  def prepare_cf_release_for_dev_release
     chdir(cf_release_branch_dir) do
       say "Rewriting all git:// & git@ to https:// ..."
       # Snippet written by Mike Reeves <swampfoxmr@gmail.com> on bosh-users mailing list
@@ -139,12 +143,14 @@ module Bosh::CloudFoundry::BoshReleaseManager
   def switch_to_development_release
     system_config.release_name = default_dev_release_name(cf_release_branch)
     system_config.release_version = "latest"
+    system_config.release_type = "final"
     system_config.save
   end
 
   def switch_to_final_release
     system_config.release_name = default_release_name
     system_config.release_version = "latest"
+    system_config.release_type = "dev"
     system_config.save
   end
 end

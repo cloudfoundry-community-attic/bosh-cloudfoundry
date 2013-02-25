@@ -90,21 +90,8 @@ describe Bosh::Cli::Command::Base do
       FileUtils.mkdir_p(@cmd.system_config.cf_release_branch_dir)
     
       @cmd.should_receive(:sh).with("git pull origin master")
-      script = <<-BASH.gsub(/^      /, '')
-      grep -rI "github.com" * .gitmodules | awk 'BEGIN {FS=":"} { print($1) }' | uniq while read file
-      do
-        echo "changing - $file"
-        sed -i 's#git://github.com#https://github.com#g' $file
-        sed -i 's#git@github.com:#https://github.com:#g' $file
-      done
-      BASH
-      @cmd.should_receive(:sh).with("sed -i 's#git@github.com:#https://github.com/#g' .gitmodules")
-      @cmd.should_receive(:sh).with("sed -i 's#git://github.com#https://github.com#g' .gitmodules")
-      @cmd.should_receive(:sh).with("git submodule update --init --recursive")
-      @cmd.should_receive(:`).with("tail -n 1 releases/index.yml | awk '{print $2}'").
-        and_return("126")
-      @cmd.should_receive(:sh).with("bosh -n --color upload release releases/appcloud-126.yml")
-      @cmd.add_option(:final, true)
+      @cmd.should_receive(:`).with("tail -n 1 releases/index.yml | awk '{print $2}'").and_return("128")
+      @cmd.should_receive(:sh).with("bosh -n --color upload release releases/appcloud-128.yml")
       @cmd.upload_release
     end
 
