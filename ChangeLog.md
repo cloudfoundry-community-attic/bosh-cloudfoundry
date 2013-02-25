@@ -4,8 +4,6 @@
 
 Command "bosh cf prepare system" now (much more quickly) uploads a final release if one doesn't exist. Finally, cf-release includes a final release that works on AWS!
 
-This command can no longer specify what stemcell & release to use; instead edit the manifest directly. The commands can be added back in future if they are useful.
-
 There is now a write up of [the concepts](/docs/concept.md) and constructs being deployed from Anders Sveen!
 
 ## v0.5
