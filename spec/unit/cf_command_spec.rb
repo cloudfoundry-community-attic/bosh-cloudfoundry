@@ -154,7 +154,7 @@ describe Bosh::Cli::Command::Base do
         ])
       end
 
-      cmd.should_receive(:bosh_stemcell_versions).exactly(4).times.and_return(['0.6.4'])
+      cmd.should_receive(:bosh_stemcell_versions).exactly(4).times.and_return(['0.7.0'])
       cmd.should_receive(:render_system)
 
       provider = Bosh::CloudFoundry::Providers::AWS.new

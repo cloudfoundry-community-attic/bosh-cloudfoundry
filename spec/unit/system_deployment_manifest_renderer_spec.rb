@@ -25,7 +25,7 @@ describe Bosh::CloudFoundry::SystemDeploymentManifestRenderer do
     @system_config.release_name = 'appcloud'
     @system_config.release_version = 'latest'
     @system_config.stemcell_name = 'bosh-stemcell'
-    @system_config.stemcell_version = '0.6.4'
+    @system_config.stemcell_version = '0.7.0'
     @system_config.core_server_flavor = 'm1.small'
     @system_config.core_ip = '1.2.3.4'
     @system_config.root_dns = 'mycompany.com'

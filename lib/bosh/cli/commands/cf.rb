@@ -111,7 +111,8 @@ module Bosh::Cli::Command
     usage "cf upload stemcell"
     desc "download/create stemcell & upload to BOSH"
     # option "--stable", "Use latest stemcell; possibly not tagged stable"
-    option "--latest", "Use latest stemcell; possibly not tagged stable [default]"
+    option "--latest", "Use latest stemcell; possibly not tagged stable"
+    option "--version VERSION", "Use base stemcell with specific version [default: 0.7.0]"
     option "--custom", "Create custom stemcell from BOSH git source"
     def upload_stemcell
       stemcell_type = "stable" if options[:stable]
@@ -308,7 +309,7 @@ module Bosh::Cli::Command
           return
         end
       end
-      unless latest_bosh_stemcell_version
+      unless best_bosh_stemcell_version
         if stemcell_name == DEFAULT_STEMCELL_NAME
           say "Attempting to upload stemcell #{stemcell_name}..."
           upload_stemcell
@@ -340,6 +341,13 @@ module Bosh::Cli::Command
       else
         false
       end
+    end
+
+    # An attempt to choose the best base stemcell for the current
+    # BOSH. Currently it hardcodes a guess on the assumption that
+    # the BOSH is from 0.8.1; rather than current edge (1.5.0.preX)
+    def best_bosh_stemcell_version
+      "0.7.0"
     end
 
     # Largest version number BOSH stemcell ("bosh-stemcell")

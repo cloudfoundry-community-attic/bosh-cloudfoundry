@@ -33,7 +33,7 @@ resource_pools:
   size: 1
   stemcell: 
     name: bosh-stemcell
-    version: 0.6.4
+    version: 0.7.0
   cloud_properties: 
     instance_type: m1.small
   persistent_disk: 16192
@@ -42,7 +42,7 @@ resource_pools:
   size: 1
   stemcell: 
     name: bosh-stemcell
-    version: 0.6.4
+    version: 0.7.0
   cloud_properties: 
     instance_type: m1.small
   persistent_disk: 16192
