@@ -23,9 +23,6 @@ describe Bosh::CloudFoundry::BoshReleaseManager do
     self.cf_release_branch_dir = File.join(cf_release_dir, "master")
     mkdir_p(cf_release_branch_dir)
     should_receive(:sh).with("git pull origin master")
-    should_receive(:sh).with("sed -i 's#git@github.com:#https://github.com/#g' .gitmodules")
-    should_receive(:sh).with("sed -i 's#git://github.com#https://github.com#g' .gitmodules")
-    should_receive(:sh).with("git submodule update --init --recursive")
     clone_or_update_cf_release
   end
 
@@ -34,25 +31,32 @@ describe Bosh::CloudFoundry::BoshReleaseManager do
     self.cf_release_branch_dir = File.join(cf_release_dir, "staging")
     mkdir_p(cf_release_branch_dir)
     should_receive(:sh).with("git pull origin staging")
+    clone_or_update_cf_release
+  end
+
+  it "prepare_cf_release_for_dev_release" do
+    self.cf_release_branch     = "master"
+    self.cf_release_branch_dir = File.join(cf_release_dir, "master")
+    mkdir_p(cf_release_branch_dir)
     should_receive(:sh).with("sed -i 's#git@github.com:#https://github.com/#g' .gitmodules")
     should_receive(:sh).with("sed -i 's#git://github.com#https://github.com#g' .gitmodules")
     should_receive(:sh).with("git submodule update --init --recursive")
-    clone_or_update_cf_release
+    prepare_cf_release_for_dev_release
   end
 
   describe "switch release types" do
     it "from final to dev" do
-      self.cf_release_branch     = "staging"
+      self.cf_release_branch     = "master"
       @system_config.release_name = "appcloud"
       @system_config.release_version = "latest"
       @system_config.save
       switch_to_development_release
-      @system_config.release_name.should == "appcloud-staging"
+      @system_config.release_name.should == "appcloud-master"
       @system_config.release_version.should == "latest"
     end
 
     it "from dev to final" do
-      @system_config.release_name = "appcloud-staging"
+      @system_config.release_name = "appcloud-master"
       @system_config.release_version = "latest"
       @system_config.save
       switch_to_final_release
