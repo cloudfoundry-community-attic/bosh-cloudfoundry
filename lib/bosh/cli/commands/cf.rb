@@ -319,12 +319,12 @@ module Bosh::Cli::Command
         end
       end
       unless stemcell_version && stemcell_version.size
-        system_config.stemcell_version = latest_bosh_stemcell_version
+        system_config.stemcell_version = best_bosh_stemcell_version
         system_config.save
       end
       unless bosh_stemcell_versions.include?(stemcell_version)
         say "Requested stemcell version #{stemcell_version} is not available.".yellow
-        system_config.stemcell_version = latest_bosh_stemcell_version
+        system_config.stemcell_version = best_bosh_stemcell_version
         system_config.save
       end
       say "Using stemcell #{stemcell_name} #{stemcell_version}".green
