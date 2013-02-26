@@ -277,8 +277,9 @@ module Bosh::Cli::Command
       elsif options.delete(:final)
         switch_to_final_release
       end
-      # default to final release
-      switch_to_final_release unless system_config.release_type
+      # TODO - default to final release when appcloud-130.yml is released
+      # switch_to_final_release unless system_config.release_type
+      switch_to_development_release unless system_config.release_type
 
       say "Using BOSH release name #{release_name_version} (#{effective_release_version})".green
       unless bosh_release_names.include?(release_name)
