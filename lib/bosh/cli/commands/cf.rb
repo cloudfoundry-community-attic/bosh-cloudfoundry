@@ -436,7 +436,7 @@ module Bosh::Cli::Command
       tags << "stable" if stemcell_type == "stable" unless openstack?
       bosh_stemcells_cmd = "bosh public stemcells --tags #{tags.join(',')}"
       say "Locating bosh stemcell, running '#{bosh_stemcells_cmd}'..."
-      `#{bosh_stemcells_cmd} | grep ' bosh-stemcell-' | grep -V pre | awk '{ print $2 }' | sort -r | head -n 1`.strip
+      `#{bosh_stemcells_cmd} | grep ' bosh-stemcell-' | grep -v pre | awk '{ print $2 }' | sort -r | head -n 1`.strip
     end
 
     def download_stemcell(stemcell_name)
