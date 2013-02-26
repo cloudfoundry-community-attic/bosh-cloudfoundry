@@ -75,7 +75,7 @@ class Bosh::CloudFoundry::Config::RedisServiceConfig
   #   size: 2
   #   stemcell: 
   #     name: bosh-stemcell
-  #     version: 0.6.4
+  #     version: 0.7.0
   #   cloud_properties: 
   #     instance_type: m1.xlarge
   def add_resource_pools_to_manifest(manifest)

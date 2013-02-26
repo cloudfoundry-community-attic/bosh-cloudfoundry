@@ -111,7 +111,8 @@ module Bosh::Cli::Command
     usage "cf upload stemcell"
     desc "download/create stemcell & upload to BOSH"
     # option "--stable", "Use latest stemcell; possibly not tagged stable"
-    option "--latest", "Use latest stemcell; possibly not tagged stable [default]"
+    option "--latest", "Use latest stemcell; possibly not tagged stable"
+    option "--version VERSION", "Use base stemcell with specific version [default: 0.7.0]"
     option "--custom", "Create custom stemcell from BOSH git source"
     def upload_stemcell
       stemcell_type = "stable" if options[:stable]
@@ -342,7 +343,7 @@ module Bosh::Cli::Command
       end
     end
 
-    # Largest version number BOSH stemcell ("bosh-stemcell")
+    # Largest version number BOSH stemcell ("bosh-stemcell") uploaded to BOSH
     # @return [String] version number, e.g. "0.6.7"
     def latest_bosh_stemcell_version
       @latest_bosh_stemcell_version ||= begin
@@ -428,12 +429,14 @@ module Bosh::Cli::Command
     # | bosh-stemcell-0.5.2.tgz                 | vsphere                |
     # | bosh-stemcell-aws-0.6.4.tgz             | aws, stable            |
     # | bosh-stemcell-aws-0.6.7.tgz             | aws                    |
+    #
+    # Ignores any stemcells with "pre" in their name
     def bosh_stemcell_name(stemcell_type)
       tags = [bosh_provider]
       tags << "stable" if stemcell_type == "stable" unless openstack?
       bosh_stemcells_cmd = "bosh public stemcells --tags #{tags.join(',')}"
       say "Locating bosh stemcell, running '#{bosh_stemcells_cmd}'..."
-      `#{bosh_stemcells_cmd} | grep ' bosh-stemcell-' | awk '{ print $2 }' | sort -r | head -n 1`.strip
+      `#{bosh_stemcells_cmd} | grep ' bosh-stemcell-' | grep -v pre | awk '{ print $2 }' | sort -r | head -n 1`.strip
     end
 
     def download_stemcell(stemcell_name)

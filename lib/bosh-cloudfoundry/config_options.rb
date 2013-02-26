@@ -384,7 +384,7 @@ module Bosh::CloudFoundry::ConfigOptions
     @bosh_stemcell_versions ||= begin
       # [{"name"=>"bosh-stemcell", "version"=>"0.6.7", "cid"=>"ami-9730bffe"}]
       stemcells = director.list_stemcells
-      stemcells.select! {|s| s["name"] == stemcell_name}
+      stemcells = stemcells.select {|s| s["name"] == stemcell_name}
       stemcells.map { |rel| rel["version"] }.sort { |v1, v2|
         version_cmp(v1, v2)
       }
