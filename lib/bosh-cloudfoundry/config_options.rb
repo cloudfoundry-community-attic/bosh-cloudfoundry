@@ -245,6 +245,16 @@ module Bosh::CloudFoundry::ConfigOptions
     end
   end
 
+  # using/uploading a dev release; not a final release
+  def dev_release_type?
+    system_config.release_type == "dev"
+  end
+
+  # using/uploading a final release; not a dev release
+  def final_release_type?
+    !dev_release_type?
+  end
+
   def system_initialized?
     system_config.system_initialized
   end
