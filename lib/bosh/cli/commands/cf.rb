@@ -319,12 +319,12 @@ module Bosh::Cli::Command
         end
       end
       unless stemcell_version && stemcell_version.size
-        system_config.stemcell_version = best_bosh_stemcell_version
+        system_config.stemcell_version = latest_bosh_stemcell_version
         system_config.save
       end
       unless bosh_stemcell_versions.include?(stemcell_version)
         say "Requested stemcell version #{stemcell_version} is not available.".yellow
-        system_config.stemcell_version = best_bosh_stemcell_version
+        system_config.stemcell_version = latest_bosh_stemcell_version
         system_config.save
       end
       say "Using stemcell #{stemcell_name} #{stemcell_version}".green
@@ -341,13 +341,6 @@ module Bosh::Cli::Command
       else
         false
       end
-    end
-
-    # An attempt to choose the best base stemcell for the current
-    # BOSH. Currently it hardcodes a guess on the assumption that
-    # the BOSH is from 0.8.1; rather than current edge (1.5.0.preX)
-    def best_bosh_stemcell_version
-      "0.7.0"
     end
 
     # Largest version number BOSH stemcell ("bosh-stemcell") uploaded to BOSH
@@ -436,12 +429,14 @@ module Bosh::Cli::Command
     # | bosh-stemcell-0.5.2.tgz                 | vsphere                |
     # | bosh-stemcell-aws-0.6.4.tgz             | aws, stable            |
     # | bosh-stemcell-aws-0.6.7.tgz             | aws                    |
+    #
+    # Ignores any stemcells with "pre" in their name
     def bosh_stemcell_name(stemcell_type)
       tags = [bosh_provider]
       tags << "stable" if stemcell_type == "stable" unless openstack?
       bosh_stemcells_cmd = "bosh public stemcells --tags #{tags.join(',')}"
       say "Locating bosh stemcell, running '#{bosh_stemcells_cmd}'..."
-      `#{bosh_stemcells_cmd} | grep ' bosh-stemcell-' | awk '{ print $2 }' | sort -r | head -n 1`.strip
+      `#{bosh_stemcells_cmd} | grep ' bosh-stemcell-' | grep -V pre | awk '{ print $2 }' | sort -r | head -n 1`.strip
     end
 
     def download_stemcell(stemcell_name)
