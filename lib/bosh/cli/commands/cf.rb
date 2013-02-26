@@ -309,7 +309,7 @@ module Bosh::Cli::Command
           return
         end
       end
-      unless best_bosh_stemcell_version
+      unless latest_bosh_stemcell_version
         if stemcell_name == DEFAULT_STEMCELL_NAME
           say "Attempting to upload stemcell #{stemcell_name}..."
           upload_stemcell
@@ -350,7 +350,7 @@ module Bosh::Cli::Command
       "0.7.0"
     end
 
-    # Largest version number BOSH stemcell ("bosh-stemcell")
+    # Largest version number BOSH stemcell ("bosh-stemcell") uploaded to BOSH
     # @return [String] version number, e.g. "0.6.7"
     def latest_bosh_stemcell_version
       @latest_bosh_stemcell_version ||= begin
