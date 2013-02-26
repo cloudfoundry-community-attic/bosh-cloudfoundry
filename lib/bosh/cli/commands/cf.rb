@@ -127,6 +127,16 @@ module Bosh::Cli::Command
     option "--final", "Upload latest final release from very latest cf-release commits [default]"
     def upload_release
       if new_branch = options.delete(:branch)
+        switch_to_development_release
+      elsif options.delete(:final)
+        switch_to_final_release
+      end
+      # TODO - default to final release when appcloud-130.yml is released
+      # switch_to_final_release unless system_config.release_type
+      switch_to_development_release unless system_config.release_type
+        
+      if dev_release_type?
+        new_branch ||= "master"
         set_cf_release_branch(new_branch)
         clone_or_update_cf_release
         prepare_cf_release_for_dev_release

@@ -88,10 +88,12 @@ describe Bosh::Cli::Command::Base do
       @cmd.system_config.cf_release_branch = "master"
       @cmd.system_config.cf_release_branch_dir = File.join(cf_release_dir, "master")
       FileUtils.mkdir_p(@cmd.system_config.cf_release_branch_dir)
-    
+
       @cmd.should_receive(:sh).with("git pull origin master")
       @cmd.should_receive(:`).with("tail -n 1 releases/index.yml | awk '{print $2}'").and_return("128")
       @cmd.should_receive(:sh).with("bosh -n --color upload release releases/appcloud-128.yml")
+
+      @cmd.add_option(:final, true)
       @cmd.upload_release
     end
 
@@ -104,8 +106,6 @@ describe Bosh::Cli::Command::Base do
       @cmd.system_config.cf_release_branch_dir = File.join(cf_release_dir, "master")
       FileUtils.mkdir_p(@cmd.system_config.cf_release_branch_dir)
 
-      @cmd.add_option(:branch, "master")
-    
       @cmd.should_receive(:sh).with("git pull origin master")
       script = <<-BASH.gsub(/^      /, '')
       grep -rI "github.com" * .gitmodules | awk 'BEGIN {FS=":"} { print($1) }' | uniq while read file
@@ -121,6 +121,8 @@ describe Bosh::Cli::Command::Base do
       @cmd.should_receive(:write_dev_config_file).with("appcloud-master")
       @cmd.should_receive(:sh).with("bosh -n --color create release --with-tarball --force")
       @cmd.should_receive(:sh).with("bosh -n --color upload release")
+
+      @cmd.add_option(:branch, "master")
       @cmd.upload_release
     end
 
@@ -145,8 +147,14 @@ describe Bosh::Cli::Command::Base do
 
       if needs_initial_release_uploaded
         cmd.should_receive(:bosh_releases).exactly(1).times.and_return([])
+
+        # TODO revert to these when appcloud-130 is released; and we go to final release
+        # cmd.should_receive(:clone_or_update_cf_release)
+        # cmd.should_receive(:upload_final_release)
+        cmd.should_receive(:set_cf_release_branch).with("master").exactly(2).times
         cmd.should_receive(:clone_or_update_cf_release)
-        cmd.should_receive(:upload_final_release)
+        cmd.should_receive(:prepare_cf_release_for_dev_release)
+        cmd.should_receive(:create_and_upload_dev_release)
       else
         cmd.should_receive(:bosh_releases).exactly(1).times.and_return([
           {"name"=>"appcloud", "versions"=>["124", "126", "129"], "in_use"=>[]},
@@ -187,11 +195,13 @@ describe Bosh::Cli::Command::Base do
       File.basename(@cmd.system).should == "production"
     end
 
-    it "uploads latest stemcell & final cf-release by default" do
-      generate_new_system(@cmd)
-      File.basename(@cmd.system).should == "production"
-      @cmd.system_config.release_name.should == "appcloud"
-    end
+    # TODO restore when appcloud-130 released
+    it "uploads latest stemcell & final cf-release by default" 
+    # do
+    #   generate_new_system(@cmd)
+    #   File.basename(@cmd.system).should == "production"
+    #   @cmd.system_config.release_name.should == "appcloud"
+    # end
 
     it "new system has common random password" do
       generate_new_system(@cmd)
