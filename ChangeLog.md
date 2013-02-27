@@ -1,5 +1,7 @@
 # Change Log
 
+Create and manage your Cloud Foundry deployments on AWS and OpenStack with a simple command line tool (a plugin for BOSH CLI in fact). Start small, grow big, and constantly upgrade your various Cloud Foundry deployments.
+
 ## v0.6
 
 There is now a write up of [the concepts](https://github.com/StarkAndWayne/bosh-cloudfoundry/blob/master/docs/concept.md) and constructs being deployed from Anders Sveen!
