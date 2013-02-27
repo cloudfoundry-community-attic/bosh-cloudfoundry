@@ -20,14 +20,9 @@ bosh-bootstrap deploy
 # and some other fields that you can
 # just press Enter for.
 
-# SSH into inception VM
+# SSH into inception VM (also see 'tmux' and 'mosh' commands)
 bosh-bootstrap ssh
 
-git config --global user.email "you@example.com"
-git config --global user.name "Your Name"
-
-sudo gem install bosh-cloudfoundry
-export TMPDIR=/var/vcap/store/tmp
 bosh cf prepare system production
 # prompts for a DNS host for your CloudFoundry, such as mycompany.com
 # will generate a new IP address
