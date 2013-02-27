@@ -1,10 +1,16 @@
 # Change Log
 
-## HEAD
+## v0.6
 
-Command "bosh cf prepare system" now (much more quickly) uploads a final release if one doesn't exist. Finally, cf-release includes a final release that works on AWS!
+There is now a write up of [the concepts](https://github.com/StarkAndWayne/bosh-cloudfoundry/blob/master/docs/concept.md) and constructs being deployed from Anders Sveen!
 
-There is now a write up of [the concepts](/docs/concept.md) and constructs being deployed from Anders Sveen!
+Tests are running on Travis CI. We have green builds!
+
+Automatically uploading base stemcell 0.7.0; rather than the very new 1.5.0-pre2 which only work with the also very new microbosh 1.5.0-pre2.
+
+Faster when using a final release because it no longer pulls down all the submodules; and some better code for handling the switch between a development and final release; but...
+
+Still need to create development releases from cf-release's master branch. Hopefully all the required patches will be in cf-release's 130 release coming soon!
 
 ## v0.5
 
