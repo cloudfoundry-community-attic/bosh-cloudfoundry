@@ -86,7 +86,7 @@ describe Bosh::Cli::Command::Base do
       cf_release_dir = File.join(@releases_dir, "cf-release")
       @cmd.system_config.cf_release_dir = cf_release_dir
       @cmd.system_config.cf_release_branch = "master"
-      @cmd.system_config.cf_release_branch_dir = File.join(cf_release_dir, "master")
+      @cmd.system_config.cf_release_branch_dir = File.join(cf_release_dir, "staging")
       FileUtils.mkdir_p(@cmd.system_config.cf_release_branch_dir)
 
       @cmd.should_receive(:sh).with("git pull origin master")
@@ -102,11 +102,11 @@ describe Bosh::Cli::Command::Base do
 
       cf_release_dir = File.join(@releases_dir, "cf-release")
       @cmd.system_config.cf_release_dir = cf_release_dir
-      @cmd.system_config.cf_release_branch = "master"
-      @cmd.system_config.cf_release_branch_dir = File.join(cf_release_dir, "master")
+      @cmd.system_config.cf_release_branch = "staging"
+      @cmd.system_config.cf_release_branch_dir = File.join(cf_release_dir, "staging")
       FileUtils.mkdir_p(@cmd.system_config.cf_release_branch_dir)
 
-      @cmd.should_receive(:sh).with("git pull origin master")
+      @cmd.should_receive(:sh).with("git pull origin staging")
       script = <<-BASH.gsub(/^      /, '')
       grep -rI "github.com" * .gitmodules | awk 'BEGIN {FS=":"} { print($1) }' | uniq while read file
       do
@@ -118,11 +118,11 @@ describe Bosh::Cli::Command::Base do
       @cmd.should_receive(:sh).with("sed -i 's#git@github.com:#https://github.com/#g' .gitmodules")
       @cmd.should_receive(:sh).with("sed -i 's#git://github.com#https://github.com#g' .gitmodules")
       @cmd.should_receive(:sh).with("git submodule update --init --recursive")
-      @cmd.should_receive(:write_dev_config_file).with("appcloud-master")
+      @cmd.should_receive(:write_dev_config_file).with("appcloud-staging")
       @cmd.should_receive(:sh).with("bosh -n --color create release --with-tarball --force")
       @cmd.should_receive(:sh).with("bosh -n --color upload release")
 
-      @cmd.add_option(:branch, "master")
+      @cmd.add_option(:branch, "staging")
       @cmd.upload_release
     end
 
@@ -151,14 +151,14 @@ describe Bosh::Cli::Command::Base do
         # TODO revert to these when appcloud-130 is released; and we go to final release
         # cmd.should_receive(:clone_or_update_cf_release)
         # cmd.should_receive(:upload_final_release)
-        cmd.should_receive(:set_cf_release_branch).with("master").exactly(2).times
+        cmd.should_receive(:set_cf_release_branch).with("staging").exactly(2).times
         cmd.should_receive(:clone_or_update_cf_release)
         cmd.should_receive(:prepare_cf_release_for_dev_release)
         cmd.should_receive(:create_and_upload_dev_release)
       else
         cmd.should_receive(:bosh_releases).exactly(1).times.and_return([
           {"name"=>"appcloud", "versions"=>["124", "126", "129"], "in_use"=>[]},
-          {"name"=>"appcloud-master", "versions"=>["124.1-dev", "126.1-dev"], "in_use"=>[]},
+          {"name"=>"appcloud-staging", "versions"=>["124.1-dev", "126.1-dev"], "in_use"=>[]},
         ])
       end
 

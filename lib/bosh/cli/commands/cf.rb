@@ -136,7 +136,7 @@ module Bosh::Cli::Command
       switch_to_development_release unless system_config.release_type
         
       if dev_release_type?
-        new_branch ||= "master"
+        new_branch ||= "staging"
         set_cf_release_branch(new_branch)
         clone_or_update_cf_release
         prepare_cf_release_for_dev_release
@@ -550,7 +550,7 @@ module Bosh::Cli::Command
       common_password
       security_group
 
-      set_cf_release_branch("master")
+      set_cf_release_branch("staging")
     end
 
     # Renders the +SystemConfig+ model (+system_config+) into the system's

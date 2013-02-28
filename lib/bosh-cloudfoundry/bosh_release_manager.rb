@@ -97,7 +97,7 @@ module Bosh::CloudFoundry::BoshReleaseManager
 
   # clones or updates cf-release for a specific branch
   # For all defaults, clones into:
-  # * /var/vcap/store/releases/cf-release/master (cf_release_branch_dir)
+  # * /var/vcap/store/releases/cf-release/staging (cf_release_branch_dir)
   #
   # Uses:
   # * releases_dir (e.g. '/var/vcap/store/releases')
