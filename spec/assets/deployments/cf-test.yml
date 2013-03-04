@@ -1,0 +1,301 @@
+---
+name: cloudfoundry-rsg
+director_uuid: fd63be52-be83-4fa3-950a-01fb26c2c781
+ 
+release:
+name: bobrelease
+version: 116.3-dev
+ 
+compilation:
+workers: 3
+network: default
+cloud_properties:
+instance_type: bosh_compilation
+ram: 2048
+disk: 8096
+cpu: 3
+ 
+update:
+canaries: 1
+canary_watch_time: 3000-90000
+update_watch_time: 3000-90000
+max_in_flight: 2
+max_errors: 1
+ 
+networks:
+- name: floating
+type: vip
+cloud_properties:
+security_groups:
+- default
+- name: default
+type: dynamic
+cloud_properties:
+security_groups:
+- default
+ 
+resource_pools:
+ 
+- name: infrastructure
+network: default
+size: 9
+stemcell:
+name: bosh-stemcell
+version: 0.6.7
+cloud_properties:
+instance_type: bosh_infrastructure
+ram: 4096
+disk: 8192
+cpu: 1
+env:
+bosh:
+password: $6$w4JRA567VU84$0TPA5/ZZqjXVvEUw5nDXBg8dYqp20xB4Qno2x4nH/oJaMrSUZ8Rgblhil4uv5x..xWA7xhwFuAXJ/rmCizql0.
+# etc1pass - password generated using mkpasswd -m sha-512
+ 
+- name: deas
+network: default
+size: 1
+stemcell:
+name: bosh-stemcell
+version: 0.6.7
+cloud_properties:
+instance_type: bosh_deas
+ram: 8192
+disk: 16384
+cpu: 4
+env:
+bosh:
+password: $6$w4JRA567VU84$0TPA5/ZZqjXVvEUw5nDXBg8dYqp20xB4Qno2x4nH/oJaMrSUZ8Rgblhil4uv5x..xWA7xhwFuAXJ/rmCizql0.
+# etc1pass - password generated using mkpasswd -m sha-512
+ 
+jobs:
+ 
+- name: nats
+template: nats
+instances: 1
+resource_pool: infrastructure
+networks:
+- name: default
+default: [dns, gateway]
+- name: floating
+static_ips:
+- 192.168.1.11
+ 
+- name: router
+template: router
+instances: 1
+resource_pool: infrastructure
+networks:
+- name: default
+default: [dns, gateway]
+- name: floating
+static_ips:
+- 192.168.1.15
+ 
+- name: stager
+template: stager
+instances: 1
+resource_pool: infrastructure
+networks:
+- name: default
+ 
+- name: ccdb_postgres
+template: postgres
+instances: 1
+resource_pool: infrastructure
+persistent_disk: 2048
+networks:
+- name: default
+default: [dns, gateway]
+- name: floating
+static_ips:
+- 192.168.1.12
+properties:
+db: ccdb
+ 
+- name: uaadb
+template: postgres
+instances: 1
+resource_pool: infrastructure
+persistent_disk: 2048
+networks:
+- name: default
+default: [dns, gateway]
+- name: floating
+static_ips:
+- 192.168.1.13
+properties:
+db: uaadb
+ 
+- name: uaa
+template: uaa
+instances: 1
+resource_pool: infrastructure
+networks:
+- name: default
+ 
+- name: dea
+template: dea
+instances: 1
+resource_pool: deas
+networks:
+- name: default
+ 
+- name: cloud_controller
+template: cloud_controller
+instances: 1
+resource_pool: infrastructure
+networks:
+- name: default
+ 
+- name: vcap_redis
+template: vcap_redis
+instances: 1
+resource_pool: infrastructure
+networks:
+- name: default
+default: [dns, gateway]
+- name: floating
+static_ips:
+- 192.168.1.16
+ 
+- name: health_manager_next
+template: health_manager_next
+instances: 1
+resource_pool: infrastructure
+networks:
+- name: default
+default: [dns, gateway]
+- name: floating
+static_ips:
+- 192.168.1.14
+ 
+ 
+properties:
+domain: cloudfoundry.test
+ 
+env:
+ 
+networks:
+apps: default
+management: default
+ 
+nats:
+user: nats
+password: aaa3ij3122
+address: 192.168.1.11
+port: 4222
+ 
+dea:
+max_memory: 4096
+ 
+stager:
+max_staging_duration: 120
+max_active_tasks: 20
+queues:
+- staging
+ 
+router:
+status:
+port: 8080
+user: aaaUxXlS0pc71wVef
+password: aaamaIf9vPV4mJyBe
+ccdb:
+address: 192.168.1.12
+port: 5524
+pool_size: 10
+roles:
+- tag: admin
+name: ccadmin
+password: aaaBauWauZZb2
+databases:
+- tag: cc
+name: appcloud
+uaadb:
+address: 192.168.1.13
+port: 2544
+roles:
+- tag: admin
+name: uaaadmin
+password: aaaDFsddfwer23223wdfWEF
+databases:
+- tag: uaa
+name: uaa
+ 
+uaa:
+catalina_opts: -Xmx768m -XX:MaxPermSize=256m
+url: http://uaa.cloudfoundry.test
+resource_id: account_manager
+client_secret: foosecret
+token_secret: barsecret
+cc:
+token_secret: WGvbxaiC37
+client_secret: fOZF5DMND
+admin:
+client_secret: MeM5fER8e
+login:
+client_secret: HZtd2FyZS
+batch:
+username: do0H2AK
+password: FSCTipl
+client:
+override: true
+autoapprove:
+- vmc
+- my
+- portal
+- micro
+- support-signon
+- login
+clients:
+dashboard:
+secret: YsLuKyUCZF
+scope: openid,dashboard.user
+authorities: uaa.admin,uaa.resource,tokens.read,scim.read,scim.write
+authorized-grant-types: client_credentials,authorization_code,refresh_token
+portal:
+override: true
+id: portal
+scope: scim.write,scim.read,openid,cloud_controller.read,cloud_controller.write
+authorities: scim.write,scim.read,openid,cloud_controller.read,cloud_controller.write,password.write,uaa.admin
+secret: secret12345
+authorized-grant-types: authorization_code,client_credentials,password,implicit
+access-token-validity: 1209600
+refresh-token-validity: 1209600
+support-services:
+scope: scim.write,scim.read,openid,cloud_controller.read,cloud_controller.write
+secret: secret67890
+id: support-services
+authorized-grant-types: authorization_code,client_credentials
+redirect-uri: http://support-signon.etc57.cloud
+authorities: portal.users.read
+access-token-validity: 1209600
+refresh-token-validity: 1209600
+scim:
+user:
+override: true
+users:
+- admin|bob|admin@bobland.com|admin|admin|clients.read,clients.write,clients.secret,uaa.admin,scim.read,scim.write,password.write
+- bob|bob|openid,dashboard.user
+ 
+cc:
+srv_api_uri: http://api.cloudfoundry.test
+password: aaauuLaap44jadlas2l312lk
+token: aaaf4eaa8c1758f66d5cb7adcb24adb9d7
+use_nginx: true
+new_stager_percent: 100
+new_stager_email_regexp: '.*@vmware.com'
+staging_upload_user: aaafhgjg
+staging_upload_password: aaafdase9
+allow_registration: true
+# uaa:
+# enabled: true
+# resource_id: cloud_controller
+# token_creation_email_filter: [""]
+admins:
+- admin.bobland.com
+vcap_redis:
+address: 192.168.1.16
+port: 5454
+password: aaaxbL98RWpwBuUJvKNojnpIcRb1ot2
+maxmemory: 2000000000 # 2GB 
