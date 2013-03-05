@@ -1,0 +1,204 @@
+---
+name: production-core
+director_uuid: fd63be52-be83-4fa3-950a-01fb26c2c781 
+
+release:
+  name: bobrelease
+  version: latest
+
+compilation:
+  workers: 3
+  network: default
+  cloud_properties:
+    instance_type: bosh
+
+update:
+  canaries: 1
+  canary_watch_time: 3000-90000
+  update_watch_time: 3000-90000
+  max_in_flight: 2
+  max_errors: 1
+
+networks:
+- name: default
+  type: dynamic
+  cloud_properties:
+     security_groups:
+       - cloudfoundry-production
+       
+- name: vip_network
+  type: vip
+  cloud_properties:
+    security_groups:
+    - cloudfoundry-production
+
+resource_pools:
+
+- name: core
+  network: default
+  size: 1
+  stemcell:
+    name: bosh-stemcell
+    version: 0.7.0
+  cloud_properties:
+    instance_type: bosh
+#env:
+#bosh:
+#password: $6$w4JRA567VU84$0TPA5/ZZqjXVvEUw5nDXBg8dYqp20xB4Qno2x4nH/oJaMrSUZ8Rgblhil4uv5x..xWA7xhwFuAXJ/rmCizql0.
+
+
+jobs:
+
+- name: core
+  template: 
+  - nats
+  - router
+  - stager
+  - postgres
+  - uaa
+  - dea
+  - cloud_controller
+  - vcap_redis
+  - health_manager_next
+  instances: 1
+  resource_pool: core
+  networks:
+  - name: default
+    default:
+    - dns
+    - gateway
+  - name: vip_network
+    static_ips:
+    - 1.2.3.4
+
+properties:
+  domain: cloudfoundry.test
+
+  env:
+
+  networks:
+    apps: default
+    management: default
+
+  nats:
+    user: nats
+    password: aaa3ij3122
+    address: 192.168.1.11
+    port: 4222
+
+  dea:
+    max_memory: 4096
+
+  stager:
+    max_staging_duration: 120
+    max_active_tasks: 20
+    queues:
+    - staging
+
+  router:
+    client_inactivity_timeout: 600
+    app_inactivity_timeout: 600
+    local_route: 1.2.3.4
+    status:
+      port: 8080
+      user: aaaUxXlS0pc71wVef
+      password: aaamaIf9vPV4mJyBe
+      
+  postgresql_server:
+    max_connections: 30
+    listen_address: 0.0.0.0
+
+  service_lifecycle:
+    download_url: 1.2.3.4
+    mount_point: /var/vcap/service_lifecycle
+    tmp_dir: /var/vcap/service_lifecycle/tmp_dir
+    resque:
+      host: 1.2.3.4
+      port: 3456
+      password: c1oudc0wc1oudc0w
+
+  db: ccdb
+  ccdb:
+    template: postgres
+    address: 1.2.3.4
+    port: 2544
+    databases:
+    - tag: cc
+      name: appcloud
+    - tag: uaa
+      name: uaa
+    roles:
+    - name: root
+      password: c1oudc0wc1oudc0w
+      tag: admin
+    - name: uaa
+      password: c1oudc0wc1oudc0w
+      tag: uaa
+
+  uaa:
+    catalina_opts: -Xmx768m -XX:MaxPermSize=256m
+    url: http://uaa.cloudfoundry.test
+    resource_id: account_manager
+    client_secret: foosecret
+    token_secret: barsecret
+    cc:
+      token_secret: WGvbxaiC37
+      client_secret: fOZF5DMND
+    admin:
+      client_secret: MeM5fER8e
+    login:
+      client_secret: HZtd2FyZS
+    batch:
+      username: do0H2AK
+      password: FSCTipl
+    client:
+      override: true
+      autoapprove:
+        - vmc
+        - my
+        - portal
+        - micro
+        - support-signon
+        - login
+    
+    scim:
+      user:
+        override: true
+      users:
+      - admin|bob|admin@bobland.com|admin|admin|clients.read,clients.write,clients.secret,uaa.admin,scim.read,scim.write,password.write
+      - bob|bob|openid,dashboard.user
+
+      
+  cc:
+    srv_api_uri: http://api.cloudfoundry.test
+    password: aaauuLaap44jadlas2l312lk
+    token: aaaf4eaa8c1758f66d5cb7adcb24adb9d7
+    use_nginx: true
+    new_stager_percent: 100
+    new_stager_email_regexp: '.*@vmware.com'
+    staging_upload_user: aaafhgjg
+    staging_upload_password: aaafdase9
+    allow_registration: true
+ #   uaa:
+ #     enabled: true
+ #     resource_id: cloud_controller
+ #     token_creation_email_filter: [""]
+    admins:
+    - admin.bobland.com
+    
+  vcap_redis:
+    address: 192.168.1.16
+    port: 5454
+    password: aaaxbL98RWpwBuUJvKNojnpIcRb1ot2
+    maxmemory: 2000000000 # 2GB    
+
+  uaadb:
+    address: 1.2.3.4
+    port: 2544
+    roles:
+    - tag: admin
+      name: uaa
+      password: c1oudc0wc1oudc0w
+    databases:
+    - tag: uaa
+      name: uaa
