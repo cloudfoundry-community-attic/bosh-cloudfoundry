@@ -14,6 +14,12 @@ Faster when using a final release because it no longer pulls down all the submod
 
 Still need to create development releases from cf-release's master branch. Hopefully all the required patches will be in cf-release's 130 release coming soon!
 
+### v0.6.1
+
+Constrain which fog version is installed to match bosh_cli. [thx @bonzofenix]
+
+Little bit of README clean up.
+
 ## v0.5
 
 Gerrit is dead. Long live gerrit. This release is for everyone who is getting started or wants to upgrade. Gerrit is dead.
