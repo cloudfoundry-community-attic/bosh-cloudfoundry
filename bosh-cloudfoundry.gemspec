@@ -26,6 +26,6 @@ deployments.
   gem.add_dependency "bosh_cli", ">=1.0.3"
   gem.add_dependency "rake" # file_utils sh helper
   gem.add_dependency "net-dns"
-  gem.add_dependency "fog", ">= 1.8.0"
+  gem.add_dependency "fog", "~>1.9.0"
   gem.add_development_dependency "rspec"
 end
