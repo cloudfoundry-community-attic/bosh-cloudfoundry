@@ -1,6 +1,6 @@
 # Change Log
 
-Create and manage your Cloud Foundry deployments on AWS and OpenStack with a simple command line tool (a plugin for BOSH CLI in fact). Start small, grow big, and constantly upgrade your various Cloud Foundry deployments.
+`bosh-cloudfoundry` is a bosh CLI plugin to create and manage your Cloud Foundry deployments on AWS and OpenStack with a simple command line tool. Start small, grow big, and constantly upgrade your various Cloud Foundry deployments.
 
 ## v0.6
 
