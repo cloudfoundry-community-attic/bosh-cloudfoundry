@@ -1,4 +1,4 @@
-# Add new services
+# Add new built-in services
 
 The primary purpose of `bosh-cloudfoundry` is to get new ops/admins to deploy Cloud Foundry quickly and successfully on BOSH. But the primary function of the tool is to generate BOSH deployment manifests for the [cf-release](https://github.com/cloudfoundry/cf-release) BOSH release.
 
@@ -27,4 +27,61 @@ The cf-release currently includes the following built-in services:
 * postgresql
 * redis
 
-### The goal of 
+### What does 'implementing a service' mean?
+
+It means we:
+
+* support CLI for adding/scaling services, which stores requirements in the SystemConfig intermediate manifest
+* convert the SystemConfig intermediate manifest into the correct deployment manifest
+
+In the sections below, let's consider we're implementing the `mysql` service (which is already implemented in cf-release).
+
+### Start with example deployment manifests
+
+The example deployment manifests for services (and other tricks that we can do) are in the [spec/assets/deployments](https://github.com/StarkAndWayne/bosh-cloudfoundry/tree/master/spec/assets/deployments) folder.
+
+When adding a new service, start by adding new examples to this folder.
+
+### Write specs to render your examples
+
+Add specs to [system_deployment_manifest_renderer_spec.rb](https://github.com/StarkAndWayne/bosh-cloudfoundry/blob/master/spec/unit/system_deployment_manifest_renderer_spec.rb) that expect to render your example spec(s) based on specific SystemConfig
+
+Look at the redis and postgresql specs for examples.
+
+### Extend SystemConfig
+
+In your manifest spec, you might want to include an extension to `@system_config` so you can implement the following idea:
+
+``` ruby
+@system_config.mysql = [
+  { "count" => 1, "flavor" => "m1.small", "plan" =>"free" },
+]
+```
+
+Initially, the [SystemConfig](https://github.com/StarkAndWayne/bosh-cloudfoundry/blob/master/lib/bosh-cloudfoundry/config/system_config.rb) class (`@system_config`) does not have a `#mysql=` method. Find where postgresql/redis are defined and add your service name in that list.
+
+### Creating a service config class
+
+For each of postgresql and redis there is a class that knows about its service's configuration, [PostgresqlServiceConfig](https://github.com/StarkAndWayne/bosh-cloudfoundry/blob/master/lib/bosh-cloudfoundry/config/postgresql_service_config.rb) & [RedisServiceConfig](https://github.com/StarkAndWayne/bosh-cloudfoundry/blob/master/lib/bosh-cloudfoundry/config/redis_service_config.rb), respectively.
+
+Create another one for your service, say `MysqlServiceConfig`.
+
+The purpose of the `SystemConfig` class is two-fold:
+
+* represent a portion of the user data in the `SystemConfig` object
+* modify a deployment manifest during its rendering process
+
+For each `SystemConfig` manifest there is one of your new `ServiceConfig` objects. It maps to a portion of the `SystemConfig` manifest file; specifically the object stored at the key you added in the section above (for example, `@system_config.mysql`).
+
+For postgresql & redis this object is an array of objects/hashes. Each object/hash represents a cluster of servers/instances/VMs that share the same server flavor and Cloud Foundry service plan. The `"count"` key indicates how many instances should be in the cluster. See section "Extend SystemConfig" above for an example.
+
+### Applying service changes into a deployment manifest
+
+Within this project, the creation of a deployment manifest is called "rendering". It is done by building up a large nested Hash, converting it to a YAML format, then saving to disk. The word "rendering" is also used simply to describe the building up of the large nested Hash that will become a deployment manifest.
+
+During the building process, we delegate to each ServiceConfig object to modify the deployment manifest object. There are four places that each `ServiceConfig` object might perform modifications:
+
+* job templates added/removed to the core job VM (method `add_core_jobs_to_manifest`); for example, `ServiceConfig` will add a service gateway job (e.g. [mysql_gateway](https://github.com/cloudfoundry/cf-release/tree/master/jobs/mysql_gateway)) to the core job
+* additional resource pools (method `add_resource_pools_to_manifest`); for example, we will need new servers/instances to provide the mysql service
+* additional jobs (method `add_jobs_to_manifest`); we want the additional resource pool servers to become mysql service nodes ([mysql_node](https://github.com/cloudfoundry/cf-release/tree/master/jobs/mysql_node))
+* additional shared properties (method `merge_manifest_properties`); for example, to configure the service plans that the service nodes will support, such as "free", and what versions of the actual service (e.g. mysql 5.5) are running.
