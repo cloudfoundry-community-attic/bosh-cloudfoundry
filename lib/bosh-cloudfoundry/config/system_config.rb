@@ -20,6 +20,13 @@ class Bosh::CloudFoundry::Config::SystemConfig < Bosh::Cli::Config
     setup_services
   end
 
+  def service_classes
+    [
+      Bosh::CloudFoundry::Config::PostgresqlServiceConfig,
+      Bosh::CloudFoundry::Config::RedisServiceConfig,
+    ]
+  end
+
   [
     :bosh_target,      # e.g. http://1.2.3.4:25555
     :bosh_target_uuid,
@@ -73,13 +80,6 @@ class Bosh::CloudFoundry::Config::SystemConfig < Bosh::Cli::Config
       self.send("#{service_name}=", [])
       @services[service_name] = service
     end
-  end
-
-  def service_classes
-    [
-      Bosh::CloudFoundry::Config::PostgresqlServiceConfig,
-      Bosh::CloudFoundry::Config::RedisServiceConfig,
-    ]
   end
 
   def supported_services
