@@ -40,20 +40,9 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
       system_config.security_group
     )
 
-    dea_config.add_core_jobs_to_manifest(manifest)
-    dea_config.add_resource_pools_to_manifest(manifest)
-    dea_config.add_jobs_to_manifest(manifest)
-    dea_config.merge_manifest_properties(manifest)
-
-    postgresql_service_config.add_core_jobs_to_manifest(manifest)
-    postgresql_service_config.add_resource_pools_to_manifest(manifest)
-    postgresql_service_config.add_jobs_to_manifest(manifest)
-    postgresql_service_config.merge_manifest_properties(manifest)
-
-    redis_service_config.add_core_jobs_to_manifest(manifest)
-    redis_service_config.add_resource_pools_to_manifest(manifest)
-    redis_service_config.add_jobs_to_manifest(manifest)
-    redis_service_config.merge_manifest_properties(manifest)
+    dea_config.build_into_manifest(manifest)
+    postgresql_service_config.build_into_manifest(manifest)
+    redis_service_config.build_into_manifest(manifest)
 
     chdir system_config.system_dir do
       mkdir_p("deployments")

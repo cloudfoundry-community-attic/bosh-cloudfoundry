@@ -89,6 +89,13 @@ class Bosh::CloudFoundry::Config::ServiceConfig
     @provider ||= Bosh::CloudFoundry::Providers.for_bosh_provider_name(system_config)
   end
 
+  def build_into_manifest(manifest)
+    add_core_jobs_to_manifest(manifest)
+    add_resource_pools_to_manifest(manifest)
+    add_jobs_to_manifest(manifest)
+    merge_manifest_properties(manifest)
+  end
+
   # Adds "redis_gateway" to colocated "core" job
   def add_core_jobs_to_manifest(manifest)
     if any_service_nodes?
