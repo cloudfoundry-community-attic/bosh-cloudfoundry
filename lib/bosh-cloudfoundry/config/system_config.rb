@@ -37,6 +37,8 @@ class Bosh::CloudFoundry::Config::SystemConfig < Bosh::Cli::Config
     end
   end
 
+  # Accessors for access to config manifest
+  # Additional accessors are created for each service, such as redis/redis= & postgresql/postgresql=
   [
     :bosh_target,      # e.g. http://1.2.3.4:25555
     :bosh_target_uuid,
