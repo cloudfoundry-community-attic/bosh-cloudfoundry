@@ -303,5 +303,17 @@ describe Bosh::Cli::Command::Base do
       @cmd.bosh_release_versions("appcloud-dev").should == ["124.1-dev", "126.1-dev"]
       @cmd.bosh_release_versions("XXX").should == []
     end
+
+    it "supports specific services" do
+      generate_new_system
+      @cmd.supported_services.should == %w[postgresql redis]
+    end
+
+    it "can access the ServiceConfig for a supported service" do
+      generate_new_system
+      service_config = @cmd.service_config("redis")
+      service_config.should_not be_nil
+      service_config.class.should == Bosh::CloudFoundry::Config::RedisServiceConfig
+    end
   end
 end
