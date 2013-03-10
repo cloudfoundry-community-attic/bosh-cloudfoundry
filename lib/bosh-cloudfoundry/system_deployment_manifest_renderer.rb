@@ -41,8 +41,9 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
     )
 
     dea_config.build_into_manifest(manifest)
-    postgresql_service_config.build_into_manifest(manifest)
-    redis_service_config.build_into_manifest(manifest)
+    system_config.services.each do |service_config|
+      service_config.build_into_manifest(manifest)
+    end
 
     chdir system_config.system_dir do
       mkdir_p("deployments")

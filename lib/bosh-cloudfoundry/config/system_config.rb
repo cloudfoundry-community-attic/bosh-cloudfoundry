@@ -76,13 +76,13 @@ class Bosh::CloudFoundry::Config::SystemConfig < Bosh::Cli::Config
   end
 
   def setup_services
-    @services = {}
+    @services_by_name = {}
     service_classes.each do |service_class|
       service = service_class.build_from_system_config(self)
       service_name = service.service_name
       self.class.create_config_accessor(service_name)
       self.send("#{service_name}=", [])
-      @services[service_name] = service
+      @services_by_name[service_name] = service
     end
   end
 
@@ -93,11 +93,15 @@ class Bosh::CloudFoundry::Config::SystemConfig < Bosh::Cli::Config
     if available_services
       puts "IGNORING 'available_services' configuration: must be an array of service names"
     end
-    @services.keys
+    @services_by_name.keys
+  end
+
+  def services
+    @services_by_name.values
   end
 
   def service(service_name)
-    @services[service_name] ||
+    @services_by_name[service_name] ||
       raise("please add #{service_name} support to SystemConfig#service method")
   end
 
