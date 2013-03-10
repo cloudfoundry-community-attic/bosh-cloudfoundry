@@ -27,6 +27,16 @@ class Bosh::CloudFoundry::Config::SystemConfig < Bosh::Cli::Config
     ]
   end
 
+  def self.create_config_accessor(attr)
+    define_method attr do
+      read(attr, false)
+    end
+
+    define_method "#{attr}=" do |value|
+      write_global(attr, value)
+    end
+  end
+
   [
     :bosh_target,      # e.g. http://1.2.3.4:25555
     :bosh_target_uuid,
@@ -51,19 +61,9 @@ class Bosh::CloudFoundry::Config::SystemConfig < Bosh::Cli::Config
     :common_persistent_disk, # e.g. 16192 (integer in Mb)
     :admin_emails,     # e.g. ['drnic@starkandwayne.com']
     :dea,              # e.g. { "count" => 2, "flavor" => "m1.large" }
-    :postgresql,       # e.g. [{ "count" => 2, "flavor" => "m1.large", "plan" => "free" }]
-    :redis,            # e.g. [{ "count" => 2, "flavor" => "m1.large", "plan" => "free" }]
     :security_group,   # e.g. "cloudfoundry-production"
     :system_initialized,  # e.g. true / false
-  ].each do |attr|
-    define_method attr do
-      read(attr, false)
-    end
-
-    define_method "#{attr}=" do |value|
-      write_global(attr, value)
-    end
-  end
+  ].each { |attr| create_config_accessor(attr) }
 
   def microbosh
     unless bosh_target
@@ -77,6 +77,7 @@ class Bosh::CloudFoundry::Config::SystemConfig < Bosh::Cli::Config
     service_classes.each do |service_class|
       service = service_class.build_from_system_config(self)
       service_name = service.service_name
+      self.class.create_config_accessor(service_name)
       self.send("#{service_name}=", [])
       @services[service_name] = service
     end
