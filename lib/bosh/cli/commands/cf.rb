@@ -571,18 +571,11 @@ module Bosh::Cli::Command
     end
 
     def supported_services
-      %w[postgresql redis]
+      system_config.supported_services
     end
 
     def service_config(service_name)
-      case service_name.to_sym
-      when :postgresql
-        Bosh::CloudFoundry::Config::PostgresqlServiceConfig.build_from_system_config(system_config)
-      when :redis
-        Bosh::CloudFoundry::Config::RedisServiceConfig.build_from_system_config(system_config)
-      else
-        raise "please add #{service_name} support to #service_config method"
-      end
+      system_config.service(service_name)
     end
 
     def default_core_server_flavor

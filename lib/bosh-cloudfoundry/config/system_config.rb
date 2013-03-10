@@ -63,4 +63,19 @@ class Bosh::CloudFoundry::Config::SystemConfig < Bosh::Cli::Config
     end
     @microbosh ||= Bosh::CloudFoundry::Config::MicroboshConfig.new(bosh_target)
   end
+
+  def supported_services
+    %w[postgresql redis]
+  end
+
+  def service(service_name)
+    case service_name.to_sym
+    when :postgresql
+      Bosh::CloudFoundry::Config::PostgresqlServiceConfig.build_from_system_config(self)
+    when :redis
+      Bosh::CloudFoundry::Config::RedisServiceConfig.build_from_system_config(self)
+    else
+      raise "please add #{service_name} support to SystemConfig#service method"
+    end
+  end
 end
