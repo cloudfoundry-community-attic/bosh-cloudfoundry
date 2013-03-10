@@ -17,6 +17,7 @@ class Bosh::CloudFoundry::Config::SystemConfig < Bosh::Cli::Config
     super(config_file, system_dir)
     self.system_dir  = system_dir
     self.system_name = File.basename(system_dir)
+    setup_default_service_config
   end
 
   [
@@ -76,6 +77,12 @@ class Bosh::CloudFoundry::Config::SystemConfig < Bosh::Cli::Config
       Bosh::CloudFoundry::Config::RedisServiceConfig.build_from_system_config(self)
     else
       raise "please add #{service_name} support to SystemConfig#service method"
+    end
+  end
+
+  def setup_default_service_config
+    supported_services.each do |service_name|
+      self.send("#{service_name}=", [])
     end
   end
 end

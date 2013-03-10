@@ -239,6 +239,7 @@ describe Bosh::Cli::Command::Base do
       @cmd.add_option(:flavor, 'm1.large')
       @cmd.add_service_node("postgresql", 4)
 
+      @cmd.system_config.postgresql.should_not be_nil
       @cmd.system_config.postgresql.size.should == 1
       postgresql_config = @cmd.system_config.postgresql.first
       postgresql_config["flavor"].should == "m1.large"
@@ -255,6 +256,7 @@ describe Bosh::Cli::Command::Base do
       @cmd.add_option(:flavor, 'm1.large')
       @cmd.add_service_node("redis", 2)
 
+      @cmd.system_config.redis.should_not be_nil
       @cmd.system_config.redis.size.should == 1
       redis_config = @cmd.system_config.redis.first
       redis_config["flavor"].should == "m1.large"
