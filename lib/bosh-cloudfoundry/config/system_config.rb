@@ -64,6 +64,7 @@ class Bosh::CloudFoundry::Config::SystemConfig < Bosh::Cli::Config
     :admin_emails,     # e.g. ['drnic@starkandwayne.com']
     :dea,              # e.g. { "count" => 2, "flavor" => "m1.large" }
     :security_group,   # e.g. "cloudfoundry-production"
+    :available_services, # e.g. ['redis']; restricts supported_services; default - all supported service
     :system_initialized,  # e.g. true / false
   ].each { |attr| create_config_accessor(attr) }
 
@@ -86,6 +87,12 @@ class Bosh::CloudFoundry::Config::SystemConfig < Bosh::Cli::Config
   end
 
   def supported_services
+    if available_services.is_a?(Array) && available_services.first.is_a?(String)
+      available_services
+    end
+    if available_services
+      puts "IGNORING 'available_services' configuration: must be an array of service names"
+    end
     @services.keys
   end
 
