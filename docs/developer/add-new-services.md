@@ -27,6 +27,8 @@ The cf-release currently includes the following built-in services:
 * postgresql
 * redis
 
+## Implement a service
+
 ### What does 'implementing a service' mean?
 
 It means we:
@@ -47,6 +49,12 @@ When adding a new service, start by adding new examples to this folder.
 Add specs to [system_deployment_manifest_renderer_spec.rb](https://github.com/StarkAndWayne/bosh-cloudfoundry/blob/master/spec/unit/system_deployment_manifest_renderer_spec.rb) that expect to render your example spec(s) based on specific SystemConfig
 
 Look at the redis and postgresql specs for examples.
+
+In a terminal window, you can run `guard` to continuously run your failing specs until they start passing:
+
+```
+$ guard
+```
 
 ### Extend SystemConfig
 
@@ -85,3 +93,23 @@ During the building process, we delegate to each ServiceConfig object to modify 
 * additional resource pools (method `add_resource_pools_to_manifest`); for example, we will need new servers/instances to provide the mysql service
 * additional jobs (method `add_jobs_to_manifest`); we want the additional resource pool servers to become mysql service nodes ([mysql_node](https://github.com/cloudfoundry/cf-release/tree/master/jobs/mysql_node))
 * additional shared properties (method `merge_manifest_properties`); for example, to configure the service plans that the service nodes will support, such as "free", and what versions of the actual service (e.g. mysql 5.5) are running.
+
+You trigger these 4 methods by calling them from the [SystemDeploymentManifestRenderer#perform](https://github.com/StarkAndWayne/bosh-cloudfoundry/blob/master/lib/bosh-cloudfoundry/system_deployment_manifest_renderer.rb#L20) method.
+
+## Tests should pass
+
+At this point, your tests should pass.
+
+## Enable the service
+
+At this point, the CLI still will not allow the new service. Let's fix that.
+
+In the main CLI file, [cf.rb](https://github.com/StarkAndWayne/bosh-cloudfoundry/blob/master/lib/bosh/cli/commands/cf.rb), find the `#supported_services` method and add your new service name (e.g. `mysql`).
+
+Finally, map your service name to your `ServiceConfig` class in the `#service_config` method.
+
+Now, when your new service should be available via the CLI:
+
+```
+$ bosh cf add service mysql
+```

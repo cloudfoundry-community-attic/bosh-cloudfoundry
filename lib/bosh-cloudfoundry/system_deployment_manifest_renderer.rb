@@ -60,7 +60,6 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
       File.open("deployments/#{system_config.system_name}-core.yml", "w") do |file|
         file << manifest.to_yaml
       end
-      # `open "deployments/#{system_config.system_name}-core.yml"`
     end
   end
 
