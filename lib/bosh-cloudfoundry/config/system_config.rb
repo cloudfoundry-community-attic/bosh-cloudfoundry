@@ -17,7 +17,7 @@ class Bosh::CloudFoundry::Config::SystemConfig < Bosh::Cli::Config
     super(config_file, system_dir)
     self.system_dir  = system_dir
     self.system_name = File.basename(system_dir)
-    setup_default_service_config
+    setup_services
   end
 
   [
@@ -65,24 +65,30 @@ class Bosh::CloudFoundry::Config::SystemConfig < Bosh::Cli::Config
     @microbosh ||= Bosh::CloudFoundry::Config::MicroboshConfig.new(bosh_target)
   end
 
+  def setup_services
+    @services = {}
+    service_classes.each do |service_class|
+      service = service_class.build_from_system_config(self)
+      service_name = service.service_name
+      self.send("#{service_name}=", [])
+      @services[service_name] = service
+    end
+  end
+
+  def service_classes
+    [
+      Bosh::CloudFoundry::Config::PostgresqlServiceConfig,
+      Bosh::CloudFoundry::Config::RedisServiceConfig,
+    ]
+  end
+
   def supported_services
-    %w[postgresql redis]
+    @services.keys
   end
 
   def service(service_name)
-    case service_name.to_sym
-    when :postgresql
-      Bosh::CloudFoundry::Config::PostgresqlServiceConfig.build_from_system_config(self)
-    when :redis
-      Bosh::CloudFoundry::Config::RedisServiceConfig.build_from_system_config(self)
-    else
-      raise "please add #{service_name} support to SystemConfig#service method"
-    end
+    @services[service_name] ||
+      raise("please add #{service_name} support to SystemConfig#service method")
   end
 
-  def setup_default_service_config
-    supported_services.each do |service_name|
-      self.send("#{service_name}=", [])
-    end
-  end
 end

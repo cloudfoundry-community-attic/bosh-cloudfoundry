@@ -7,6 +7,7 @@ module Bosh::CloudFoundry::Config
 
     # name that maps into the cf-release's jobs folder
     # for redis_gateway and redis_node jobs
+    # also used as the key into SystemConfig manifest
     def service_name
       "redis"
     end
