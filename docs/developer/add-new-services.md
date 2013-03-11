@@ -66,13 +66,69 @@ In your manifest spec, you might want to include an extension to `@system_config
 ]
 ```
 
-Initially, the [SystemConfig](https://github.com/StarkAndWayne/bosh-cloudfoundry/blob/master/lib/bosh-cloudfoundry/config/system_config.rb) class (`@system_config`) does not have a `#mysql=` method. Find where postgresql/redis are defined and add your service name in that list.
+Initially, the [SystemConfig](https://github.com/StarkAndWayne/bosh-cloudfoundry/blob/master/lib/bosh-cloudfoundry/config/system_config.rb) class (`@system_config`) does not have a `#mysql=` method. Let's now implement support for the new service.
 
 ### Creating a service config class
 
 For each of postgresql and redis there is a class that knows about its service's configuration, [PostgresqlServiceConfig](https://github.com/StarkAndWayne/bosh-cloudfoundry/blob/master/lib/bosh-cloudfoundry/config/postgresql_service_config.rb) & [RedisServiceConfig](https://github.com/StarkAndWayne/bosh-cloudfoundry/blob/master/lib/bosh-cloudfoundry/config/redis_service_config.rb), respectively.
 
-Create another one for your service, say `MysqlServiceConfig`.
+Create another one for your service, say `MysqlServiceConfig` as a subclass of [ServiceConfig](https://github.com/drnic/bosh-cloudfoundry/blob/master/lib/bosh-cloudfoundry/config/service_config.rb). Make it look something like:
+
+``` ruby
+# Copyright (c) 2012-2013 Stark & Wayne, LLC
+
+module Bosh; module CloudFoundry; module Config; end; end; end
+
+module Bosh::CloudFoundry::Config
+  class MysqlServiceConfig < ServiceConfig
+
+    # name that maps into the cf-release's jobs folder
+    # for postgresql_gateway and postgresql_node jobs
+    # also used as the key into SystemConfig manifest
+    def service_name
+      "mysql"
+    end
+
+    # Add extra configuration properties into the manifest
+    # for the gateway, node, and service plans
+    def merge_manifest_properties(manifest)
+      if any_service_nodes?
+        # TODO
+      end
+    end
+  end
+
+  SystemConfig.register_service_config(MysqlServiceConfig)
+end
+```
+
+Look at the other `ServiceConfig` subclasses for examples of what to put into the `merge_manifest_properties` method.
+
+### Hooking it up
+
+There is one step to hooking up your new class to make it fully integrated. Add the following line to the bottom of the [config.rb](https://github.com/drnic/bosh-cloudfoundry/blob/master/lib/bosh-cloudfoundry/config.rb) file:
+
+``` ruby
+require "bosh-cloudfoundry/config/mysql_service_config"
+```
+
+This will automatically register the new class with SystemConfig because of the call to `SystemConfig.register_service_config` at the end of the `mysql_service_config.rb` file above.
+
+### Tests should pass
+
+At this point, your tests should pass. 
+
+If they don't then adjust your `merge_manifest_properties` method or perhaps you'll need to override more of the methods provided by `ServiceConfig`.
+
+### Using the service
+
+Now, when your new service should be available via the CLI:
+
+```
+$ bosh cf add service mysql
+```
+
+## Further explanations
 
 The purpose of the `SystemConfig` class is two-fold:
 
@@ -94,22 +150,4 @@ During the building process, we delegate to each ServiceConfig object to modify 
 * additional jobs (method `add_jobs_to_manifest`); we want the additional resource pool servers to become mysql service nodes ([mysql_node](https://github.com/cloudfoundry/cf-release/tree/master/jobs/mysql_node))
 * additional shared properties (method `merge_manifest_properties`); for example, to configure the service plans that the service nodes will support, such as "free", and what versions of the actual service (e.g. mysql 5.5) are running.
 
-You trigger these 4 methods by calling them from the [SystemDeploymentManifestRenderer#perform](https://github.com/StarkAndWayne/bosh-cloudfoundry/blob/master/lib/bosh-cloudfoundry/system_deployment_manifest_renderer.rb#L20) method.
-
-## Tests should pass
-
-At this point, your tests should pass.
-
-## Enable the service
-
-At this point, the CLI still will not allow the new service. Let's fix that.
-
-In the main CLI file, [cf.rb](https://github.com/StarkAndWayne/bosh-cloudfoundry/blob/master/lib/bosh/cli/commands/cf.rb), find the `#supported_services` method and add your new service name (e.g. `mysql`).
-
-Finally, map your service name to your `ServiceConfig` class in the `#service_config` method.
-
-Now, when your new service should be available via the CLI:
-
-```
-$ bosh cf add service mysql
-```
+The first three all have common implementations for all `ServiceConfig` subclasses. It is possible that your service may require already implementations. If so, then reimplement them in your subclass.
