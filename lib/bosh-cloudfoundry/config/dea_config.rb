@@ -46,6 +46,13 @@ class Bosh::CloudFoundry::Config::DeaConfig
     @system_config.save
   end
 
+  def build_into_manifest(manifest)
+    add_core_jobs_to_manifest(manifest)
+    add_resource_pools_to_manifest(manifest)
+    add_jobs_to_manifest(manifest)
+    merge_manifest_properties(manifest)
+  end
+
   # Adds additional cf-release jobs into the core server (the core job in the manifest)
   def add_core_jobs_to_manifest(manifest)
     if dea_server_count == 0
