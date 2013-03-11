@@ -20,13 +20,6 @@ class Bosh::CloudFoundry::Config::SystemConfig < Bosh::Cli::Config
     setup_services
   end
 
-  def service_classes
-    [
-      Bosh::CloudFoundry::Config::PostgresqlServiceConfig,
-      Bosh::CloudFoundry::Config::RedisServiceConfig,
-    ]
-  end
-
   def self.create_config_accessor(attr)
     define_method attr do
       read(attr, false)
@@ -73,6 +66,19 @@ class Bosh::CloudFoundry::Config::SystemConfig < Bosh::Cli::Config
       raise "please set #bosh_target before requesting microbosh configuration"
     end
     @microbosh ||= Bosh::CloudFoundry::Config::MicroboshConfig.new(bosh_target)
+  end
+
+  def self.register_service_config(service_config_class)
+    @service_classes ||= []
+    @service_classes << service_config_class
+  end
+
+  def self.service_classes
+    @service_classes
+  end
+
+  def service_classes
+    self.class.service_classes
   end
 
   def setup_services

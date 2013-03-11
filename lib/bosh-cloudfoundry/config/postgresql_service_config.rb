@@ -46,4 +46,6 @@ module Bosh::CloudFoundry::Config
       end
     end
   end
+
+  SystemConfig.register_service_config(PostgresqlServiceConfig)
 end
