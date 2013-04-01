@@ -233,7 +233,7 @@ module Bosh::CloudFoundry::ConfigOptions
         err "Please set base_systems_dir configuration for non-interactive mode"
       end
       
-      base_systems_dir = ask("Path for to store all CloudFoundry systems: ") {
+      base_systems_dir = ask("Path to store all CloudFoundry systems: ") {
         |q| q.default = DEFAULT_BASE_SYSTEM_PATH }
       common_config.base_systems_dir = File.expand_path(base_systems_dir)
       unless File.directory?(common_config.base_systems_dir)
