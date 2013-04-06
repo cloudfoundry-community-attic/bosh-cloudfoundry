@@ -12,15 +12,18 @@ If you have an AWS or OpenStack account then you can deploy a running Cloud Foun
 
 **You should not need to know anything before running this tutorial.** If you do this tutorial and you feel it was too complex or you needed to know something additional, please [create a ticket](https://github.com/StarkAndWayne/bosh-cloudfoundry/issues).
 
+## Run these steps on your local laptop/desktop
+
 ```
-# on your laptop
 gem install bosh-bootstrap
 bosh-bootstrap deploy
 # prompts for AWS/OpenStack credentials
 # and some other fields that you can
 # just press Enter for.
-
-# SSH into inception VM (also see 'tmux' and 'mosh' commands)
+```
+## SSH into inception VM and run these commands on that inception VM 
+### (also see 'tmux' and 'mosh' commands)
+```
 bosh-bootstrap ssh
 
 bosh cf prepare system production
