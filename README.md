@@ -33,6 +33,10 @@ bosh cf prepare system production
 # the re-run:
 bosh cf prepare system production
 
+# See this issue and try workaround mentioned in https://github.com/StarkAndWayne/bosh-cloudfoundry/issues/150#issuecomment-16020175 if it complains for DNS
+
+Checking that DNS api.mycompany.com resolves to IP address 54.244.123.127... ooh no!
+
 # use special "cf deploy" to install VMC & create initial VMC user
 bosh cf deploy
 
