@@ -231,7 +231,7 @@ class Bosh::CloudFoundry::SystemDeploymentManifestRenderer
          "uaa"=>
           {"enabled"=>true,
            "resource_id"=>"cloud_controller",
-           "token_creation_email_filter"=>[""]},
+           "token_creation_email_filter"=>""},
          "service_extension"=>{"service_lifecycle"=>{"max_upload_size"=>5}},
          "use_nginx"=>false},
        "postgresql_server"=>{"max_connections"=>30, "listen_address"=>"0.0.0.0"},
