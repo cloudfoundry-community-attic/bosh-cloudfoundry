@@ -121,8 +121,7 @@ properties:
     uaa: 
       enabled: true
       resource_id: cloud_controller
-      token_creation_email_filter: 
-      - ""
+      token_creation_email_filter: ""
     service_extension: 
       service_lifecycle: 
         max_upload_size: 5
