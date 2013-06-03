@@ -1,5 +1,7 @@
 # Bosh::CloudFoundry
 
+NOTICE: This specific project does not currently work. Sorry. This project was developed for Cloud Foundry v1 cf-release bosh release, which sadly does not work and is not maintained. It does not yet support v2. And it might not. Potentially looking to upgrade @pivotal-vmware's AWS VPC-only [bootstrap-cf-plugin](https://github.com/cloudfoundry/bootstrap-cf-plugin) project to support all Bosh-loving cloud providers. And make it sexy. We'll see.
+
 You want Cloud Foundry? You can now create, scale, upgrade and patch one or more Cloud Foundry deployments using very simple, easy to learn and remember CLI commands.
 
 Currently supports AWS and OpenStack only. vSphere and vCloud support will require someone to tell me that they really want it.
