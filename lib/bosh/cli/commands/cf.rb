@@ -106,7 +106,7 @@ module Bosh::Cli::Command
             },
             "networks" => {},
             "properties" => {
-              "cf" => attrs.attributes_with_string_keys
+              attrs.properties_key => attrs.attributes_with_string_keys
             }
           }.to_yaml
         end
@@ -126,7 +126,18 @@ module Bosh::Cli::Command
       end
     end
 
+    usage "show cf passwords"
+    desc "display the internal passwords for deployment"
+    def show_cf_passwords
+      load_deployment_into_attributes
+      say "Common password: #{attrs.validated_color(:common_password)}"
+    end
+
     protected
+    def load_deployment_into_attributes
+      attrs.load_deployment_file(deployment)
+    end
+
     def release_versioned_template
       @release_versioned_template ||= begin
         Bosh::Cloudfoundry::ReleaseVersionedTemplate.new(release_version, bosh_cpi, deployment_size)

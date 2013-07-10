@@ -30,7 +30,7 @@ ip_addresses    = find("properties.cf.ip_addresses")
 security_group  = find("properties.cf.security_group")
 core_size       = find("properties.cf.core_size")
 persistent_disk = find("properties.cf.persistent_disk")
-common_password = random_string 12, :common
+common_password = find("properties.cf.common_password")
 -%>
 name: <%= name %>
 director_uuid: <%= find("director_uuid") %>
@@ -142,11 +142,13 @@ jobs:
 
 properties:
   cf:
+    name: <%= name %>
     dns: <%= dns %>
     ip_addresses: <%= ip_addresses.inspect %>
     core_size: <%= core_size %>
     security_group: <%= security_group %>
     persistent_disk: <%= persistent_disk %>
+    common_password: <%= common_password %>
 
   domain: <%= dns %>
   system_domain: <%= dns %>.com

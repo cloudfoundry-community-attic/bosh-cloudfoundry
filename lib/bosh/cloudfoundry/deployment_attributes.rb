@@ -11,10 +11,11 @@ module Bosh::Cloudfoundry
       @bosh_status = bosh_status
       @released_versioned_template = released_versioned_template
       @attributes = attributes
-      @attributes[:name] = default_name
-      @attributes[:core_size] = default_size
-      @attributes[:persistent_disk] = default_persistent_disk
-      @attributes[:security_group] = default_security_group
+      @attributes[:name] ||= default_name
+      @attributes[:core_size] ||= default_size
+      @attributes[:persistent_disk] ||= default_persistent_disk
+      @attributes[:security_group] ||= default_security_group
+      @attributes[:common_password] ||= random_string(12, :common)
     end
 
     def name
@@ -47,6 +48,19 @@ module Bosh::Cloudfoundry
 
     def set(attribute, value)
       attributes[attribute.to_sym] = value if value
+    end
+
+    def load_deployment_file(deployment_file)
+      deployment_obj = YAML.load_file(deployment_file)
+      attributes = deployment_obj["properties"][properties_key]
+      @attributes = attributes.inject({}) do |mem, key_value|
+        k, v = key_value; mem[k.to_sym] = v; mem
+      end
+    end
+
+    # attributes are stored within deployment file at properties.cf
+    def properties_key
+      "cf"
     end
 
     def validate(attribute)
@@ -118,6 +132,22 @@ module Bosh::Cloudfoundry
 
     def bosh_cpi
       @bosh_status["cpi"]
+    end
+
+    # Generate a random string for passwords and tokens.
+    # Length is the length of the string.
+    # name is an optional name of a previously generated string. This is used
+    # to allow setting the same password for different components.
+    # Extracted from Bosh::Cli::Command::Biff
+    def random_string(length, name=nil)
+      random_string = SecureRandom.hex(length)[0...length]
+
+      @random_cache ||= {}
+      if name
+        @random_cache[name] ||= random_string
+      else
+        random_string
+      end
     end
 
   end
