@@ -159,7 +159,7 @@ properties:
     address: 0.core.default.cf.microbosh
     port: 4222
     user: nats
-    password: "c1oudc0w"
+    password: <%= common_password %>
     authorization_timeout: 5
 
   router:
@@ -167,7 +167,7 @@ properties:
     status:
       port: 8080
       user: gorouter
-      password: "c1oudc0w"
+      password: <%= common_password %>
 
   dea: &dea
     max_memory: 4096
@@ -213,10 +213,10 @@ properties:
     roles:
       - tag: admin
         name: ccadmin
-        password: "c1oudc0w"
+        password: <%= common_password %>
       - tag: admin
         name: uaaadmin
-        password: "c1oudc0w"
+        password: <%= common_password %>
     databases:
       - tag: cc
         name: ccdb
@@ -232,7 +232,7 @@ properties:
     roles:
       - tag: admin
         name: ccadmin
-        password: "c1oudc0w"
+        password: <%= common_password %>
     databases:
       - tag: cc
         name: ccdb
@@ -247,7 +247,7 @@ properties:
     roles:
       - tag: admin
         name: uaaadmin
-        password: "c1oudc0w"
+        password: <%= common_password %>
     databases:
       - tag: uaa
         name: uaadb
@@ -262,7 +262,7 @@ properties:
     cc_partition: default
     db_encryption_key: "b963127302433579"
     bootstrap_admin_email: admin@mycloud.com
-    bulk_api_password: "c1oudc0w"
+    bulk_api_password: <%= common_password %>
     uaa_resource_id: cloud_controller
     staging_upload_user: uploaduser
     staging_upload_password: c1oudc0w
@@ -316,9 +316,9 @@ properties:
         spULZVNRxq7veq/fzwIDAQAB
         -----END PUBLIC KEY-----
     cc:
-      client_secret: "c1oudc0w"
+      client_secret: <%= common_password %>
     admin:
-      client_secret: "c1oudc0w"
+      client_secret: <%= common_password %>
     batch:
       username: batchuser
       password: c1oudc0w
