@@ -31,7 +31,6 @@ module Bosh::Cli::Command
     option "--dns mycloud.com", "Primary domain"
     option "--ip 1.2.3.4,1.2.3.5", Array, "Public IPs; one per router node"
     option "--name cf-<timestamp>", "Unique bosh deployment name"
-    option "--size small", "Resource size of core server"
     option "--disk 4096", Integer, "Size of persistent disk (Mb)"
     option "--security-group default", String, "Security group to assign to provisioned VMs"
     def create_cf
