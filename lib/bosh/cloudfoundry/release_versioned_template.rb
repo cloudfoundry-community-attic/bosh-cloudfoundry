@@ -27,6 +27,10 @@ module Bosh::Cloudfoundry
       File.join(template_base_path, minimum_release_version_number, cpi_label, deployment_size_name, "spec")
     end
 
+    def spec
+      YAML.load_file(spec_file_path)
+    end
+
     # TODO implement a real algorithm when there is a 2nd release & 2nd set of templates
     def minimum_release_version_number
       "v132"
