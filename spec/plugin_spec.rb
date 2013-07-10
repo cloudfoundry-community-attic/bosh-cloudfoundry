@@ -15,12 +15,13 @@ describe Bosh::Cli::Command::CloudFoundry do
     context "with requirements" do
       before do
         command.add_option(:config, home_file(".bosh_config"))
+        command.add_option(:non_interactive, true)
         command.add_option(:ip, ["1.2.3.4"])
         command.add_option(:dns, "mycloud.com")
         command.should_receive(:auth_required)
         director = mock("director_client")
         director.should_receive(:get_status).and_return({"uuid" => "UUID", "cpi" => "aws"})
-        command.should_receive(:bosh_director_client).and_return(director)
+        command.stub(:director_client).and_return(director)
       end
 
       it "generates a deployment file" do
