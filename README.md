@@ -14,6 +14,8 @@ $ bosh delete cf
 
 The deployed Cloud Foundry does not include any data or messaging services for the user applications. These are available as add-ons coming soon.
 
+[![Build Status](https://travis-ci.org/StarkAndWayne/bosh-cloudfoundry.png?branch=v0.7)](https://travis-ci.org/StarkAndWayne/bosh-cloudfoundry)
+
 ## Requirements
 
 You must use the same BOSH for deploying redis as you use to deploy Cloud Foundry (unless your DNS is configured to be shared across the two BOSH).
