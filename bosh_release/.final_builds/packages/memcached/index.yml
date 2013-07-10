@@ -1,0 +1,6 @@
+---
+builds:
+  92c454a81f5c6d9c5bb54cfa8288dd584cb74dd1:
+    blobstore_id: rest/objects/4e4e78bca41e121204e4e86ee5392104fcfe25e48e72
+    version: 1
+    sha1: 2fb79b316516813888f18208d106a688756b9bbe
