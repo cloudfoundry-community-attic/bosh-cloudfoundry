@@ -24,10 +24,10 @@
 #
 #     $ bosh diff deployment_file.yml.erb
 #
-dns = find("properties.cf.dns")
-ip_addresses = find("properties.cf.ip_addresses")
-security_group = find("properties.cf.security_group")
-core_size = find("properties.cf.core_size")
+dns             = find("properties.cf.dns")
+ip_addresses    = find("properties.cf.ip_addresses")
+security_group  = find("properties.cf.security_group")
+core_size       = find("properties.cf.core_size")
 persistent_disk = find("properties.cf.persistent_disk")
 common_password = random_string 12, :common
 -%>
@@ -93,7 +93,7 @@ jobs:
       - login
     instances: 1
     resource_pool: medium
-    persistent_disk: 8192
+    persistent_disk: <%= persistent_disk %>
     networks:
     - name: default
       default:
@@ -124,7 +124,9 @@ jobs:
       - gateway
     - name: floating
       static_ips:
-      - 216.55.141.200
+      <%- ip_addresses.each do |ip| -%>
+      - <%= ip %>
+      <%- end -%>
     properties:
       db: databases
 
@@ -145,11 +147,11 @@ properties:
     security_group: <%= security_group %>
     persistent_disk: <%= persistent_disk %>
 
-  domain: mycloud.com
-  system_domain: mycloud.com
-  system_domain_organization: "mycloud"
+  domain: <%= dns %>
+  system_domain: <%= dns %>.com
+  system_domain_organization: system_domain
   app_domains:
-    - mycloud.com
+    - <%= dns %>
 
   networks:
     apps: default
@@ -258,14 +260,14 @@ properties:
   cc: &cc
     logging_level: debug
     external_host: ccng
-    srv_api_uri: http://api.mycloud.com
+    srv_api_uri: http://api.<%= dns %>
     cc_partition: default
     db_encryption_key: "b963127302433579"
-    bootstrap_admin_email: admin@mycloud.com
+    bootstrap_admin_email: admin@<%= dns %>
     bulk_api_password: <%= common_password %>
     uaa_resource_id: cloud_controller
     staging_upload_user: uploaduser
-    staging_upload_password: c1oudc0w
+    staging_upload_password: <%= common_password %>
     resource_pool:
       resource_directory_key: cc-resources
       fog_connection:
@@ -281,12 +283,12 @@ properties:
   login:
     protocol: http
     links:
-      home: http://console.mycloud.com
-      passwd: http://console.mycloud.com/password_resets/new
-      signup: http://console.mycloud.com/register
+      home: http://console.<%= dns %>
+      passwd: http://console.<%= dns %>/password_resets/new
+      signup: http://console.<%= dns %>/register
 
   uaa:
-    url: http://uaa.mycloud.com
+    url: http://uaa.<%= dns %>
     spring_profiles: postgresql
     no_ssl: true
     catalina_opts: -Xmx768m -XX:MaxPermSize=256m
@@ -321,7 +323,7 @@ properties:
       client_secret: <%= common_password %>
     batch:
       username: batchuser
-      password: c1oudc0w
+      password: <%= common_password %>
     client:
       autoapprove:
         - cf
@@ -335,14 +337,14 @@ properties:
         override: true
         scope: openid
         authorities: oauth.login
-        secret: c1oudc0w
+        secret: <%= common_password %>
         authorized-grant-types: authorization_code,client_credentials,refresh_token
-        redirect-uri: http://login.mycloud.com
+        redirect-uri: http://login.<%= dns %>
       support-services:
         scope: scim.write,scim.read,openid,cloud_controller.read,cloud_controller.write
         secret: ssosecretsso
         authorized-grant-types: authorization_code,client_credentials
-        redirect-uri: http://support-signon.mycloud.com
+        redirect-uri: http://support-signon.<%= dns %>
         authorities: portal.users.read
         access-token-validity: 1209600
         refresh-token-validity: 1209600
@@ -366,5 +368,5 @@ properties:
         autoapprove: true
     scim:
       users:
-      - admin|c1oudc0w|scim.write,scim.read,openid,cloud_controller.admin
-      - services|c1oudc0w|scim.write,scim.read,openid,cloud_controller.admin
+      - admin|<%= common_password %>|scim.write,scim.read,openid,cloud_controller.admin
+      - services|<%= common_password %>|scim.write,scim.read,openid,cloud_controller.admin
