@@ -63,7 +63,7 @@ module Bosh::Cli::Command
     end
 
     def attrs
-      @deployment_attributes ||= release_versioned_template.deployment_attributes_class.new
+      @deployment_attributes ||= release_versioned_template.deployment_attributes_class.new(release_versioned_template)
     end
 
     # TODO - support other deployment sizes

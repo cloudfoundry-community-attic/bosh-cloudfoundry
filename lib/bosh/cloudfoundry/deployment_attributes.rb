@@ -3,7 +3,8 @@ module Bosh::Cloudfoundry
   # input attributes that can or must be provided by a user.
   class DeploymentAttributes
     attr_reader :attributes
-    def initialize(attributes = {})
+    def initialize(released_versioned_template, attributes = {})
+      @released_versioned_template = released_versioned_template
       @attributes = attributes
       @attributes[:name] = default_name
       @attributes[:size] = default_size
