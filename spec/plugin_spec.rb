@@ -36,6 +36,5 @@ describe Bosh::Cli::Command::CloudFoundry do
       expect { command.create_cf }.to raise_error(Bosh::Cli::CliError)
     end
 
-    it "requires --size"
   end
 end
