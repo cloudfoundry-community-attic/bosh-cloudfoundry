@@ -15,3 +15,7 @@ spec/reports
 test/tmp
 test/version_tmp
 tmp
+bosh_release/.final_builds/jobs/*/*.tgz
+bosh_release/.final_builds/packages/*/*.tgz
+bosh_release/releases/*.tgz
+deployments

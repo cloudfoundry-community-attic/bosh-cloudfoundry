@@ -1,9 +1,5 @@
 require "yaml"
 
-# for the #sh helper
-require "rake"
-require "rake/file_utils"
-
 require "bosh/cloudfoundry"
 
 module Bosh::Cli::Command
@@ -20,6 +16,14 @@ module Bosh::Cli::Command
         c.usage =~ /cf/
       }
       Bosh::Cli::Command::Help.list_commands(cmds)
+    end
+
+    usage "prepare cf"
+    desc "upload latest Cloud Foundry release to bosh"
+    def prepare_cf
+      auth_required
+
+      release_cmd(non_interactive: true).upload(release_yml)
     end
 
     usage "create cf"
@@ -134,6 +138,37 @@ module Bosh::Cli::Command
       release_versioned_template.template_file_path
     end
 
+    def bosh_release_dir
+      File.expand_path("../../../../../bosh_release", __FILE__)
+    end
+
+    def latest_release_version
+      # the releases/index.yml contains all the available release versions in an unordered
+      # hash of hashes in YAML format:
+      #     --- 
+      #     builds: 
+      #       af61f03c5ad6327e0795402f1c458f2fc6f21201: 
+      #         version: 3
+      #       39c029d0af9effc6913f3333434b894ff6433638: 
+      #         version: 1
+      #       5f5d0a7fb577fec3c09408c94f7abbe2d52a042c: 
+      #         version: 4
+      #       f044d47e0183f084db9dac5a6ef00d7bd21c8451: 
+      #         version: 2
+      release_index = YAML.load_file(File.join(bosh_release_dir, "releases/index.yml"))
+      latest_version = release_index["builds"].values.inject(0) do |max_version, release|
+        version = release["version"]
+        max_version < version ? version : max_version
+      end
+      latest_version
+    end
+
+    def release_yml
+      @release_yml ||= begin
+        Dir[File.join(bosh_release_dir, "releases", "*-#{latest_release_version}.yml")].first
+      end
+    end
+
     def attrs
       @deployment_attributes ||= begin
         klass = release_versioned_template.deployment_attributes_class
@@ -169,7 +204,15 @@ module Bosh::Cli::Command
     end
 
     def deployment_cmd(options = {})
-      deployment_cmd ||= Bosh::Cli::Command::Deployment.new
+      cmd ||= Bosh::Cli::Command::Deployment.new
+      options.each do |key, value|
+        cmd.add_option key.to_sym, value
+      end
+      cmd
+    end
+
+    def release_cmd(options = {})
+      cmd ||= Bosh::Cli::Command::Release.new
       options.each do |key, value|
         cmd.add_option key.to_sym, value
       end

@@ -16,6 +16,29 @@ describe Bosh::Cli::Command::CloudFoundry do
     subject.cf_help
   end
 
+  context "prepare cf" do
+    before do
+      command.add_option(:config, home_file(".bosh_config"))
+      command.add_option(:non_interactive, true)
+      command.should_receive(:auth_required)
+    end
+
+    context "director does not already have release" do
+      it "upload release" do
+        release_yml = File.expand_path("../../bosh_release/releases/cf-release-132.yml", __FILE__)
+        release_cmd = mock("release_cmd")
+        release_cmd.should_receive(:upload).with(release_yml)
+        command.stub(:release_cmd).and_return(release_cmd)
+
+        command.prepare_cf
+      end
+    end
+
+    context "director already has release" do
+      it "do not upload"
+    end
+  end
+
   context "create cf" do
     context "with requirements" do
       before do
