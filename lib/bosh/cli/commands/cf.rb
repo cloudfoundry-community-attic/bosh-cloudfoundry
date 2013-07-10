@@ -44,7 +44,7 @@ module Bosh::Cli::Command
       bosh_status # preload
 
       attrs.set_unless_nil(:name, options[:name])
-      attrs.set_unless_nil(:size, options[:size])
+      attrs.set_unless_nil(:core_size, options[:core_size] || options[:size])
       attrs.set_unless_nil(:persistent_disk, options[:disk])
       attrs.set_unless_nil(:security_group, options[:security_group])
 
@@ -52,13 +52,13 @@ module Bosh::Cli::Command
       say "CPI: #{bosh_cpi.make_green}"
       say "DNS mapping: #{attrs.validated_color(:dns)} --> #{attrs.validated_color(:ip_addresses)}"
       say "Deployment name: #{attrs.validated_color(:name)}"
-      say "Resource size: #{attrs.validated_color(:size)}"
+      say "Resource size: #{attrs.validated_color(:core_size)}"
       say "Persistent disk: #{attrs.validated_color(:persistent_disk)}"
       say "Security group: #{attrs.validated_color(:security_group)}"
       nl
 
       step("Validating resource size", "Resource size must be in #{attrs.available_resource_sizes.join(', ')}", :non_fatal) do
-        attrs.validate(:size)
+        attrs.validate(:core_size)
       end
 
       unless confirmed?("Security group #{attrs.validated_color(:security_group)} exists with ports #{attrs.required_ports.join(", ")}")
@@ -103,20 +103,20 @@ module Bosh::Cli::Command
             },
             "networks" => {},
             "properties" => {
-              "cf" => attrs.attributes
+              "cf" => attrs.attributes_with_string_keys
             }
           }.to_yaml
         end
 
-        # stdout = Bosh::Cli::Config.output
-        # Bosh::Cli::Config.output = nil
-        # deployment_cmd(non_interactive: true).set_current(deployment_file)
-        # biff_cmd(non_interactive: true).biff(template_file)
-        # Bosh::Cli::Config.output = stdout
+        stdout = Bosh::Cli::Config.output
+        Bosh::Cli::Config.output = nil
+        deployment_cmd(non_interactive: true).set_current(deployment_file)
+        biff_cmd(non_interactive: true).biff(template_file)
+        Bosh::Cli::Config.output = stdout
       end
       # re-set current deployment to show output
-      # deployment_cmd.set_current(deployment_file)
-      # deployment_cmd(non_interactive: options[:non_interactive]).perform
+      deployment_cmd.set_current(deployment_file)
+      deployment_cmd(non_interactive: options[:non_interactive]).perform
     rescue Bosh::Cli::ValidationHalted
       errors.each do |error|
         say error.make_red
@@ -128,6 +128,10 @@ module Bosh::Cli::Command
       @release_versioned_template ||= begin
         Bosh::Cloudfoundry::ReleaseVersionedTemplate.new(release_version, bosh_cpi, deployment_size)
       end
+    end
+
+    def template_file
+      release_versioned_template.template_file_path
     end
 
     def attrs
@@ -157,27 +161,30 @@ module Bosh::Cli::Command
     end
 
     def deployment_file
-      @deployment_file ||= File.join(deployment_file_dir, "#{attrs.name}.yml")
+      File.join(deployment_file_dir, "#{attrs.name}.yml")
     end
 
     def deployment_file_dir
-      "deployments/cf"
+      File.expand_path("deployments/cf")
     end
 
     def deployment_cmd(options = {})
-      cmd = Bosh::Cli::Command::Deployment.new
+      deployment_cmd ||= Bosh::Cli::Command::Deployment.new
       options.each do |key, value|
         cmd.add_option key.to_sym, value
       end
       cmd
     end
 
+    def biff
+      @biff_cmd ||= Bosh::Cli::Command::Biff.new
+    end
+
     def biff_cmd(options = {})
-      cmd = Bosh::Cli::Command::Biff.new
       options.each do |key, value|
-        cmd.add_option key.to_sym, value
+        biff.add_option key.to_sym, value
       end
-      cmd
+      biff
     end
 
     def bosh_status

@@ -21,12 +21,23 @@ describe Bosh::Cli::Command::CloudFoundry do
       before do
         command.add_option(:config, home_file(".bosh_config"))
         command.add_option(:non_interactive, true)
+        command.add_option(:name, "demo")
         command.add_option(:ip, ["1.2.3.4"])
         command.add_option(:dns, "mycloud.com")
+
         command.should_receive(:auth_required)
+
         director = mock("director_client")
         director.should_receive(:get_status).and_return({"uuid" => "UUID", "cpi" => "aws"})
         command.stub(:director_client).and_return(director)
+
+        command.stub(:deployment).and_return(home_file("deployments/cf/demo.yml"))
+        command.biff.stub(:deployment).and_return(home_file("deployments/cf/demo.yml"))
+
+        deployment_cmd = mock("deployment_cmd")
+        deployment_cmd.should_receive(:set_current).with(home_file("deployments/cf/demo.yml"))
+        deployment_cmd.stub(:perform)
+        command.stub(:deployment_cmd).and_return(deployment_cmd)
       end
 
       it "generates a deployment file" do
@@ -41,7 +52,7 @@ describe Bosh::Cli::Command::CloudFoundry do
         in_home_dir do
           command.create_cf
           manifest = YAML.load_file(command.deployment_file)
-          required_deployment_keys = %w[name description release compilation update resource_pools jobs properties]
+          required_deployment_keys = %w[name director_uuid releases compilation update resource_pools jobs properties]
           required_deployment_keys.each do |required_key|
             manifest[required_key].should_not be_nil
           end

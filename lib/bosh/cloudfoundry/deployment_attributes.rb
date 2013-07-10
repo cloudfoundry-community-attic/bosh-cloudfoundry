@@ -12,7 +12,7 @@ module Bosh::Cloudfoundry
       @released_versioned_template = released_versioned_template
       @attributes = attributes
       @attributes[:name] = default_name
-      @attributes[:size] = default_size
+      @attributes[:core_size] = default_size
       @attributes[:persistent_disk] = default_persistent_disk
       @attributes[:security_group] = default_security_group
     end
@@ -21,8 +21,8 @@ module Bosh::Cloudfoundry
       @attributes[:name]
     end
 
-    def size
-      @attributes[:size]
+    def core_size
+      @attributes[:core_size]
     end
 
     def persistent_disk
@@ -47,30 +47,6 @@ module Bosh::Cloudfoundry
 
     def set(attribute, value)
       attributes[attribute.to_sym] = value if value
-    end
-
-    def display_and_validate
-      nl
-      say "CPI: #{bosh_cpi.make_green}"
-      say "DNS mapping: #{validated_color(:dns)} --> #{validated_color(:ip_addresses)}"
-      say "Deployment name: #{validated_color(:name)}"
-      say "Resource size: #{validated_color(:size)}"
-      say "Persistent disk: #{validated_color(:persistent_disk)}"
-      say "Security group: #{validated_color(:security_group)}"
-      nl
-
-      step("Validating resource size", "Resource size must be in #{available_resource_sizes.join(', ')}", :non_fatal) do
-        available_resource_sizes.include?(size)
-      end
-
-      unless confirmed?("Security group exists with ports #{required_ports.join(", ")}")
-        cancel_deployment
-      end
-      unless confirmed?("Creating Cloud Foundry")
-        cancel_deployment
-      end
-
-      raise Bosh::Cli::ValidationHalted unless errors.empty?
     end
 
     def validate(attribute)
@@ -111,6 +87,13 @@ module Bosh::Cloudfoundry
       [22, 80, 443, 4222]
     end
 
+    def attributes_with_string_keys
+      attributes.inject({}) do |mem, key_value|
+        key, value = key_value
+        mem[key.to_s] = value
+        mem
+      end
+    end
 
     private
     def default_name
