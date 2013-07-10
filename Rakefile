@@ -1,12 +1,22 @@
+ENV["BUNDLE_GEMFILE"] ||= File.expand_path("../Gemfile", __FILE__)
+
+require "rubygems"
+require "bundler"
+Bundler.setup(:default, :test, :development)
+
 require "bundler/gem_tasks"
 
+require "rake/dsl_definition"
+require "rake"
+require "rspec/core/rake_task"
+
 bosh_release = "cf-release"
-target_bosh_release_path = File.expand_path("../bosh_release", __FILE__)
 
 namespace :bosh do
   namespace :release do
     desc "Import latest #{bosh_release}"
     task :import, :path do |t, args|
+      target_bosh_release_path = File.expand_path("../bosh_release", __FILE__)
       source_bosh_release = File.expand_path(args[:path])
       unless File.directory?(source_bosh_release)
         $stderr.puts "Please pass path to source bosh release"
@@ -39,3 +49,11 @@ namespace :bosh do
 end
 
 task :release => "bosh:release:clean"
+
+desc "Run specs"
+unit_rspec_task = RSpec::Core::RakeTask.new(:unit) do |t|
+  t.pattern = "spec/**/*_spec.rb"
+  t.rspec_opts = %w(--format progress --color)
+end
+
+task :default => :spec
