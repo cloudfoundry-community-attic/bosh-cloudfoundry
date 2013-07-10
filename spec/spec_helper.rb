@@ -10,12 +10,13 @@ $:.unshift(File.expand_path("../../lib", __FILE__))
 
 require "rspec/core"
 require "tmpdir"
-require "bosh-bootstrap"
-require "bosh-bootstrap/cli/helpers"
 
 # for the #sh helper
 require "rake"
 require "rake/file_utils"
+
+# bosh_cli
+require "cli"
 
 # load all files in spec/support/* (but not lower down)
 Dir[File.dirname(__FILE__) + '/support/*'].each do |path|

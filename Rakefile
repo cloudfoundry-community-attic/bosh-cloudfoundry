@@ -51,8 +51,8 @@ end
 task :release => "bosh:release:clean"
 
 desc "Run specs"
-unit_rspec_task = RSpec::Core::RakeTask.new(:unit) do |t|
-  t.pattern = "spec/**/*_spec.rb"
+unit_rspec_task = RSpec::Core::RakeTask.new(:spec) do |t|
+  t.pattern = "spec/*_spec.rb"
   t.rspec_opts = %w(--format progress --color)
 end
 
