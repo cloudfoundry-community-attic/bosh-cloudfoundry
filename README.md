@@ -37,7 +37,7 @@ Install via RubyGems:
 
 ```
 $ gem install bosh_cli -v "~> 1.5.0.pre" --source https://s3.amazonaws.com/bosh-jenkins-gems/ 
-$ gem install bosh-cloudfoundry
+$ gem install bosh-cloudfoundry -v "~> 0.7.0.alpha"
 ```
 
 The `bosh_cli` gem is currently only available from S3, rather than RubyGem itself. So it needs to be installed first.

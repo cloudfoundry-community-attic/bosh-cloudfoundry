@@ -5,6 +5,7 @@
 `bosh-cloudfoundry` is back, rewritten, and supporting Cloud Foundry v2.
 
 ```
+$ gem install bosh-cloudfoundry -v "~> 0.7.0.alpha"
 $ bosh prepare cf
 $ bosh create cf --dns mycloud.com --public-ip 1.2.3.4
 ```
