@@ -52,6 +52,10 @@ def home_file(*path)
   File.join(ENV['HOME'], *path)
 end
 
+def in_tmp_dir(&block)
+  FileUtils.chdir(home_file, &block)
+end
+
 RSpec.configure do |c|
   c.before(:each) do
     setup_home_dir

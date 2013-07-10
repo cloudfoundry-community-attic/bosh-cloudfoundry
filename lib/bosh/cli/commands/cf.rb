@@ -69,6 +69,58 @@ module Bosh::Cli::Command
       end
 
       raise Bosh::Cli::ValidationHalted unless errors.empty?
+
+      # Create an initial deployment file; upon which the CPI-specific template will be applied below
+      # Initial file will look like:
+      # ---
+      # name: NAME
+      # director_uuid: 4ae3a0f0-70a5-4c0d-95f2-7fafaefe8b9e
+      # releases:
+      #  - name: cf-release
+      #    version: 132
+      # networks: {}
+      # properties:
+      #   cf:
+      #     dns: mycloud.com
+      #     ip_addresses: ['1.2.3.4']
+      #     core_size: medium
+      #     security_group: cf
+      #     persistent_disk: 4096
+      step("Checking/creating #{deployment_file_dir} for deployment files",
+           "Failed to create #{deployment_file_dir} for deployment files", :fatal) do
+        mkdir_p(deployment_file_dir)
+      end
+
+      step("Creating deployment file #{deployment_file}",
+           "Failed to create deployment file #{deployment_file}", :fatal) do
+        File.open(deployment_file, "w") do |file|
+          file << {
+            "name" => attrs.name,
+            "director_uuid" => bosh_uuid,
+            "releases" => {
+              "name" => release_name,
+              "version" => release_version
+            },
+            "networks" => {},
+            "properties" => {
+              "cf" => attrs.attributes
+            }
+          }.to_yaml
+        end
+
+        # stdout = Bosh::Cli::Config.output
+        # Bosh::Cli::Config.output = nil
+        # deployment_cmd(non_interactive: true).set_current(deployment_file)
+        # biff_cmd(non_interactive: true).biff(template_file)
+        # Bosh::Cli::Config.output = stdout
+      end
+      # re-set current deployment to show output
+      # deployment_cmd.set_current(deployment_file)
+      # deployment_cmd(non_interactive: options[:non_interactive]).perform
+    rescue Bosh::Cli::ValidationHalted
+      errors.each do |error|
+        say error.make_red
+      end
     end
 
     protected
@@ -85,6 +137,11 @@ module Bosh::Cli::Command
       end
     end
 
+    # TODO - determined by the release version (appcloud-131, cf-release-132, ...)
+    def release_name
+      "cf-release"
+    end
+
     # TODO - support other release versions
     def release_version
       132
@@ -99,6 +156,29 @@ module Bosh::Cli::Command
       director
     end
 
+    def deployment_file
+      @deployment_file ||= File.join(deployment_file_dir, "#{attrs.name}.yml")
+    end
+
+    def deployment_file_dir
+      "deployments/cf"
+    end
+
+    def deployment_cmd(options = {})
+      cmd = Bosh::Cli::Command::Deployment.new
+      options.each do |key, value|
+        cmd.add_option key.to_sym, value
+      end
+      cmd
+    end
+
+    def biff_cmd(options = {})
+      cmd = Bosh::Cli::Command::Biff.new
+      options.each do |key, value|
+        cmd.add_option key.to_sym, value
+      end
+      cmd
+    end
 
     def bosh_status
       @bosh_status ||= begin
