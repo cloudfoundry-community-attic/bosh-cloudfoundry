@@ -24,6 +24,7 @@
 #
 #     $ bosh diff deployment_file.yml.erb
 #
+name            = find("name")
 dns             = find("properties.cf.dns")
 ip_addresses    = find("properties.cf.ip_addresses")
 security_group  = find("properties.cf.security_group")
@@ -31,7 +32,7 @@ core_size       = find("properties.cf.core_size")
 persistent_disk = find("properties.cf.persistent_disk")
 common_password = random_string 12, :common
 -%>
-name: <%= find("name") %>
+name: <%= name %>
 director_uuid: <%= find("director_uuid") %>
 
 releases:
@@ -158,7 +159,7 @@ properties:
     management: default
 
   nats:
-    address: 0.core.default.cf.microbosh
+    address: 0.core.default.<%= name %>.microbosh
     port: 4222
     user: nats
     password: <%= common_password %>
@@ -182,10 +183,10 @@ properties:
 
   service_lifecycle:
     serialization_data_server:
-    - 0.core.default.cf.microbosh
+    - 0.core.default.<%= name %>.microbosh
 
   syslog_aggregator:
-    address: 0.core.default.cf.microbosh
+    address: 0.core.default.<%= name %>.microbosh
     port: 54321
 
   serialization_data_server:
@@ -201,8 +202,8 @@ properties:
     use_datadog: false
 
   nfs_server:
-    address: 0.core.default.cf.microbosh
-    #network: "*.cf.microbosh"
+    address: 0.core.default.<%= name %>.microbosh
+    #network: "*.<%= name %>.microbosh"
     #idmapd_domain: iad1
 
   debian_nfs_server:
@@ -210,7 +211,7 @@ properties:
 
   databases: &databases
     db_scheme: postgres
-    address: 0.core.default.cf.microbosh
+    address: 0.core.default.<%= name %>.microbosh
     port: 5524
     roles:
       - tag: admin
@@ -229,7 +230,7 @@ properties:
 
   ccdb: &ccdb
     db_scheme: postgres
-    address: 0.core.default.cf.microbosh
+    address: 0.core.default.<%= name %>.microbosh
     port: 5524
     roles:
       - tag: admin
@@ -244,7 +245,7 @@ properties:
 
   uaadb: 
     db_scheme: postgresql
-    address: 0.core.default.cf.microbosh
+    address: 0.core.default.<%= name %>.microbosh
     port: 5524
     roles:
       - tag: admin
