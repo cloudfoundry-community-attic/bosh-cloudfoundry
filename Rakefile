@@ -11,12 +11,12 @@ require "rake"
 require "rspec/core/rake_task"
 
 bosh_release = "cf-release"
+target_bosh_release_path = File.expand_path("../bosh_release", __FILE__)
 
 namespace :bosh do
   namespace :release do
     desc "Import latest #{bosh_release}"
     task :import, :path do |t, args|
-      target_bosh_release_path = File.expand_path("../bosh_release", __FILE__)
       source_bosh_release = File.expand_path(args[:path])
       unless File.directory?(source_bosh_release)
         $stderr.puts "Please pass path to source bosh release"
