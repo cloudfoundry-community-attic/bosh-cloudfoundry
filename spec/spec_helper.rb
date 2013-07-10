@@ -52,16 +52,8 @@ def home_file(*path)
   File.join(ENV['HOME'], *path)
 end
 
-def in_tmp_dir(&block)
+def in_home_dir(&block)
   FileUtils.chdir(home_file, &block)
-end
-
-RSpec.configure do |c|
-  c.before(:each) do
-    setup_home_dir
-  end
-
-  c.color_enabled = true
 end
 
 def get_tmp_file_path(content)

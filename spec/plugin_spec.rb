@@ -30,7 +30,7 @@ describe Bosh::Cli::Command::CloudFoundry do
       end
 
       it "generates a deployment file" do
-        in_tmp_dir do
+        in_home_dir do
           File.should_not be_exist(command.deployment_file)
           command.create_cf
           File.should be_exist(command.deployment_file)
@@ -38,7 +38,7 @@ describe Bosh::Cli::Command::CloudFoundry do
       end
 
       it "generates deployment file with required keys" do
-        in_tmp_dir do
+        in_home_dir do
           command.create_cf
           manifest = YAML.load_file(command.deployment_file)
           required_deployment_keys = %w[name description release compilation update resource_pools jobs properties]
@@ -49,7 +49,7 @@ describe Bosh::Cli::Command::CloudFoundry do
       end
 
       it "generate deployment file that can be normalized" do
-        in_tmp_dir do
+        in_home_dir do
           command.create_cf
           manifest = YAML.load_file(command.deployment_file)
           # invokes #err if any errors found
@@ -58,7 +58,7 @@ describe Bosh::Cli::Command::CloudFoundry do
       end
 
       it "specifies core size" do
-        in_tmp_dir do
+        in_home_dir do
           command.add_option(:size, "xlarge")
           command.create_cf
         end
