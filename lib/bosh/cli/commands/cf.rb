@@ -40,35 +40,30 @@ module Bosh::Cli::Command
 
       auth_required
 
-      name = options[:name] || default_name
-      resource_size = options[:size] || default_size
-      persistent_disk = options[:disk] || default_persistent_disk
-      security_group = options[:security_group] || default_security_group
-      redis_port = 6379
+      attrs.set_unless_nil(:name, options[:name])
+      attrs.set_unless_nil(:size, options[:size])
+      attrs.set_unless_nil(:persistent_disk, options[:disk])
+      attrs.set_unless_nil(:security_group, options[:security_group])
 
       bosh_status # preload
       nl
       say "CPI: #{bosh_cpi.make_green}"
-      say "Deployment name: #{name.make_green}"
-      say "Resource size: #{validated_resource_size_colored(resource_size)}"
-      say "Persistent disk: #{persistent_disk.to_s.make_green}"
-      say "Security group: #{security_group.make_green}"
+      say "Deployment name: #{attrs.validated_color(:name)}"
+      say "Resource size: #{attrs.validated_color(:size)}"
+      say "Persistent disk: #{attrs.validated_color(:persistent_disk)}"
+      say "Security group: #{attrs.validated_color(:security_group)}"
       nl
 
 
     end
 
     protected
-    def default_name
-      "cf-#{Time.now.to_i}"
+    def release_versioned_template
+      @release_versioned_template ||= Bosh::Cloudfoundry::ReleaseVersionedTemplate.new(release_version, bosh_cpi, deployment_size)
     end
 
-    def default_size
-      "small"
-    end
-
-    def default_persistent_disk
-      4096
+    def attrs
+      @deployment_attributes ||= release_versioned_template.deployment_attributes_class.new
     end
 
     # TODO - support other deployment sizes
@@ -79,10 +74,6 @@ module Bosh::Cli::Command
     # TODO - support other deployment sizes
     def deployment_size
       "dev"
-    end
-
-    def release_versioned_template
-      @release_versioned_template ||= Bosh::Cloudfoundry::ReleaseVersionedTemplate.new(release_version, bosh_cpi, deployment_size)
     end
 
     def bosh_release_spec
@@ -103,10 +94,6 @@ module Bosh::Cli::Command
     def validated_resource_size_colored(resource_size)
       available_resource_sizes.include?(resource_size) ?
         resource_size.make_green : resource_size.make_red
-    end
-
-    def default_security_group
-      "default"
     end
 
     def bosh_status

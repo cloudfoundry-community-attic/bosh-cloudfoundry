@@ -19,6 +19,10 @@ module Bosh::Cloudfoundry
       raise "release_version_number must be an integer" unless release_version_number.is_a?(Fixnum)
     end
 
+    def deployment_attributes_class
+      Bosh::Cloudfoundry::DeploymentAttributes
+    end
+
     def template_file_path
       File.join(template_base_path, minimum_release_version_number, cpi_label, deployment_size_name, "deployment_file.yml.erb")
     end
