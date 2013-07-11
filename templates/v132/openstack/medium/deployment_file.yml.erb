@@ -24,6 +24,8 @@
 #
 #     $ bosh diff deployment_file.yml.erb
 #
+no_ssl          = true
+protocol        = no_ssl ? "http" : "https"
 name            = find("name")
 dns             = find("properties.cf.dns")
 ip_addresses    = find("properties.cf.ip_addresses")
@@ -84,6 +86,7 @@ resource_pools:
 
 jobs:
   - name: core
+    release: cf-release
     template:
       - syslog_aggregator
       - nats
@@ -105,6 +108,7 @@ jobs:
 
   # need a separate job for uaa due to https://github.com/cloudfoundry/cf-release/issues/104
   - name: uaa
+    release: cf-release
     template:
       - uaa
     instances: 1
@@ -114,6 +118,7 @@ jobs:
         default: [dns, gateway]
 
   - name: api
+    release: cf-release
     template:
       - cloud_controller_ng
       - gorouter
@@ -133,6 +138,7 @@ jobs:
       db: databases
 
   - name: dea
+    release: cf-release
     template:
       - dea_next
     instances: 1
@@ -207,7 +213,7 @@ properties:
   nfs_server:
     address: 0.core.default.<%= name %>.microbosh
     #network: "*.<%= name %>.microbosh"
-    #idmapd_domain: iad1
+    #idmapd_domain: <%= dns %>
 
   debian_nfs_server:
     no_root_squash: true
@@ -264,7 +270,7 @@ properties:
   cc: &cc
     logging_level: debug
     external_host: ccng
-    srv_api_uri: http://api.<%= dns %>
+    srv_api_uri: <%= protocol %>://api.<%= dns %>
     cc_partition: default
     db_encryption_key: "b963127302433579"
     bootstrap_admin_email: admin@<%= dns %>
@@ -285,16 +291,16 @@ properties:
   ccng: *cc
 
   login:
-    protocol: http
+    protocol: <%= protocol %>
     links:
-      home: http://console.<%= dns %>
-      passwd: http://console.<%= dns %>/password_resets/new
-      signup: http://console.<%= dns %>/register
+      home: <%= protocol %>://console.<%= dns %>
+      passwd: <%= protocol %>://console.<%= dns %>/password_resets/new
+      signup: <%= protocol %>://console.<%= dns %>/register
 
   uaa:
-    url: http://uaa.<%= dns %>
+    url: <%= protocol %>://uaa.<%= dns %>
     spring_profiles: postgresql
-    no_ssl: true
+    no_ssl: <%= no_ssl %>
     catalina_opts: -Xmx768m -XX:MaxPermSize=256m
     resource_id: account_manager
     jwt:
@@ -343,12 +349,12 @@ properties:
         authorities: oauth.login
         secret: <%= common_password %>
         authorized-grant-types: authorization_code,client_credentials,refresh_token
-        redirect-uri: http://login.<%= dns %>
+        redirect-uri: <%= protocol %>://login.<%= dns %>
       support-services:
         scope: scim.write,scim.read,openid,cloud_controller.read,cloud_controller.write
         secret: ssosecretsso
         authorized-grant-types: authorization_code,client_credentials
-        redirect-uri: http://support-signon.<%= dns %>
+        redirect-uri: <%= protocol %>://support-signon.<%= dns %>
         authorities: portal.users.read
         access-token-validity: 1209600
         refresh-token-validity: 1209600
@@ -368,7 +374,7 @@ properties:
         scope: openid,cloud_controller.read,cloud_controller.write
         authorities: uaa.resource,oauth.service,clients.read,clients.write,clients.secret
         authorized-grant-types: authorization_code,client_credentials,password,implicit
-        redirect-uri: http://servicesmgmt.yourdomain.com/auth/cloudfoundry/callback
+        redirect-uri: <%= protocol %>://servicesmgmt.yourdomain.com/auth/cloudfoundry/callback
         autoapprove: true
     scim:
       users:

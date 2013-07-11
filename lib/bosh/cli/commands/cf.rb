@@ -198,7 +198,7 @@ module Bosh::Cli::Command
 
     # TODO - support other deployment sizes
     def deployment_size
-      "dev"
+      "medium"
     end
 
     def director_client
