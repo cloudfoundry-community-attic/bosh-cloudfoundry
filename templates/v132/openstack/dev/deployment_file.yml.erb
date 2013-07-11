@@ -103,6 +103,7 @@ jobs:
     properties:
       db: databases
 
+  # need a separate job for uaa due to https://github.com/cloudfoundry/cf-release/issues/104
   - name: uaa
     template:
       - uaa
