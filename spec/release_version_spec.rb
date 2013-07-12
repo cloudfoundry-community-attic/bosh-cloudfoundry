@@ -15,7 +15,20 @@ describe Bosh::Cloudfoundry::ReleaseVersion do
     Bosh::Cloudfoundry::ReleaseVersion.available_versions.should == [132]
   end
 
-  it "loads available CPIs" do
-    Bosh::Cloudfoundry::ReleaseVersion.for_version(132).available_cpi_names.should == %w[aws openstack]
+  context "for v132" do
+    subject { Bosh::Cloudfoundry::ReleaseVersion.for_version(132) }
+
+    it "loads available CPIs" do
+      subject.available_cpi_names.should == %w[aws openstack]
+    end
+
+    it "has valid CPIs" do
+      subject.valid_cpi?("aws").should be_true
+      subject.valid_cpi?("openstack").should be_true
+    end
+
+    it "has invalid CPIs" do
+      subject.valid_cpi?("xyz").should be_false
+    end
   end
 end
