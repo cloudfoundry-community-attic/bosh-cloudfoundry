@@ -114,8 +114,9 @@ module Bosh::Cloudfoundry
       "cf-#{Time.now.to_i}"
     end
 
+    # TODO change to small when its implemented
     def default_size
-      "small"
+      "medium"
     end
 
     def default_persistent_disk

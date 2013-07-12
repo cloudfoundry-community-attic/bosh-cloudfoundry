@@ -59,6 +59,7 @@ describe Bosh::Cli::Command::CloudFoundry do
         command.add_option(:name, "demo")
         command.add_option(:ip, ["1.2.3.4"])
         command.add_option(:dns, "mycloud.com")
+        command.add_option(:common_password, "qwertyasdfgh")
 
         command.should_receive(:auth_required)
 
@@ -80,6 +81,7 @@ describe Bosh::Cli::Command::CloudFoundry do
           File.should_not be_exist(command.deployment_file)
           command.create_cf
           File.should be_exist(command.deployment_file)
+          files_match(spec_asset("v132/aws/medium.yml"), command.deployment_file)
         end
       end
 

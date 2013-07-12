@@ -50,6 +50,7 @@ module Bosh::Cli::Command
       attrs.set_unless_nil(:core_size, options[:core_size] || options[:size])
       attrs.set_unless_nil(:persistent_disk, options[:disk])
       attrs.set_unless_nil(:security_group, options[:security_group])
+      attrs.set_unless_nil(:common_password, options[:common_password])
 
       nl
       say "CPI: #{bosh_cpi.make_green}"
