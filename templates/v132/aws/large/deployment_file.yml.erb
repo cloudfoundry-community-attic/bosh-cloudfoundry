@@ -195,6 +195,15 @@ jobs:
         default: [dns, gateway]            
 
 properties:
+  cf:
+    name: <%= name %>
+    dns: <%= dns %>
+    ip_addresses: <%= ip_addresses.inspect %>
+    core_size: <%= core_size %>
+    security_group: <%= security_group %>
+    persistent_disk: <%= persistent_disk %>
+    common_password: <%= common_password %>
+
   domain: <%= dns %>
   system_domain: <%= dns %>
   system_domain_organization: <%= dns %>
