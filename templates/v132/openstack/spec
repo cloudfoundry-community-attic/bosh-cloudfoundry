@@ -1,4 +1,4 @@
 ---
-deployments:
+deployment_sizes:
 - medium
 - large

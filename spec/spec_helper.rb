@@ -18,6 +18,8 @@ require "rake/file_utils"
 # bosh_cli
 require "cli"
 
+require "bosh/cloudfoundry"
+
 # load all files in spec/support/* (but not lower down)
 Dir[File.dirname(__FILE__) + '/support/*'].each do |path|
   require path unless File.directory?(path)
