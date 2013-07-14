@@ -1,7 +1,5 @@
-require "bosh/cloudfoundry/release_versioned_template"
-
-describe Bosh::Cloudfoundry::ReleaseVersionedTemplate do
-  subject { Bosh::Cloudfoundry::ReleaseVersionedTemplate.new(132, "aws", "dev") }
+describe Bosh::Cloudfoundry::ReleaseVersionCpiSize do
+  subject { Bosh::Cloudfoundry::ReleaseVersionCpiSize.new(132, "aws", "dev") }
   it "path to template" do
     subject.template_file_path.should =~ %r{v132/aws/dev/deployment_file.yml.erb$}
   end

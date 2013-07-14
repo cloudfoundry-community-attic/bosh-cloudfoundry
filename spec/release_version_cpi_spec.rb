@@ -1,5 +1,5 @@
-describe Bosh::Cloudfoundry::ReleaseVersionForCpi do
-  subject { Bosh::Cloudfoundry::ReleaseVersionForCpi.for_cpi(132, "aws") }
+describe Bosh::Cloudfoundry::ReleaseVersionCpi do
+  subject { Bosh::Cloudfoundry::ReleaseVersionCpi.for_cpi(132, "aws") }
 
   it "has available deployment sizes" do
     subject.available_deployment_sizes.should == %w[medium large]

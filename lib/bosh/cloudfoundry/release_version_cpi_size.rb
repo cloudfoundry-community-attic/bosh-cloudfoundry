@@ -8,7 +8,7 @@ module Bosh::Cloudfoundry
   # To achieve these goals it includes templates for each combination of CPI & sizing & release version.
   #
   # This class calculates which deployment template to use for the current deployment.
-  class ReleaseVersionedTemplate
+  class ReleaseVersionCpiSize
     attr_reader :cpi_label
     attr_reader :deployment_size_name
 
