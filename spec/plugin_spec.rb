@@ -76,31 +76,25 @@ describe Bosh::Cli::Command::CloudFoundry do
         command.stub(:deployment_cmd).and_return(deployment_cmd)
       end
 
-      it "generates a deployment file" do
+      it "generates a medium deployment (medium is default size)" do
         in_home_dir do
           File.should_not be_exist(command.deployment_file)
           command.create_cf
-          File.should be_exist(command.deployment_file)
           files_match(spec_asset("v132/aws/medium.yml"), command.deployment_file)
+
+          manifest = YAML.load_file(command.deployment_file)
+          Bosh::Cli::DeploymentManifest.new(manifest).normalize
         end
       end
 
-      it "generates deployment file with required keys" do
+      it "generates a large deployment" do
         in_home_dir do
-          command.create_cf
-          manifest = YAML.load_file(command.deployment_file)
-          required_deployment_keys = %w[name director_uuid releases compilation update resource_pools jobs properties]
-          required_deployment_keys.each do |required_key|
-            manifest[required_key].should_not be_nil
-          end
-        end
-      end
+          command.add_option(:deployment_size, "large")
 
-      it "generate deployment file that can be normalized" do
-        in_home_dir do
           command.create_cf
+          files_match(spec_asset("v132/aws/large.yml"), command.deployment_file)
+
           manifest = YAML.load_file(command.deployment_file)
-          # invokes #err if any errors found
           Bosh::Cli::DeploymentManifest.new(manifest).normalize
         end
       end

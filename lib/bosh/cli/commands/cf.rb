@@ -33,6 +33,7 @@ module Bosh::Cli::Command
     option "--name cf-<timestamp>", "Unique bosh deployment name"
     option "--disk 4096", Integer, "Size of persistent disk (Mb)"
     option "--security-group default", String, "Security group to assign to provisioned VMs"
+    option "--deployment-size medium", String, "Size of deployment - medium or large"
     def create_cf
       ip_addresses = options[:ip]
       err("USAGE: bosh create cf --ip 1.2.3.4 -- please provide one IP address that will be bound to router.") if ip_addresses.blank?
@@ -47,7 +48,7 @@ module Bosh::Cli::Command
       bosh_status # preload
 
       attrs.set_unless_nil(:name, options[:name])
-      attrs.set_unless_nil(:core_size, options[:core_size] || options[:size])
+      attrs.set_unless_nil(:deployment_size, options[:deployment_size])
       attrs.set_unless_nil(:persistent_disk, options[:disk])
       attrs.set_unless_nil(:security_group, options[:security_group])
       attrs.set_unless_nil(:common_password, options[:common_password])
@@ -56,13 +57,13 @@ module Bosh::Cli::Command
       say "CPI: #{bosh_cpi.make_green}"
       say "DNS mapping: #{attrs.validated_color(:dns)} --> #{attrs.validated_color(:ip_addresses)}"
       say "Deployment name: #{attrs.validated_color(:name)}"
-      say "Resource size: #{attrs.validated_color(:core_size)}"
+      say "Resource size: #{attrs.validated_color(:deployment_size)}"
       say "Persistent disk: #{attrs.validated_color(:persistent_disk)}"
       say "Security group: #{attrs.validated_color(:security_group)}"
       nl
 
-      step("Validating resource size", "Resource size must be in #{attrs.available_resource_sizes.join(', ')}", :non_fatal) do
-        attrs.validate(:core_size)
+      step("Validating deployment size", "Available deployment sizes are #{attrs.available_deployment_sizes.join(', ')}", :non_fatal) do
+        attrs.validate(:deployment_size)
       end
 
       unless confirmed?("Security group #{attrs.validated_color(:security_group)} exists with ports #{attrs.required_ports.join(", ")}")
@@ -87,7 +88,7 @@ module Bosh::Cli::Command
       #   cf:
       #     dns: mycloud.com
       #     ip_addresses: ['1.2.3.4']
-      #     core_size: medium
+      #     deployment_size: medium
       #     security_group: cf
       #     persistent_disk: 4096
       step("Checking/creating #{deployment_file_dir} for deployment files",
@@ -199,7 +200,6 @@ module Bosh::Cli::Command
       132
     end
 
-    # TODO - support other deployment sizes
     def deployment_size
       "medium"
     end

@@ -12,7 +12,7 @@ module Bosh::Cloudfoundry
       @released_versioned_template = released_versioned_template
       @attributes = attributes
       @attributes[:name] ||= default_name
-      @attributes[:core_size] ||= default_size
+      @attributes[:deployment_size] ||= default_deployment_size
       @attributes[:persistent_disk] ||= default_persistent_disk
       @attributes[:security_group] ||= default_security_group
       @attributes[:common_password] ||= random_string(12, :common)
@@ -22,8 +22,8 @@ module Bosh::Cloudfoundry
       @attributes[:name]
     end
 
-    def core_size
-      @attributes[:core_size]
+    def deployment_size
+      @attributes[:deployment_size]
     end
 
     def persistent_disk
@@ -92,6 +92,11 @@ module Bosh::Cloudfoundry
       end
     end
 
+    def available_deployment_sizes
+      # TODO get list from templates/vXYZ/CPI/spec
+      %w[medium large]
+    end
+
     # If using security groups, the following ports must be opened for external access:
     # * 22 - ssh to all servers
     # * 80 - http traffic to routers
@@ -115,7 +120,7 @@ module Bosh::Cloudfoundry
     end
 
     # TODO change to small when its implemented
-    def default_size
+    def default_deployment_size
       "medium"
     end
 
