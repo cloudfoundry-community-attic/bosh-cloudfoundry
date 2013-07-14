@@ -10,12 +10,12 @@ module Bosh::Cloudfoundry
     attr_reader :cpi
 
     def self.for_cpi(release_version, cpi)
-      release_version = ReleaseVersion.for_version(release_version) unless release_version.is_a?(ReleaseVersion)
-      raise "CPI #{cpi} not available for version #{release_version.version_number}" unless release_version.valid_cpi?(cpi)
       ReleaseVersionCpi.new(release_version, cpi)
     end
 
     def initialize(release_version, cpi)
+      release_version = ReleaseVersion.for_version(release_version) unless release_version.is_a?(ReleaseVersion)
+      raise "CPI #{cpi} not available for version #{release_version.version_number}" unless release_version.valid_cpi?(cpi)
       @release_version, @cpi = release_version, cpi
     end
 

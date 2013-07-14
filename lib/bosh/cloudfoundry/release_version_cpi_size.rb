@@ -9,40 +9,38 @@ module Bosh::Cloudfoundry
   #
   # This class calculates which deployment template to use for the current deployment.
   class ReleaseVersionCpiSize
-    attr_reader :cpi_label
-    attr_reader :deployment_size_name
+    attr_reader :release_version_cpi
+    attr_reader :deployment_size
 
-    def initialize(release_version_number, cpi_label, deployment_size_name)
-      @release_version_number = release_version_number
-      @cpi_label              = cpi_label
-      @deployment_size_name   = deployment_size_name
-      raise "release_version_number must be an integer" unless release_version_number.is_a?(Fixnum)
+    def self.for_deployment_size(release_version, cpi, deployment_size)
+      release_version_cpi = ReleaseVersionCpi.for_cpi(release_version, cpi)
+      ReleaseVersionCpiSize.new(release_version_cpi, deployment_size)
+    end
+
+    def initialize(release_version_cpi, deployment_size)
+      @release_version_cpi = release_version_cpi
+      @deployment_size = deployment_size
     end
 
     def deployment_attributes_class
       Bosh::Cloudfoundry::DeploymentAttributes
     end
 
+    def template_dir
+      File.join(release_version_cpi.template_dir, deployment_size)
+    end
+
     def template_file_path
-      File.join(template_base_path, minimum_release_version_number, cpi_label, deployment_size_name, "deployment_file.yml.erb")
+      File.join(template_dir, "deployment_file.yml.erb")
     end
 
     def spec_file_path
-      File.join(template_base_path, minimum_release_version_number, cpi_label, deployment_size_name, "spec")
+      File.join(template_dir, "spec")
     end
 
     def spec
       YAML.load_file(spec_file_path)
     end
 
-    # TODO implement a real algorithm when there is a 2nd release & 2nd set of templates
-    def minimum_release_version_number
-      "v132"
-    end
-
-    private
-    def template_base_path
-      File.expand_path("../../../../templates", __FILE__)
-    end
   end
 end

@@ -3,8 +3,8 @@ module Bosh::Cloudfoundry
   # v132 was the first release of Cloud Foundry v2.
   #
   # This class represents an available release version, for which there are a subset of CPIs supported.
-  # From this class you can navigate to ReleaseVersionForCpi for the CPI specific aspect of a release version;
-  # and from ReleaseVersionForCpi you can navigate to one or more ReleaseVersionedTemplates (deployment sizes).
+  # From this class you can navigate to ReleaseVersionCpi for the CPI specific aspect of a release version;
+  # and from ReleaseVersionCpi you can navigate to one or more ReleaseVersionCpiSizes (deployment sizes).
   class ReleaseVersion
     attr_reader :version_number
 
@@ -50,6 +50,9 @@ module Bosh::Cloudfoundry
         Dir[File.join(template_dir, "*")].map {|dir| File.basename(dir)}
       end
     end
-    
+
+    def valid_cpi?(cpi)
+      available_cpi_names.include?(cpi)
+    end
   end
 end
