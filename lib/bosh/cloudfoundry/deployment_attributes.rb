@@ -37,11 +37,11 @@ module Bosh::Cloudfoundry
     end
 
     def ip_addresses
-      @attribute[:ip_addresses]
+      @attributes[:ip_addresses]
     end
 
     def dns
-      @attribute[:dns]
+      @attributes[:dns]
     end
 
     def set_unless_nil(attribute, value)
