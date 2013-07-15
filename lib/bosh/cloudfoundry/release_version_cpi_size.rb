@@ -12,13 +12,8 @@ module Bosh::Cloudfoundry
     attr_reader :release_version_cpi
     attr_reader :deployment_size
 
-    def self.for_deployment_size(release_version, cpi, deployment_size)
-      release_version_cpi = ReleaseVersionCpi.for_cpi(release_version, cpi)
-      ReleaseVersionCpiSize.new(release_version_cpi, deployment_size)
-    end
-
-    def initialize(release_version_cpi, deployment_size)
-      @release_version_cpi = release_version_cpi
+    def initialize(release_version, cpi, deployment_size)
+      @release_version_cpi = ReleaseVersionCpi.for_cpi(release_version, cpi)
       @deployment_size = deployment_size
     end
 

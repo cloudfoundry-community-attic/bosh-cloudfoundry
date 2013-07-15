@@ -135,18 +135,20 @@ module Bosh::Cli::Command
     end
 
     protected
+    # After a deployment is created, the input properties/attributes are stored within the generated
+    # deployment file. Therefore, to update a deployment, first we must load in the attributes.
     def load_deployment_into_attributes
       attrs.load_deployment_file(deployment)
     end
 
-    def release_versioned_template
-      @release_versioned_template ||= begin
-        Bosh::Cloudfoundry::ReleaseVersionedTemplate.new(release_version, bosh_cpi, deployment_size)
+    def release_version_cpi_size
+      @release_version_cpi_size ||= begin
+        Bosh::Cloudfoundry::ReleaseVersionCpiSize.new(release_version, bosh_cpi, deployment_size)
       end
     end
 
     def template_file
-      release_versioned_template.template_file_path
+      release_version_cpi_size.template_file_path
     end
 
     def bosh_release_dir
@@ -182,8 +184,8 @@ module Bosh::Cli::Command
 
     def attrs
       @deployment_attributes ||= begin
-        klass = release_versioned_template.deployment_attributes_class
-        klass.new(director_client, bosh_status, release_versioned_template)
+        klass = release_version_cpi_size.deployment_attributes_class
+        klass.new(director_client, bosh_status, release_version_cpi_size)
       end
     end
 
