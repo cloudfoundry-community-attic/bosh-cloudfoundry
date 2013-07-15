@@ -70,7 +70,7 @@ module Bosh::Cloudfoundry
     end
 
     # Perform the create/update deployment described by this +DeploymentFile+
-    def deploy
+    def deploy(options={})
       # set current deployment to show the change in the output
       deployment_cmd.set_current(deployment_file)
       deployment_cmd(non_interactive: options[:non_interactive]).perform
@@ -132,6 +132,10 @@ module Bosh::Cloudfoundry
 
     def deployment_file_dir
       File.expand_path("deployments/cf")
+    end
+
+    def template_file
+      release_version_cpi_size.template_file_path
     end
 
     def deployment_cmd(options = {})

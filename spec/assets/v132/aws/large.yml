@@ -13,8 +13,8 @@ networks:
 - name: default
   type: dynamic
   cloud_properties:
-  security_groups:
-  - cf
+    security_groups:
+    - cf
 
 compilation:
   workers: 6

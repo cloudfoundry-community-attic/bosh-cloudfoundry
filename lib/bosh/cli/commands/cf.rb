@@ -85,7 +85,7 @@ module Bosh::Cli::Command
       deployment_file = DeploymentFile.new(@release_version_cpi_size, attrs, bosh_status)
       deployment_file.prepare_environment
       deployment_file.create_deployment_file
-      deployment_file.deploy
+      deployment_file.deploy(options)
 
     rescue Bosh::Cli::ValidationHalted
       errors.each do |error|
@@ -118,10 +118,6 @@ module Bosh::Cli::Command
       @deployment_file = DeploymentFile.reconstruct_from_deployment_file(deployment, director_client, bosh_status)
       @deployment_attributes = @deployment_file.deployment_attributes
       @release_version_cpi_size = @deployment_file.release_version_cpi_size
-    end
-
-    def template_file
-      @release_version_cpi_size.template_file_path
     end
 
     def bosh_release_dir
