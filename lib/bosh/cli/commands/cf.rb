@@ -113,11 +113,10 @@ module Bosh::Cli::Command
           }.to_yaml
         end
 
-        stdout = Bosh::Cli::Config.output
-        Bosh::Cli::Config.output = nil
-        deployment_cmd(non_interactive: true).set_current(deployment_file)
-        biff_cmd(non_interactive: true).biff(template_file)
-        Bosh::Cli::Config.output = stdout
+        quieten_output do
+          deployment_cmd(non_interactive: true).set_current(deployment_file)
+          biff_cmd(non_interactive: true).biff(template_file)
+        end
       end
       # re-set current deployment to show output
       deployment_cmd.set_current(deployment_file)
@@ -258,6 +257,13 @@ module Bosh::Cli::Command
 
     def bosh_cpi
       bosh_status["cpi"]
+    end
+
+    def quieten_output(&block)
+      stdout = Bosh::Cli::Config.output
+      Bosh::Cli::Config.output = nil
+      yield
+      Bosh::Cli::Config.output = stdout
     end
   end
 end
