@@ -1,4 +1,5 @@
 require "bosh/cli/commands/cf"
+require "fakeweb"
 
 describe Bosh::Cli::Command::CloudFoundry do
   include FileUtils
@@ -11,6 +12,7 @@ describe Bosh::Cli::Command::CloudFoundry do
   end
 
   before { setup_home_dir }
+  before { FakeWeb.allow_net_connect = false }
 
   it "shows help" do
     subject.cf_help
@@ -53,7 +55,7 @@ describe Bosh::Cli::Command::CloudFoundry do
     end
 
     context "with requirements" do
-      before do
+      it "creates cf deployment" do
         command.add_option(:config, home_file(".bosh_config"))
         command.add_option(:non_interactive, true)
         command.add_option(:name, "demo")
@@ -68,55 +70,42 @@ describe Bosh::Cli::Command::CloudFoundry do
         command.stub(:director_client).and_return(director)
 
         command.stub(:deployment).and_return(home_file("deployments/cf/demo.yml"))
-        command.biff.stub(:deployment).and_return(home_file("deployments/cf/demo.yml"))
 
-        deployment_cmd = mock("deployment_cmd")
-        deployment_cmd.should_receive(:set_current).with(home_file("deployments/cf/demo.yml"))
-        deployment_cmd.stub(:perform)
-        command.stub(:deployment_cmd).and_return(deployment_cmd)
-      end
+        deployment_file = mock("deployment_file")
+        Bosh::Cloudfoundry::DeploymentFile.should_receive(:new).
+          and_return(deployment_file)
+        deployment_file.should_receive(:prepare_environment)
+        deployment_file.should_receive(:create_deployment_file)
+        deployment_file.should_receive(:deploy)
 
-      it "generates a medium deployment (medium is default size)" do
-        in_home_dir do
-          File.should_not be_exist(command.deployment_file)
-          command.create_cf
-          files_match(spec_asset("v132/aws/medium.yml"), command.deployment_file)
-
-          manifest = YAML.load_file(command.deployment_file)
-          Bosh::Cli::DeploymentManifest.new(manifest).normalize
-        end
-      end
-
-      it "generates a large deployment" do
-        in_home_dir do
-          command.add_option(:deployment_size, "large")
-
-          command.create_cf
-          files_match(spec_asset("v132/aws/large.yml"), command.deployment_file)
-
-          manifest = YAML.load_file(command.deployment_file)
-          Bosh::Cli::DeploymentManifest.new(manifest).normalize
-        end
-      end
-
-      it "specifies core size" do
-        in_home_dir do
-          command.add_option(:size, "xlarge")
-          command.create_cf
-        end
-      end
-
-      context "and show passwords" do
-        it "displays the list of internal passwords" do
-          in_home_dir do
-            command.create_cf
-            command.show_cf_passwords
-          end
-        end
+        command.create_cf
       end
 
     end
 
+    it "displays the list of internal passwords" do
+      command.add_option(:config, home_file(".bosh_config"))
+      command.add_option(:non_interactive, true)
+
+      director = mock("director_client")
+      director.should_receive(:get_status).and_return({"uuid" => "UUID", "cpi" => "aws"})
+      command.stub(:director_client).and_return(director)
+
+      command.stub(:deployment).and_return(home_file("deployment.yml"))
+      File.open(home_file("deployment.yml"), "w") do |f|
+        f << {
+          "releases" => [
+            {"name" => "cf-release", "version" => 132}
+          ],
+          "properties" => {
+            "cf" => {
+              "common_passwords" => "qwerty"
+            }
+          }
+        }.to_yaml
+      end
+      command.show_cf_passwords
+    end
   end
 
 end

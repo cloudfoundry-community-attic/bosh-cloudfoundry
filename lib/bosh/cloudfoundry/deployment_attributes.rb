@@ -6,10 +6,12 @@ module Bosh::Cloudfoundry
     include Bosh::Cli::Validation
 
     attr_reader :attributes
-    def initialize(director_client, bosh_status, released_versioned_template, attributes = {})
+    attr_reader :released_version_cpi
+
+    def initialize(director_client, bosh_status, released_version_cpi, attributes = {})
       @director_client = director_client
       @bosh_status = bosh_status
-      @released_versioned_template = released_versioned_template
+      @released_version_cpi = released_version_cpi
       @attributes = attributes
       @attributes[:name] ||= default_name
       @attributes[:deployment_size] ||= default_deployment_size
@@ -58,15 +60,12 @@ module Bosh::Cloudfoundry
       end
     end
 
-    # attributes are stored within deployment file at properties.cf
-    def properties_key
-      "cf"
-    end
-
     def validate(attribute)
       value = attributes[attribute.to_sym]
-      if attribute.to_s =~ /size$/
-        available_resource_sizes.include?(value)
+      if attribute.to_s == "deployment_size"
+        available_deployment_sizes.include?(value)
+      elsif attribute.to_s =~ /size$/
+        available_resources.include?(value)
       else
         true
       end
@@ -83,18 +82,26 @@ module Bosh::Cloudfoundry
     end
 
     # TODO move these validations into a "ValidatedSize" class or similar
-    def available_resource_sizes
-      resources = @released_versioned_template.spec["resources"]
-      if resources && resources.is_a?(Array) && resources.first.is_a?(String)
-        resources
-      else
-        err "template spec needs 'resources' key with list of resource pool names available"
+    def available_resources
+      @available_resources ||= begin
+        resources = released_version_cpi.spec["resources"]
+        if resources && resources.is_a?(Array) && resources.first.is_a?(String)
+          resources
+        else
+          err "template spec needs 'resources' key with list of resource pool names available; found #{released_version_cpi.spec.inspect}"
+        end
       end
     end
 
     def available_deployment_sizes
-      # TODO get list from templates/vXYZ/CPI/spec
-      %w[medium large]
+      @available_deployment_sizes ||= begin
+        deployment_sizes = released_version_cpi.spec["deployment_sizes"]
+        if deployment_sizes && deployment_sizes.is_a?(Array) && deployment_sizes.first.is_a?(String)
+          deployment_sizes
+        else
+          err "template spec needs 'deployment_sizes' key with list of deployment sizes names available; found #{deployment_sizes.spec.inspect}"
+        end
+      end
     end
 
     # If using security groups, the following ports must be opened for external access:

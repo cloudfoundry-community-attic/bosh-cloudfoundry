@@ -15,6 +15,10 @@ describe Bosh::Cloudfoundry::ReleaseVersion do
     Bosh::Cloudfoundry::ReleaseVersion.available_versions.should == [132]
   end
 
+  it "knows latest version number" do
+    Bosh::Cloudfoundry::ReleaseVersion.latest_version_number == 132
+  end
+
   context "for v132" do
     subject { Bosh::Cloudfoundry::ReleaseVersion.for_version(132) }
 
