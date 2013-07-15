@@ -54,6 +54,7 @@ module Bosh::Cli::Command
       attrs.set_unless_nil(:persistent_disk, options[:disk])
       attrs.set_unless_nil(:security_group, options[:security_group])
       attrs.set_unless_nil(:common_password, options[:common_password])
+      attrs.set_unless_nil(:deployment_size, options[:deployment_size])
 
       release_version = ReleaseVersion.latest_version_number
       @release_version_cpi_size = 
@@ -63,12 +64,12 @@ module Bosh::Cli::Command
       say "CPI: #{bosh_cpi.make_green}"
       say "DNS mapping: #{attrs.validated_color(:dns)} --> #{attrs.validated_color(:ip_addresses)}"
       say "Deployment name: #{attrs.validated_color(:name)}"
-      say "Resource size: #{attrs.validated_color(:deployment_size)}"
+      say "Deployment size: #{attrs.validated_color(:deployment_size)}"
       say "Persistent disk: #{attrs.validated_color(:persistent_disk)}"
       say "Security group: #{attrs.validated_color(:security_group)}"
       nl
 
-      step("Validating deployment size", "Available deployment sizes are #{attrs.available_deployment_sizes.join(', ')}", :non_fatal) do
+      step("Validating deployment size", "Available deployment sizes are #{attrs.available_deployment_sizes.join(', ')}", :fatal) do
         attrs.validate(:deployment_size)
       end
 
