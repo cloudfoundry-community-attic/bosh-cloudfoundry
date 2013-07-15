@@ -105,6 +105,10 @@ module Bosh::Cloudfoundry
       release_version_cpi_size = ReleaseVersionCpiSize.new(release_version_cpi, deployment_size)
 
       attributes = deployment_file["properties"][properties_key]
+      # convert string keys to symbol keys
+      attributes = attributes.inject({}) do |mem, key_value|
+        k, v = key_value; mem[k.to_sym] = v; mem
+      end
       deployment_attributes = DeploymentAttributes.new(director_client, bosh_status, release_version_cpi, attributes)
 
       self.new(release_version_cpi_size, deployment_attributes, bosh_status)
@@ -159,6 +163,10 @@ module Bosh::Cloudfoundry
 
     def bosh_uuid
       bosh_status["uuid"]
+    end
+
+    def bosh_cpi
+      bosh_status["cpi"]
     end
 
     # attributes are stored within deployment file at properties.cf

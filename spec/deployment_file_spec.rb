@@ -1,4 +1,31 @@
 describe Bosh::Cloudfoundry::DeploymentFile do
+  it "can reconstruct DeploymentFile from even minimal deployment file" do
+    file = home_file("deployment.yml")
+    File.open(file, "w") do |f|
+      f << {
+        "releases" => [
+          {"name" => "cf-release", "version" => 132}
+        ],
+        "properties" => {
+          "cf" => {
+            "dns" => "mycloud.com",
+            "ip_addresses" => ['1.2.3.4'],
+            "deployment_size" => "medium",
+            "security_group" => "cf",
+            "persistent_disk" => 4096,
+            "common_passwords" => "qwerty"
+          }
+        }
+      }.to_yaml
+    end
+    deployment_file = Bosh::Cloudfoundry::DeploymentFile.reconstruct_from_deployment_file(
+      file, mock("director"), {"cpi" => "openstack"})
+
+    deployment_file.deployment_size.should == "medium"
+    deployment_file.deployment_attributes.dns.should == "mycloud.com"
+    deployment_file.bosh_cpi.should == "openstack"
+    deployment_file.release_version_number.should == 132
+  end
   # it "generates a medium deployment (medium is default size)" do
   #   in_home_dir do
   #     File.should_not be_exist(command.deployment_file)

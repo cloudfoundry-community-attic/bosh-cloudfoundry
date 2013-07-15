@@ -52,14 +52,6 @@ module Bosh::Cloudfoundry
       attributes[attribute.to_sym] = value if value
     end
 
-    def load_deployment_file(deployment_file)
-      deployment_obj = YAML.load_file(deployment_file)
-      attributes = deployment_obj["properties"][properties_key]
-      @attributes = attributes.inject({}) do |mem, key_value|
-        k, v = key_value; mem[k.to_sym] = v; mem
-      end
-    end
-
     def validate(attribute)
       value = attributes[attribute.to_sym]
       if attribute.to_s == "deployment_size"

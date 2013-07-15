@@ -42,7 +42,7 @@ module Bosh::Cloudfoundry
     end
 
     def release_version_number
-      release_version_cpi.release_version
+      release_version_cpi.release_version_number
     end
 
   end
