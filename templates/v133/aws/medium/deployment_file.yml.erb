@@ -68,7 +68,7 @@ compilation:
 resource_pools:
   - name: small
     network: default
-    size: 3
+    size: 4
     stemcell:
       name: bosh-stemcell
       version: latest
@@ -77,7 +77,7 @@ resource_pools:
 
   - name: medium
     network: default
-    size: 2
+    size: 1
     stemcell:
       name: bosh-stemcell
       version: latest
@@ -134,7 +134,7 @@ jobs:
       - cloud_controller_ng
       - gorouter
     instances: 1
-    resource_pool: medium
+    resource_pool: small
     networks:
     - name: default
       default:
