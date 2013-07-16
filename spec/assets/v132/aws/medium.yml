@@ -115,7 +115,7 @@ properties:
     name: demo
     dns: mycloud.com
     ip_addresses: ["1.2.3.4"]
-    core_size: medium
+    deployment_size: medium
     security_group: default
     persistent_disk: 4096
     common_password: qwertyasdfgh
@@ -164,7 +164,7 @@ properties:
   serialization_data_server:
     port: 8080
     logging_level: debug
-    upload_token: 8f7COGvThwlmulIzAgOHxMXurBrG364k
+    upload_token: qwertyasdfgh
     upload_timeout: 10
 
   collector:
@@ -243,6 +243,7 @@ properties:
     staging_upload_password: qwertyasdfgh
     resource_pool:
       resource_directory_key: cc-resources
+      # Local provider when using NFS
       fog_connection:
         provider: Local
         local_root: /var/vcap/shared
@@ -300,7 +301,6 @@ properties:
     client:
       autoapprove:
         - cf
-        - vmc
         - my
         - micro
         - support-signon
@@ -315,29 +315,34 @@ properties:
         redirect-uri: http://login.mycloud.com
       support-services:
         scope: scim.write,scim.read,openid,cloud_controller.read,cloud_controller.write
-        secret: ssosecretsso
+        secret: qwertyasdfgh
         authorized-grant-types: authorization_code,client_credentials
         redirect-uri: http://support-signon.mycloud.com
         authorities: portal.users.read
         access-token-validity: 1209600
         refresh-token-validity: 1209600
-      vmc:
+      oauth2service:
+        secret: qwertyasdfgh
+        scope: openid,cloud_controller.read,cloud_controller.write
+        authorities: uaa.resource,oauth.service,clients.read,clients.write,clients.secret
+        authorized-grant-types: client_credentials,implicit
+        redirect-uri: http://rewritten-later.cloudfoundry.com/whatever
         override: true
-        authorized-grant-types: password,implicit
-        authorities: uaa.none
-        scope: cloud_controller.read,cloud_controller.write,openid,password.write,cloud_controller.admin,scim.read,scim.write
+        autoapprove: true
       cf:
         override: true
         authorized-grant-types: password,implicit,refresh_token
         authorities: uaa.none
         scope: cloud_controller.read,cloud_controller.write,openid,password.write,cloud_controller.admin,scim.read,scim.write
+        access-token-validity: 7200
+        refresh-token-validity: 1209600
       servicesmgmt:
         override: true
-        secret: serivcesmgmtsecret
+        secret: qwertyasdfgh
         scope: openid,cloud_controller.read,cloud_controller.write
         authorities: uaa.resource,oauth.service,clients.read,clients.write,clients.secret
         authorized-grant-types: authorization_code,client_credentials,password,implicit
-        redirect-uri: http://servicesmgmt.yourdomain.com/auth/cloudfoundry/callback
+        redirect-uri: http://servicesmgmt.mycloud.com/auth/cloudfoundry/callback
         autoapprove: true
     scim:
       users:

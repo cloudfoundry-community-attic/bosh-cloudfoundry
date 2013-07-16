@@ -6,13 +6,15 @@ module Bosh::Cloudfoundry
     include Bosh::Cli::Validation
 
     attr_reader :attributes
-    def initialize(director_client, bosh_status, released_versioned_template, attributes = {})
+    attr_reader :released_version_cpi
+
+    def initialize(director_client, bosh_status, released_version_cpi, attributes = {})
       @director_client = director_client
       @bosh_status = bosh_status
-      @released_versioned_template = released_versioned_template
+      @released_version_cpi = released_version_cpi
       @attributes = attributes
       @attributes[:name] ||= default_name
-      @attributes[:core_size] ||= default_size
+      @attributes[:deployment_size] ||= default_deployment_size
       @attributes[:persistent_disk] ||= default_persistent_disk
       @attributes[:security_group] ||= default_security_group
       @attributes[:common_password] ||= random_string(12, :common)
@@ -22,8 +24,8 @@ module Bosh::Cloudfoundry
       @attributes[:name]
     end
 
-    def core_size
-      @attributes[:core_size]
+    def deployment_size
+      @attributes[:deployment_size]
     end
 
     def persistent_disk
@@ -35,11 +37,11 @@ module Bosh::Cloudfoundry
     end
 
     def ip_addresses
-      @attribute[:ip_addresses]
+      @attributes[:ip_addresses]
     end
 
     def dns
-      @attribute[:dns]
+      @attributes[:dns]
     end
 
     def set_unless_nil(attribute, value)
@@ -50,23 +52,12 @@ module Bosh::Cloudfoundry
       attributes[attribute.to_sym] = value if value
     end
 
-    def load_deployment_file(deployment_file)
-      deployment_obj = YAML.load_file(deployment_file)
-      attributes = deployment_obj["properties"][properties_key]
-      @attributes = attributes.inject({}) do |mem, key_value|
-        k, v = key_value; mem[k.to_sym] = v; mem
-      end
-    end
-
-    # attributes are stored within deployment file at properties.cf
-    def properties_key
-      "cf"
-    end
-
     def validate(attribute)
       value = attributes[attribute.to_sym]
-      if attribute.to_s =~ /size$/
-        available_resource_sizes.include?(value)
+      if attribute.to_s == "deployment_size"
+        available_deployment_sizes.include?(value)
+      elsif attribute.to_s =~ /size$/
+        available_resources.include?(value)
       else
         true
       end
@@ -83,12 +74,25 @@ module Bosh::Cloudfoundry
     end
 
     # TODO move these validations into a "ValidatedSize" class or similar
-    def available_resource_sizes
-      resources = @released_versioned_template.spec["resources"]
-      if resources && resources.is_a?(Array) && resources.first.is_a?(String)
-        resources
-      else
-        err "template spec needs 'resources' key with list of resource pool names available"
+    def available_resources
+      @available_resources ||= begin
+        resources = released_version_cpi.spec["resources"]
+        if resources && resources.is_a?(Array) && resources.first.is_a?(String)
+          resources
+        else
+          err "template spec needs 'resources' key with list of resource pool names available; found #{released_version_cpi.spec.inspect}"
+        end
+      end
+    end
+
+    def available_deployment_sizes
+      @available_deployment_sizes ||= begin
+        deployment_sizes = released_version_cpi.spec["deployment_sizes"]
+        if deployment_sizes && deployment_sizes.is_a?(Array) && deployment_sizes.first.is_a?(String)
+          deployment_sizes
+        else
+          err "template spec needs 'deployment_sizes' key with list of deployment sizes names available; found #{deployment_sizes.spec.inspect}"
+        end
       end
     end
 
@@ -115,7 +119,7 @@ module Bosh::Cloudfoundry
     end
 
     # TODO change to small when its implemented
-    def default_size
+    def default_deployment_size
       "medium"
     end
 

@@ -12,7 +12,7 @@
 #   cf:
 #     dns: mycloud.com
 #     ip_addresses: ['1.2.3.4']
-#     core_size: medium
+#     deployment_size: medium
 #     security_group: cf
 #     persistent_disk: 4096
 #
@@ -30,7 +30,7 @@ name            = find("name")
 dns             = find("properties.cf.dns")
 ip_addresses    = find("properties.cf.ip_addresses")
 security_group  = find("properties.cf.security_group")
-core_size       = find("properties.cf.core_size")
+deployment_size = find("properties.cf.deployment_size")
 persistent_disk = find("properties.cf.persistent_disk")
 common_password = find("properties.cf.common_password")
 -%>
@@ -152,7 +152,7 @@ properties:
     name: <%= name %>
     dns: <%= dns %>
     ip_addresses: <%= ip_addresses.inspect %>
-    core_size: <%= core_size %>
+    deployment_size: <%= deployment_size %>
     security_group: <%= security_group %>
     persistent_disk: <%= persistent_disk %>
     common_password: <%= common_password %>
@@ -201,7 +201,7 @@ properties:
   serialization_data_server:
     port: 8080
     logging_level: debug
-    upload_token: 8f7COGvThwlmulIzAgOHxMXurBrG364k
+    upload_token: <%= common_password %>
     upload_timeout: 10
 
   collector:
@@ -272,7 +272,7 @@ properties:
     external_host: ccng
     srv_api_uri: <%= protocol %>://api.<%= dns %>
     cc_partition: default
-    db_encryption_key: "b963127302433579"
+    db_encryption_key: <%= common_password %>
     bootstrap_admin_email: admin@<%= dns %>
     bulk_api_password: <%= common_password %>
     uaa_resource_id: cloud_controller
@@ -280,6 +280,7 @@ properties:
     staging_upload_password: <%= common_password %>
     resource_pool:
       resource_directory_key: cc-resources
+      # Local provider when using NFS
       fog_connection:
         provider: Local
         local_root: /var/vcap/shared
@@ -337,7 +338,6 @@ properties:
     client:
       autoapprove:
         - cf
-        - vmc
         - my
         - micro
         - support-signon
@@ -352,29 +352,34 @@ properties:
         redirect-uri: <%= protocol %>://login.<%= dns %>
       support-services:
         scope: scim.write,scim.read,openid,cloud_controller.read,cloud_controller.write
-        secret: ssosecretsso
+        secret: <%= common_password %>
         authorized-grant-types: authorization_code,client_credentials
         redirect-uri: <%= protocol %>://support-signon.<%= dns %>
         authorities: portal.users.read
         access-token-validity: 1209600
         refresh-token-validity: 1209600
-      vmc:
+      oauth2service:
+        secret: <%= common_password %>
+        scope: openid,cloud_controller.read,cloud_controller.write
+        authorities: uaa.resource,oauth.service,clients.read,clients.write,clients.secret
+        authorized-grant-types: client_credentials,implicit
+        redirect-uri: <%= protocol %>://rewritten-later.cloudfoundry.com/whatever
         override: true
-        authorized-grant-types: password,implicit
-        authorities: uaa.none
-        scope: cloud_controller.read,cloud_controller.write,openid,password.write,cloud_controller.admin,scim.read,scim.write
+        autoapprove: true
       cf:
         override: true
         authorized-grant-types: password,implicit,refresh_token
         authorities: uaa.none
         scope: cloud_controller.read,cloud_controller.write,openid,password.write,cloud_controller.admin,scim.read,scim.write
+        access-token-validity: 7200
+        refresh-token-validity: 1209600
       servicesmgmt:
         override: true
-        secret: serivcesmgmtsecret
+        secret: <%= common_password %>
         scope: openid,cloud_controller.read,cloud_controller.write
         authorities: uaa.resource,oauth.service,clients.read,clients.write,clients.secret
         authorized-grant-types: authorization_code,client_credentials,password,implicit
-        redirect-uri: <%= protocol %>://servicesmgmt.yourdomain.com/auth/cloudfoundry/callback
+        redirect-uri: <%= protocol %>://servicesmgmt.mycloud.com/auth/cloudfoundry/callback
         autoapprove: true
     scim:
       users:

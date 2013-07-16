@@ -6,6 +6,7 @@ module Bosh::Cloudfoundry
   # From this class you can navigate to ReleaseVersionCpi for the CPI specific aspect of a release version;
   # and from ReleaseVersionCpi you can navigate to one or more ReleaseVersionCpiSizes (deployment sizes).
   class ReleaseVersion
+    attr_reader :release_name
     attr_reader :version_number
 
     def self.for_version(version_number)
@@ -16,7 +17,10 @@ module Bosh::Cloudfoundry
     # converts templates/v132, templates/v140, etc into [132, 140]
     def self.available_versions
       @available_versions ||= begin
-        Dir[File.join(base_template_dir, "v*")].map {|dir| File.basename(dir)}.map {|version| version[1..-1].to_i}
+        Dir[File.join(base_template_dir, "v*")].
+          map {|dir| File.basename(dir)}.
+          map {|version| version[1..-1].to_i}.
+          sort
       end
     end
 
@@ -33,8 +37,13 @@ module Bosh::Cloudfoundry
       available_version
     end
 
+    def self.latest_version_number
+      available_versions.last
+    end
+
     def initialize(version_number)
       @version_number = version_number
+      @release_name = "cf-release" # TODO determine from release file
     end
 
     def self.base_template_dir

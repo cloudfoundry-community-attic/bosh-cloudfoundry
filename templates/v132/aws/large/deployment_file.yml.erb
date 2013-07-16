@@ -12,7 +12,7 @@
 #   cf:
 #     dns: mycloud.com
 #     ip_addresses: ['1.2.3.4']
-#     core_size: medium
+#     deployment_size: medium
 #     security_group: cf
 #     persistent_disk: 4096
 #
@@ -28,7 +28,7 @@ name            = find("name")
 dns             = find("properties.cf.dns")
 ip_addresses    = find("properties.cf.ip_addresses")
 security_group  = find("properties.cf.security_group")
-core_size       = find("properties.cf.core_size")
+deployment_size = find("properties.cf.deployment_size")
 persistent_disk = find("properties.cf.persistent_disk")
 common_password = find("properties.cf.common_password")
 no_ssl          = true
@@ -48,8 +48,8 @@ networks:
 - name: default
   type: dynamic
   cloud_properties:
-  security_groups:
-  - <%= security_group %>
+    security_groups:
+    - <%= security_group %>
 
 compilation:
   workers: 6
@@ -173,7 +173,9 @@ jobs:
         default: [dns, gateway]
       - name: floating
         static_ips:
-          - 75.55.102.226
+        <%- ip_addresses.each do |ip| -%>
+        - <%= ip %>
+        <%- end -%>
 
   - name: health_manager
     release: cf-release
@@ -199,7 +201,7 @@ properties:
     name: <%= name %>
     dns: <%= dns %>
     ip_addresses: <%= ip_addresses.inspect %>
-    core_size: <%= core_size %>
+    deployment_size: <%= deployment_size %>
     security_group: <%= security_group %>
     persistent_disk: <%= persistent_disk %>
     common_password: <%= common_password %>
@@ -311,16 +313,20 @@ properties:
   cc: &cc
     logging_level: debug
     external_host: ccng
-    srv_api_uri: <%= protocol %>://ccng.<%= dns %>
+    srv_api_uri: <%= protocol %>://api.<%= dns %>
     cc_partition: default
     db_encryption_key: <%= common_password %>
     bootstrap_admin_email: admin@<%= dns %>
     bulk_api_password: <%= common_password %>
     uaa_resource_id: cloud_controller
-    staging_upload_user: upload
+    staging_upload_user: uploaduser
     staging_upload_password: <%= common_password %>
     resource_pool:
       resource_directory_key: cc-resources
+      # Local provider when using NFS
+      fog_connection:
+        provider: Local
+        local_root: /var/vcap/shared
     packages:
       app_package_directory_key: cc-packages
     droplets:
@@ -337,6 +343,7 @@ properties:
 
   uaa:
     url: <%= protocol %>://uaa.<%= dns %>
+    spring_profiles: postgresql
     no_ssl: <%= no_ssl %>
     catalina_opts: -Xmx768m -XX:MaxPermSize=256m
     resource_id: account_manager
@@ -387,14 +394,6 @@ properties:
         secret: <%= common_password %>
         authorized-grant-types: authorization_code,client_credentials,refresh_token
         redirect-uri: <%= protocol %>://login.<%= dns %>
-      portal:
-        override: true
-        scope: openid,cloud_controller.read,cloud_controller.write,password.write
-        authorities: scim.write,scim.read,openid,cloud_controller.read,cloud_controller.write,password.write,uaa.admin,uaa.resource,cloud_controller.admin
-        secret: <%= common_password %>
-        authorized-grant-types: authorization_code,client_credentials
-        access-token-validity: 1209600
-        refresh-token-validity: 1209600
       support-services:
         scope: scim.write,scim.read,openid,cloud_controller.read,cloud_controller.write
         secret: <%= common_password %>

@@ -13,6 +13,11 @@ module Bosh::Cloudfoundry
       ReleaseVersionCpi.new(release_version, cpi)
     end
 
+    def self.latest_for_cpi(cpi)
+      release_version = ReleaseVersion.latest_version_number
+      ReleaseVersionCpi.new(release_version, cpi)
+    end
+
     def initialize(release_version, cpi)
       release_version = ReleaseVersion.for_version(release_version) unless release_version.is_a?(ReleaseVersion)
       raise "CPI #{cpi} not available for version #{release_version.version_number}" unless release_version.valid_cpi?(cpi)
@@ -37,6 +42,14 @@ module Bosh::Cloudfoundry
 
     def default_deployment_size
       spec["default_deployment_size"]
+    end
+
+    def release_name
+      release_version.release_name
+    end
+
+    def release_version_number
+      release_version.version_number
     end
   end
 end
