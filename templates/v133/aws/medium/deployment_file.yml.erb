@@ -1,10 +1,45 @@
 ---
-name: demo
-director_uuid: UUID
+<%-
+# Example source deployment file that can be used:
+# ---
+# name: NAME
+# director_uuid: 4ae3a0f0-70a5-4c0d-95f2-7fafaefe8b9e
+# releases:
+#  - name: cf-release
+#    version: 132
+# networks: {}
+# properties:
+#   cf:
+#     dns: mycloud.com
+#     ip_addresses: ['1.2.3.4']
+#     deployment_size: medium
+#     security_group: cf
+#     persistent_disk: 4096
+#
+# Then target that deployment file:
+#
+#     $ bosh deployment path/to/file/above
+#
+# Then apply this template:
+#
+#     $ bosh diff deployment_file.yml.erb
+#
+no_ssl          = true
+protocol        = no_ssl ? "http" : "https"
+name            = find("name")
+dns             = find("properties.cf.dns")
+ip_addresses    = find("properties.cf.ip_addresses")
+security_group  = find("properties.cf.security_group")
+deployment_size = find("properties.cf.deployment_size")
+persistent_disk = find("properties.cf.persistent_disk")
+common_password = find("properties.cf.common_password")
+-%>
+name: <%= name %>
+director_uuid: <%= find("director_uuid") %>
 
 releases:
  - name: cf-release
-   version: 133
+   version: <%= find("releases.version") %>
 
 networks:
 - name: floating
@@ -14,7 +49,7 @@ networks:
   type: dynamic
   cloud_properties:
     security_groups:
-    - default
+    - <%= security_group %>
 
 update:
   canaries: 1
@@ -33,7 +68,7 @@ compilation:
 resource_pools:
   - name: small
     network: default
-    size: 2
+    size: 3
     stemcell:
       name: bosh-stemcell
       version: latest
@@ -56,8 +91,8 @@ jobs:
       - postgres
       - debian_nfs_server
     instances: 1
-    resource_pool: medium
-    persistent_disk: 4096
+    resource_pool: small
+    persistent_disk: <%= persistent_disk %>
     networks:
     - name: default
       default:
@@ -66,7 +101,7 @@ jobs:
     properties:
       db: databases
 
-  - name: api
+  - name: core
     release: cf-release
     template:
       - syslog_aggregator
@@ -74,6 +109,28 @@ jobs:
       - health_manager_next
       - collector
       - login
+    instances: 1
+    resource_pool: medium
+    networks:
+    - name: default
+      default:
+      - dns
+      - gateway
+
+  # need a separate job for uaa due to https://github.com/cloudfoundry/cf-release/issues/104
+  - name: uaa
+    release: cf-release
+    template:
+      - uaa
+    instances: 1
+    resource_pool: small
+    networks:
+      - name: default
+        default: [dns, gateway]
+
+  - name: api
+    release: cf-release
+    template:
       - cloud_controller_ng
       - gorouter
     instances: 1
@@ -85,20 +142,11 @@ jobs:
       - gateway
     - name: floating
       static_ips:
-      - 1.2.3.4
+      <%- ip_addresses.each do |ip| -%>
+      - <%= ip %>
+      <%- end -%>
     properties:
       db: databases
-
-  - name: uaa
-    release: cf-release
-    template:
-      - uaa
-    instances: 1
-    resource_pool: small
-    networks:
-      - name: default
-        default: [dns, gateway]
-
 
   - name: dea
     release: cf-release
@@ -112,29 +160,29 @@ jobs:
 
 properties:
   cf:
-    name: demo
-    dns: mycloud.com
-    ip_addresses: ["1.2.3.4"]
-    deployment_size: medium
-    security_group: default
-    persistent_disk: 4096
-    common_password: qwertyasdfgh
+    name: <%= name %>
+    dns: <%= dns %>
+    ip_addresses: <%= ip_addresses.inspect %>
+    deployment_size: <%= deployment_size %>
+    security_group: <%= security_group %>
+    persistent_disk: <%= persistent_disk %>
+    common_password: <%= common_password %>
 
-  domain: mycloud.com
-  system_domain: mycloud.com.com
+  domain: <%= dns %>
+  system_domain: <%= dns %>.com
   system_domain_organization: system_domain
   app_domains:
-    - mycloud.com
+    - <%= dns %>
 
   networks:
     apps: default
     management: default
 
   nats:
-    address: 0.core.default.demo.microbosh
+    address: 0.core.default.<%= name %>.microbosh
     port: 4222
     user: nats
-    password: qwertyasdfgh
+    password: <%= common_password %>
     authorization_timeout: 5
 
   router:
@@ -142,7 +190,7 @@ properties:
     status:
       port: 8080
       user: gorouter
-      password: qwertyasdfgh
+      password: <%= common_password %>
 
   dea: &dea
     max_memory: 4096
@@ -155,16 +203,16 @@ properties:
 
   service_lifecycle:
     serialization_data_server:
-    - 0.core.default.demo.microbosh
+    - 0.core.default.<%= name %>.microbosh
 
   syslog_aggregator:
-    address: 0.core.default.demo.microbosh
+    address: 0.core.default.<%= name %>.microbosh
     port: 54321
 
   serialization_data_server:
     port: 8080
     logging_level: debug
-    upload_token: qwertyasdfgh
+    upload_token: <%= common_password %>
     upload_timeout: 10
 
   collector:
@@ -174,24 +222,24 @@ properties:
     use_datadog: false
 
   nfs_server:
-    address: 0.core.default.demo.microbosh
-    #network: "*.demo.microbosh"
-    #idmapd_domain: mycloud.com
+    address: 0.core.default.<%= name %>.microbosh
+    #network: "*.<%= name %>.microbosh"
+    #idmapd_domain: <%= dns %>
 
   debian_nfs_server:
     no_root_squash: true
 
   databases: &databases
     db_scheme: postgres
-    address: 0.core.default.demo.microbosh
+    address: 0.core.default.<%= name %>.microbosh
     port: 5524
     roles:
       - tag: admin
         name: ccadmin
-        password: qwertyasdfgh
+        password: <%= common_password %>
       - tag: admin
         name: uaaadmin
-        password: qwertyasdfgh
+        password: <%= common_password %>
     databases:
       - tag: cc
         name: ccdb
@@ -202,12 +250,12 @@ properties:
 
   ccdb: &ccdb
     db_scheme: postgres
-    address: 0.core.default.demo.microbosh
+    address: 0.core.default.<%= name %>.microbosh
     port: 5524
     roles:
       - tag: admin
         name: ccadmin
-        password: qwertyasdfgh
+        password: <%= common_password %>
     databases:
       - tag: cc
         name: ccdb
@@ -217,12 +265,12 @@ properties:
 
   uaadb: 
     db_scheme: postgresql
-    address: 0.core.default.demo.microbosh
+    address: 0.core.default.<%= name %>.microbosh
     port: 5524
     roles:
       - tag: admin
         name: uaaadmin
-        password: qwertyasdfgh
+        password: <%= common_password %>
     databases:
       - tag: uaa
         name: uaadb
@@ -233,14 +281,14 @@ properties:
   cc: &cc
     logging_level: debug
     external_host: ccng
-    srv_api_uri: http://api.mycloud.com
+    srv_api_uri: <%= protocol %>://api.<%= dns %>
     cc_partition: default
-    db_encryption_key: qwertyasdfgh
-    bootstrap_admin_email: admin@mycloud.com
-    bulk_api_password: qwertyasdfgh
+    db_encryption_key: <%= common_password %>
+    bootstrap_admin_email: admin@<%= dns %>
+    bulk_api_password: <%= common_password %>
     uaa_resource_id: cloud_controller
     staging_upload_user: uploaduser
-    staging_upload_password: qwertyasdfgh
+    staging_upload_password: <%= common_password %>
     resource_pool:
       resource_directory_key: cc-resources
       # Local provider when using NFS
@@ -255,16 +303,16 @@ properties:
   ccng: *cc
 
   login:
-    protocol: http
+    protocol: <%= protocol %>
     links:
-      home: http://console.mycloud.com
-      passwd: http://console.mycloud.com/password_resets/new
-      signup: http://console.mycloud.com/register
+      home: <%= protocol %>://console.<%= dns %>
+      passwd: <%= protocol %>://console.<%= dns %>/password_resets/new
+      signup: <%= protocol %>://console.<%= dns %>/register
 
   uaa:
-    url: http://uaa.mycloud.com
+    url: <%= protocol %>://uaa.<%= dns %>
     spring_profiles: postgresql
-    no_ssl: true
+    no_ssl: <%= no_ssl %>
     catalina_opts: -Xmx768m -XX:MaxPermSize=256m
     resource_id: account_manager
     jwt:
@@ -292,12 +340,12 @@ properties:
         spULZVNRxq7veq/fzwIDAQAB
         -----END PUBLIC KEY-----
     cc:
-      client_secret: qwertyasdfgh
+      client_secret: <%= common_password %>
     admin:
-      client_secret: qwertyasdfgh
+      client_secret: <%= common_password %>
     batch:
       username: batchuser
-      password: qwertyasdfgh
+      password: <%= common_password %>
     client:
       autoapprove:
         - cf
@@ -310,23 +358,23 @@ properties:
         override: true
         scope: openid
         authorities: oauth.login
-        secret: qwertyasdfgh
+        secret: <%= common_password %>
         authorized-grant-types: authorization_code,client_credentials,refresh_token
-        redirect-uri: http://login.mycloud.com
+        redirect-uri: <%= protocol %>://login.<%= dns %>
       support-services:
         scope: scim.write,scim.read,openid,cloud_controller.read,cloud_controller.write
-        secret: qwertyasdfgh
+        secret: <%= common_password %>
         authorized-grant-types: authorization_code,client_credentials
-        redirect-uri: http://support-signon.mycloud.com
+        redirect-uri: <%= protocol %>://support-signon.<%= dns %>
         authorities: portal.users.read
         access-token-validity: 1209600
         refresh-token-validity: 1209600
       oauth2service:
-        secret: qwertyasdfgh
+        secret: <%= common_password %>
         scope: openid,cloud_controller.read,cloud_controller.write
         authorities: uaa.resource,oauth.service,clients.read,clients.write,clients.secret
         authorized-grant-types: client_credentials,implicit
-        redirect-uri: http://rewritten-later.cloudfoundry.com/whatever
+        redirect-uri: <%= protocol %>://rewritten-later.cloudfoundry.com/whatever
         override: true
         autoapprove: true
       cf:
@@ -338,13 +386,13 @@ properties:
         refresh-token-validity: 1209600
       servicesmgmt:
         override: true
-        secret: qwertyasdfgh
+        secret: <%= common_password %>
         scope: openid,cloud_controller.read,cloud_controller.write
         authorities: uaa.resource,oauth.service,clients.read,clients.write,clients.secret
         authorized-grant-types: authorization_code,client_credentials,password,implicit
-        redirect-uri: http://servicesmgmt.mycloud.com/auth/cloudfoundry/callback
+        redirect-uri: <%= protocol %>://servicesmgmt.mycloud.com/auth/cloudfoundry/callback
         autoapprove: true
     scim:
       users:
-      - admin|qwertyasdfgh|scim.write,scim.read,openid,cloud_controller.admin
-      - services|qwertyasdfgh|scim.write,scim.read,openid,cloud_controller.admin
+      - admin|<%= common_password %>|scim.write,scim.read,openid,cloud_controller.admin
+      - services|<%= common_password %>|scim.write,scim.read,openid,cloud_controller.admin

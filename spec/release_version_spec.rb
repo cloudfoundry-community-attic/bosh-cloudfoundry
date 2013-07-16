@@ -8,15 +8,15 @@ describe Bosh::Cloudfoundry::ReleaseVersion do
   end
 
   it "finds an next available version match" do
-    Bosh::Cloudfoundry::ReleaseVersion.for_version(133).version_number.should == 132
+    Bosh::Cloudfoundry::ReleaseVersion.for_version(134).version_number.should == 133
   end
 
   it "knows available versions" do
-    Bosh::Cloudfoundry::ReleaseVersion.available_versions.should == [132]
+    Bosh::Cloudfoundry::ReleaseVersion.available_versions.should == [132, 133]
   end
 
   it "knows latest version number" do
-    Bosh::Cloudfoundry::ReleaseVersion.latest_version_number == 132
+    Bosh::Cloudfoundry::ReleaseVersion.latest_version_number.should == 133
   end
 
   context "for v132" do

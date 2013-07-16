@@ -28,7 +28,7 @@ module Bosh::Cloudfoundry
       available_version, *versions = available_versions
       while versions && versions.size > 0
         version, *versions = versions
-        if version < version_number
+        if version <= version_number
           available_version = version
         else
           return available_version
