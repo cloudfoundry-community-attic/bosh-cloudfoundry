@@ -222,7 +222,7 @@ properties:
     use_datadog: false
 
   nfs_server:
-    address: 0.core.default.<%= name %>.microbosh
+    address: 0.data.default.<%= name %>.microbosh
     #network: "*.<%= name %>.microbosh"
     #idmapd_domain: <%= dns %>
 
@@ -231,7 +231,7 @@ properties:
 
   databases: &databases
     db_scheme: postgres
-    address: 0.core.default.<%= name %>.microbosh
+    address: 0.data.default.<%= name %>.microbosh
     port: 5524
     roles:
       - tag: admin
@@ -250,7 +250,7 @@ properties:
 
   ccdb: &ccdb
     db_scheme: postgres
-    address: 0.core.default.<%= name %>.microbosh
+    address: 0.data.default.<%= name %>.microbosh
     port: 5524
     roles:
       - tag: admin
@@ -265,7 +265,7 @@ properties:
 
   uaadb: 
     db_scheme: postgresql
-    address: 0.core.default.<%= name %>.microbosh
+    address: 0.data.default.<%= name %>.microbosh
     port: 5524
     roles:
       - tag: admin
