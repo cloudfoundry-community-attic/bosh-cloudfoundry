@@ -8,4 +8,10 @@ describe Bosh::Cloudfoundry::ReleaseVersionCpi do
   it "has default deployment size" do
     subject.default_deployment_size.should == "medium"
   end
+
+  it "latest_for_cpi(bosh_cpi)" do
+    rvc = Bosh::Cloudfoundry::ReleaseVersionCpi.latest_for_cpi("aws")
+    rvc.cpi.should == "aws"
+    rvc.release_version_number.should == 132
+  end
 end

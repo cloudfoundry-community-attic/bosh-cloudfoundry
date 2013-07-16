@@ -1,11 +1,11 @@
 require "yaml"
-
 require "bosh/cloudfoundry"
 
 module Bosh::Cli::Command
   class CloudFoundry < Base
     include FileUtils
     include Bosh::Cli::Validation
+    include Bosh::Cloudfoundry
 
     usage "cf"
     desc  "show micro cf sub-commands"
@@ -23,6 +23,7 @@ module Bosh::Cli::Command
     def prepare_cf
       auth_required
 
+      release_yml = Dir[File.join(bosh_release_dir, "releases", "*-#{latest_release_version}.yml")].first
       release_cmd(non_interactive: true).upload(release_yml)
     end
 
@@ -33,7 +34,13 @@ module Bosh::Cli::Command
     option "--name cf-<timestamp>", "Unique bosh deployment name"
     option "--disk 4096", Integer, "Size of persistent disk (Mb)"
     option "--security-group default", String, "Security group to assign to provisioned VMs"
+    option "--deployment-size medium", String, "Size of deployment - medium or large"
     def create_cf
+      auth_required
+      bosh_status # preload
+
+      setup_deployment_attributes
+
       ip_addresses = options[:ip]
       err("USAGE: bosh create cf --ip 1.2.3.4 -- please provide one IP address that will be bound to router.") if ip_addresses.blank?
       err("Only one IP address is supported currently. Please create an issue to mention you need more.") if ip_addresses.size > 1
@@ -43,26 +50,27 @@ module Bosh::Cli::Command
       err("USAGE: bosh create cf --dns mycloud.com -- please provide a base DNS that has a '*' A record referencing IPs") unless dns
       attrs.set(:dns, dns)
 
-      auth_required
-      bosh_status # preload
-
       attrs.set_unless_nil(:name, options[:name])
-      attrs.set_unless_nil(:core_size, options[:core_size] || options[:size])
       attrs.set_unless_nil(:persistent_disk, options[:disk])
       attrs.set_unless_nil(:security_group, options[:security_group])
       attrs.set_unless_nil(:common_password, options[:common_password])
+      attrs.set_unless_nil(:deployment_size, options[:deployment_size])
+
+      release_version = ReleaseVersion.latest_version_number
+      @release_version_cpi_size = 
+        ReleaseVersionCpiSize.new(@release_version_cpi, attrs.deployment_size)
 
       nl
       say "CPI: #{bosh_cpi.make_green}"
       say "DNS mapping: #{attrs.validated_color(:dns)} --> #{attrs.validated_color(:ip_addresses)}"
       say "Deployment name: #{attrs.validated_color(:name)}"
-      say "Resource size: #{attrs.validated_color(:core_size)}"
+      say "Deployment size: #{attrs.validated_color(:deployment_size)}"
       say "Persistent disk: #{attrs.validated_color(:persistent_disk)}"
       say "Security group: #{attrs.validated_color(:security_group)}"
       nl
 
-      step("Validating resource size", "Resource size must be in #{attrs.available_resource_sizes.join(', ')}", :non_fatal) do
-        attrs.validate(:core_size)
+      step("Validating deployment size", "Available deployment sizes are #{attrs.available_deployment_sizes.join(', ')}", :fatal) do
+        attrs.validate(:deployment_size)
       end
 
       unless confirmed?("Security group #{attrs.validated_color(:security_group)} exists with ports #{attrs.required_ports.join(", ")}")
@@ -74,53 +82,11 @@ module Bosh::Cli::Command
 
       raise Bosh::Cli::ValidationHalted unless errors.empty?
 
-      # Create an initial deployment file; upon which the CPI-specific template will be applied below
-      # Initial file will look like:
-      # ---
-      # name: NAME
-      # director_uuid: 4ae3a0f0-70a5-4c0d-95f2-7fafaefe8b9e
-      # releases:
-      #  - name: cf-release
-      #    version: 132
-      # networks: {}
-      # properties:
-      #   cf:
-      #     dns: mycloud.com
-      #     ip_addresses: ['1.2.3.4']
-      #     core_size: medium
-      #     security_group: cf
-      #     persistent_disk: 4096
-      step("Checking/creating #{deployment_file_dir} for deployment files",
-           "Failed to create #{deployment_file_dir} for deployment files", :fatal) do
-        mkdir_p(deployment_file_dir)
-      end
+      deployment_file = DeploymentFile.new(@release_version_cpi_size, attrs, bosh_status)
+      deployment_file.prepare_environment
+      deployment_file.create_deployment_file
+      deployment_file.deploy(options)
 
-      step("Creating deployment file #{deployment_file}",
-           "Failed to create deployment file #{deployment_file}", :fatal) do
-        File.open(deployment_file, "w") do |file|
-          file << {
-            "name" => attrs.name,
-            "director_uuid" => bosh_uuid,
-            "releases" => {
-              "name" => release_name,
-              "version" => release_version
-            },
-            "networks" => {},
-            "properties" => {
-              attrs.properties_key => attrs.attributes_with_string_keys
-            }
-          }.to_yaml
-        end
-
-        stdout = Bosh::Cli::Config.output
-        Bosh::Cli::Config.output = nil
-        deployment_cmd(non_interactive: true).set_current(deployment_file)
-        biff_cmd(non_interactive: true).biff(template_file)
-        Bosh::Cli::Config.output = stdout
-      end
-      # re-set current deployment to show output
-      deployment_cmd.set_current(deployment_file)
-      deployment_cmd(non_interactive: options[:non_interactive]).perform
     rescue Bosh::Cli::ValidationHalted
       errors.each do |error|
         say error.make_red
@@ -130,25 +96,28 @@ module Bosh::Cli::Command
     usage "show cf passwords"
     desc "display the internal passwords for deployment"
     def show_cf_passwords
-      load_deployment_into_attributes
+
+      setup_deployment_attributes
+      reconstruct_deployment_file
       say "Common password: #{attrs.validated_color(:common_password)}"
     end
 
     protected
+    def setup_deployment_attributes
+      @release_version_cpi = ReleaseVersionCpi.latest_for_cpi(bosh_cpi)
+      @deployment_attributes = DeploymentAttributes.new(director_client, bosh_status, @release_version_cpi)
+    end
+
+    def attrs
+      @deployment_attributes
+    end
+
     # After a deployment is created, the input properties/attributes are stored within the generated
     # deployment file. Therefore, to update a deployment, first we must load in the attributes.
-    def load_deployment_into_attributes
-      attrs.load_deployment_file(deployment)
-    end
-
-    def release_version_cpi_size
-      @release_version_cpi_size ||= begin
-        Bosh::Cloudfoundry::ReleaseVersionCpiSize.new(release_version, bosh_cpi, deployment_size)
-      end
-    end
-
-    def template_file
-      release_version_cpi_size.template_file_path
+    def reconstruct_deployment_file
+      @deployment_file = DeploymentFile.reconstruct_from_deployment_file(deployment, director_client, bosh_status)
+      @deployment_attributes = @deployment_file.deployment_attributes
+      @release_version_cpi_size = @deployment_file.release_version_cpi_size
     end
 
     def bosh_release_dir
@@ -176,71 +145,8 @@ module Bosh::Cli::Command
       latest_version
     end
 
-    def release_yml
-      @release_yml ||= begin
-        Dir[File.join(bosh_release_dir, "releases", "*-#{latest_release_version}.yml")].first
-      end
-    end
-
-    def attrs
-      @deployment_attributes ||= begin
-        klass = release_version_cpi_size.deployment_attributes_class
-        klass.new(director_client, bosh_status, release_version_cpi_size)
-      end
-    end
-
-    # TODO - determined by the release version (appcloud-131, cf-release-132, ...)
-    def release_name
-      "cf-release"
-    end
-
-    # TODO - support other release versions
-    def release_version
-      132
-    end
-
-    # TODO - support other deployment sizes
-    def deployment_size
-      "medium"
-    end
-
     def director_client
       director
-    end
-
-    def deployment_file
-      File.join(deployment_file_dir, "#{attrs.name}.yml")
-    end
-
-    def deployment_file_dir
-      File.expand_path("deployments/cf")
-    end
-
-    def deployment_cmd(options = {})
-      cmd ||= Bosh::Cli::Command::Deployment.new
-      options.each do |key, value|
-        cmd.add_option key.to_sym, value
-      end
-      cmd
-    end
-
-    def release_cmd(options = {})
-      cmd ||= Bosh::Cli::Command::Release.new
-      options.each do |key, value|
-        cmd.add_option key.to_sym, value
-      end
-      cmd
-    end
-
-    def biff
-      @biff_cmd ||= Bosh::Cli::Command::Biff.new
-    end
-
-    def biff_cmd(options = {})
-      options.each do |key, value|
-        biff.add_option key.to_sym, value
-      end
-      biff
     end
 
     def bosh_status
@@ -250,10 +156,6 @@ module Bosh::Cli::Command
         end
         @bosh_status
       end
-    end
-
-    def bosh_uuid
-      bosh_status["uuid"]
     end
 
     def bosh_cpi
