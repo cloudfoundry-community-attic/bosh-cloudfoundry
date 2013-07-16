@@ -4,7 +4,7 @@ director_uuid: UUID
 
 releases:
  - name: cf-release
-   version: 132
+   version: 133
 
 networks:
 - name: floating
@@ -14,14 +14,7 @@ networks:
   type: dynamic
   cloud_properties:
     security_groups:
-    - default
-
-update:
-  canaries: 1
-  canary_watch_time: 30000-600000
-  update_watch_time: 30000-600000
-  max_in_flight: 4
-  max_errors: 1
+    - cf
 
 compilation:
   workers: 6
@@ -30,85 +23,141 @@ compilation:
   cloud_properties:
     instance_type: m1.medium
 
+update:
+  canaries: 1
+  canary_watch_time: 30000-600000
+  update_watch_time: 30000-600000
+  max_in_flight: 4
+  max_errors: 1
+
 resource_pools:
   - name: small
     network: default
-    size: 2
+    size: 9
     stemcell:
       name: bosh-stemcell
       version: latest
     cloud_properties:
       instance_type: m1.small
 
-  - name: medium
+  - name: large
     network: default
-    size: 2
+    size: 1
     stemcell:
       name: bosh-stemcell
       version: latest
     cloud_properties:
-      instance_type: m1.medium
+      instance_type: m1.large
 
 jobs:
-  - name: core
+  - name: syslog_aggregator
     release: cf-release
-    template:
+    template: 
       - syslog_aggregator
-      - nats
-      - postgres
-      - health_manager_next
-      - collector
-      - debian_nfs_server
-      - login
     instances: 1
-    resource_pool: medium
-    persistent_disk: 4096
+    resource_pool: small
+    persistent_disk: 65536
     networks:
-    - name: default
-      default:
-      - dns
-      - gateway
+      - name: default
+        default: [dns, gateway]
+      
+  - name: postgres
+    release: cf-release
+    template: 
+      - postgres
+    instances: 1
+    resource_pool: small
+    persistent_disk: 65536
+    networks:
+      - name: default
+        default: [dns, gateway]
     properties:
       db: databases
 
-  # need a separate job for uaa due to https://github.com/cloudfoundry/cf-release/issues/104
-  - name: uaa
+  - name: nfs_server
     release: cf-release
     template:
+      - debian_nfs_server
+    instances: 1
+    resource_pool: small
+    persistent_disk: 65536
+    networks:
+      - name: default
+        default: [dns, gateway]            
+
+  - name: nats
+    release: cf-release
+    template: 
+      - nats
+    instances: 1
+    resource_pool: small
+    networks:
+      - name: default
+        default: [dns, gateway]            
+            
+  - name: uaa
+    release: cf-release
+    template: 
       - uaa
     instances: 1
     resource_pool: small
     networks:
       - name: default
-        default: [dns, gateway]
+        default: [dns, gateway]           
 
-  - name: api
+  - name: login
     release: cf-release
-    template:
-      - cloud_controller_ng
-      - gorouter
-    instances: 1
-    resource_pool: medium
-    networks:
-    - name: default
-      default:
-      - dns
-      - gateway
-    - name: floating
-      static_ips:
-      - 1.2.3.4
-    properties:
-      db: databases
-
-  - name: dea
-    release: cf-release
-    template:
-      - dea_next
+    template: 
+      - login
     instances: 1
     resource_pool: small
     networks:
       - name: default
         default: [dns, gateway]
+
+  - name: cloud_controller
+    release: cf-release
+    template: 
+      - cloud_controller_ng
+    instances: 1
+    resource_pool: small
+    networks:
+      - name: default
+        default: [dns, gateway]
+    properties:
+      ccdb: ccdb
+
+  - name: router
+    release: cf-release
+    template: 
+      - gorouter
+    instances: 1
+    resource_pool: small
+    networks:
+      - name: default
+        default: [dns, gateway]
+      - name: floating
+        static_ips:
+        - 1.2.3.4
+
+  - name: health_manager
+    release: cf-release
+    template: 
+      - health_manager_next
+    instances: 1
+    resource_pool: small
+    networks:
+      - name: default
+        default: [dns, gateway]
+       
+  - name: dea
+    release: cf-release
+    template: dea_next
+    instances: 1
+    resource_pool: large
+    networks:
+      - name: default
+        default: [dns, gateway]            
 
 properties:
   cf:
@@ -116,13 +165,13 @@ properties:
     dns: mycloud.com
     ip_addresses: ["1.2.3.4"]
     deployment_size: medium
-    security_group: default
+    security_group: cf
     persistent_disk: 4096
     common_password: qwertyasdfgh
 
   domain: mycloud.com
-  system_domain: mycloud.com.com
-  system_domain_organization: system_domain
+  system_domain: mycloud.com
+  system_domain_organization: mycloud.com
   app_domains:
     - mycloud.com
 
@@ -131,7 +180,7 @@ properties:
     management: default
 
   nats:
-    address: 0.core.default.demo.microbosh
+    address: 0.nats.default.demo.microbosh
     port: 4222
     user: nats
     password: qwertyasdfgh
@@ -146,19 +195,19 @@ properties:
 
   dea: &dea
     max_memory: 4096
-    memory_mb: 4084
+    memory_mb: 4096
     memory_overcommit_factor: 4
-    disk_mb: 4096
+    disk_mb: 16384
     disk_overcommit_factor: 4
 
   dea_next: *dea
 
   service_lifecycle:
     serialization_data_server:
-    - 0.core.default.demo.microbosh
+    - 169.254.1.1 
 
   syslog_aggregator:
-    address: 0.core.default.demo.microbosh
+    address: 0.syslog-aggregator.default.demo.microbosh
     port: 54321
 
   serialization_data_server:
@@ -167,23 +216,17 @@ properties:
     upload_token: qwertyasdfgh
     upload_timeout: 10
 
-  collector:
-    deployment_name: cf
-    use_tsdb: false
-    use_aws_cloudwatch: false
-    use_datadog: false
-
   nfs_server:
-    address: 0.core.default.demo.microbosh
-    #network: "*.demo.microbosh"
-    #idmapd_domain: mycloud.com
+    address: 0.nfs-server.default.demo.microbosh
+    # network: "*.demo.microbosh"
+    # idmapd_domain: mycloud.com
 
   debian_nfs_server:
     no_root_squash: true
 
   databases: &databases
     db_scheme: postgres
-    address: 0.core.default.demo.microbosh
+    address: 0.postgres.default.demo.microbosh
     port: 5524
     roles:
       - tag: admin
@@ -202,7 +245,7 @@ properties:
 
   ccdb: &ccdb
     db_scheme: postgres
-    address: 0.core.default.demo.microbosh
+    address: 0.postgres.default.demo.microbosh
     port: 5524
     roles:
       - tag: admin
@@ -217,7 +260,7 @@ properties:
 
   uaadb: 
     db_scheme: postgresql
-    address: 0.core.default.demo.microbosh
+    address: 0.postgres.default.demo.microbosh
     port: 5524
     roles:
       - tag: admin
