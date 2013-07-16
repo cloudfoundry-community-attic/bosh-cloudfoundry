@@ -4,7 +4,7 @@ director_uuid: UUID
 
 releases:
  - name: cf-release
-   version: 132
+   version: 133
 
 networks:
 - name: floating
@@ -50,16 +50,11 @@ resource_pools:
       instance_type: m1.medium
 
 jobs:
-  - name: core
+  - name: data
     release: cf-release
     template:
-      - syslog_aggregator
-      - nats
       - postgres
-      - health_manager_next
-      - collector
       - debian_nfs_server
-      - login
     instances: 1
     resource_pool: medium
     persistent_disk: 4096
@@ -87,6 +82,11 @@ jobs:
     template:
       - cloud_controller_ng
       - gorouter
+      - syslog_aggregator
+      - nats
+      - health_manager_next
+      - collector
+      - login
     instances: 1
     resource_pool: medium
     networks:

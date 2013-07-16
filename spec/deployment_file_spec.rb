@@ -16,7 +16,7 @@ describe Bosh::Cloudfoundry::DeploymentFile do
             "deployment_size" => "medium",
             "security_group" => "cf",
             "persistent_disk" => 4096,
-            "common_passwords" => "qwerty"
+            "common_passwords" => "qwertyasdfgh"
           })
         }
       }.to_yaml
@@ -36,17 +36,24 @@ describe Bosh::Cloudfoundry::DeploymentFile do
     deployment_file.release_version_number.should == 132
   end
 
+  # aws & openstack
+  # v132 & v133
+  # medium & large
+
   context "generates deployment (aws)" do
     let(:bosh_cpi) { "aws" }
     let(:bosh_status) { {"cpi" => bosh_cpi, "uuid" => "UUID"} }
+    let(:attributes) { {
+      name: "demo",
+      dns: "mycloud.com",
+      ip_addresses: ['1.2.3.4'],
+      common_password: "qwertyasdfgh",
+      deployment_size: "medium"
+    } }
     let(:release_version_cpi) { Bosh::Cloudfoundry::ReleaseVersionCpi.latest_for_cpi(bosh_cpi) }
     let(:release_version_cpi_medium) { Bosh::Cloudfoundry::ReleaseVersionCpiSize.new(release_version_cpi, "medium") }
     let(:deployment_attributes) do
-      Bosh::Cloudfoundry::DeploymentAttributes.new(mock("director"), bosh_status, release_version_cpi_medium, {
-        name: "demo",
-        dns: "mycloud.com",
-        ip_addresses: ['1.2.3.4']
-      })
+      Bosh::Cloudfoundry::DeploymentAttributes.new(mock("director"), bosh_status, release_version_cpi_medium, attributes)
     end
 
     subject { Bosh::Cloudfoundry::DeploymentFile.new(release_version_cpi_medium, deployment_attributes, bosh_status) }
@@ -61,11 +68,12 @@ describe Bosh::Cloudfoundry::DeploymentFile do
 
     it "medium size" do
       in_home_dir do
-        file = home_file("deployments/cf/demo.yml")
         subject.prepare_environment
+
         subject.create_deployment_file
+        files_match(spec_asset("v132/aws/medium.yml"), subject.deployment_file)
+
         subject.deploy(non_interactive: true)
-        manifest = YAML.load_file(file)
       end
     end
   # 
