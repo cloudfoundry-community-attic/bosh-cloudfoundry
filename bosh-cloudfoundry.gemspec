@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |spec|
   spec.name          = "bosh-cloudfoundry"
-  spec.version       = "0.7.0.alpha.3"
+  spec.version       = "0.7.0.alpha.4"
   spec.authors       = ["Dr Nic Williams"]
   spec.email         = ["drnicwilliams@gmail.com"]
   spec.description   = %q{Create & manage Cloud Foundry deployments}
