@@ -1,7 +1,7 @@
 describe Bosh::Cloudfoundry::DeploymentFile do
 
   def initial_deployment_file(properties = {})
-    FileUtils.mkdir_p("deployments/cf")
+    FileUtils.mkdir_p(home_file("deployments/cf"))
     file = home_file("deployments/cf/deployment.yml")
     File.open(file, "w") do |f|
       f << {
