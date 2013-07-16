@@ -27,7 +27,7 @@ describe Bosh::Cli::Command::CloudFoundry do
 
     context "director does not already have release" do
       it "upload release" do
-        release_yml = File.expand_path("../../bosh_release/releases/cf-release-132.yml", __FILE__)
+        release_yml = File.expand_path("../../bosh_release/releases/cf-release-133.yml", __FILE__)
         release_cmd = mock("release_cmd")
         release_cmd.should_receive(:upload).with(release_yml)
         command.stub(:release_cmd).and_return(release_cmd)
