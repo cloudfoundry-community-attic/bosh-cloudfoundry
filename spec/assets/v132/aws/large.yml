@@ -138,7 +138,7 @@ jobs:
         default: [dns, gateway]
       - name: floating
         static_ips:
-          - 75.55.102.226
+        - 1.2.3.4
 
   - name: health_manager
     release: cf-release

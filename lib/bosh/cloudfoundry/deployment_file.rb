@@ -67,6 +67,10 @@ module Bosh::Cloudfoundry
           biff_cmd(non_interactive: true).biff(template_file)
         end
       end
+    rescue Bosh::Cli::ValidationHalted
+      errors.each do |error|
+        say error.make_red
+      end
     end
 
     # Perform the create/update deployment described by this +DeploymentFile+

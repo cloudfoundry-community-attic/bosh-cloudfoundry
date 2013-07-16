@@ -173,7 +173,9 @@ jobs:
         default: [dns, gateway]
       - name: floating
         static_ips:
-          - 75.55.102.226
+        <%- ip_addresses.each do |ip| -%>
+        - <%= ip %>
+        <%- end -%>
 
   - name: health_manager
     release: cf-release
