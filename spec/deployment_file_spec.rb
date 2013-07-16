@@ -71,7 +71,7 @@ describe Bosh::Cloudfoundry::DeploymentFile do
         subject.prepare_environment
 
         subject.create_deployment_file
-        files_match(spec_asset("v132/aws/medium.yml"), subject.deployment_file)
+        files_match(spec_asset("v133/aws/medium.yml"), subject.deployment_file)
 
         subject.deploy(non_interactive: true)
       end
