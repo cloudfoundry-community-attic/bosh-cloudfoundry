@@ -1,5 +1,5 @@
 describe Bosh::Cloudfoundry::ReleaseVersionCpi do
-  subject { Bosh::Cloudfoundry::ReleaseVersionCpi.for_cpi(132, "aws") }
+  subject { Bosh::Cloudfoundry::ReleaseVersionCpi.for_cpi(133, "aws") }
 
   it "has available deployment sizes" do
     subject.available_deployment_sizes.should == %w[medium large]
@@ -12,6 +12,6 @@ describe Bosh::Cloudfoundry::ReleaseVersionCpi do
   it "latest_for_cpi(bosh_cpi)" do
     rvc = Bosh::Cloudfoundry::ReleaseVersionCpi.latest_for_cpi("aws")
     rvc.cpi.should == "aws"
-    rvc.release_version_number.should == 132
+    rvc.release_version_number.should == 133
   end
 end

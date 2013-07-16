@@ -4,7 +4,7 @@ director_uuid: UUID
 
 releases:
  - name: cf-release
-   version: 132
+   version: 133
 
 networks:
 - name: floating
@@ -33,7 +33,7 @@ compilation:
 resource_pools:
   - name: small
     network: default
-    size: 2
+    size: 3
     stemcell:
       name: bosh-stemcell
       version: latest
@@ -50,18 +50,13 @@ resource_pools:
       instance_type: m1.medium
 
 jobs:
-  - name: core
+  - name: data
     release: cf-release
     template:
-      - syslog_aggregator
-      - nats
       - postgres
-      - health_manager_next
-      - collector
       - debian_nfs_server
-      - login
     instances: 1
-    resource_pool: medium
+    resource_pool: small
     persistent_disk: 4096
     networks:
     - name: default
@@ -70,6 +65,22 @@ jobs:
       - gateway
     properties:
       db: databases
+
+  - name: core
+    release: cf-release
+    template:
+      - syslog_aggregator
+      - nats
+      - health_manager_next
+      - collector
+      - login
+    instances: 1
+    resource_pool: medium
+    networks:
+    - name: default
+      default:
+      - dns
+      - gateway
 
   # need a separate job for uaa due to https://github.com/cloudfoundry/cf-release/issues/104
   - name: uaa
@@ -174,7 +185,7 @@ properties:
     use_datadog: false
 
   nfs_server:
-    address: 0.core.default.demo.microbosh
+    address: 0.data.default.demo.microbosh
     #network: "*.demo.microbosh"
     #idmapd_domain: mycloud.com
 
@@ -183,7 +194,7 @@ properties:
 
   databases: &databases
     db_scheme: postgres
-    address: 0.core.default.demo.microbosh
+    address: 0.data.default.demo.microbosh
     port: 5524
     roles:
       - tag: admin
@@ -202,7 +213,7 @@ properties:
 
   ccdb: &ccdb
     db_scheme: postgres
-    address: 0.core.default.demo.microbosh
+    address: 0.data.default.demo.microbosh
     port: 5524
     roles:
       - tag: admin
@@ -217,7 +228,7 @@ properties:
 
   uaadb: 
     db_scheme: postgresql
-    address: 0.core.default.demo.microbosh
+    address: 0.data.default.demo.microbosh
     port: 5524
     roles:
       - tag: admin
