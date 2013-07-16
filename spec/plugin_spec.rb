@@ -52,7 +52,7 @@ describe Bosh::Cli::Command::CloudFoundry do
     context "validation failures" do
       before do
         director = instance_double("Bosh::Cli::Director")
-        director.should_receive(:get_status).and_return({"uuid" => "UUID", "cpi" => "aws"})
+        director.stub(:get_status).and_return({"uuid" => "UUID", "cpi" => "aws"})
         command.stub(:director_client).and_return(director)
       end
       it "requires --ip 1.2.3.4" do
