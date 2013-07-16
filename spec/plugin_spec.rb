@@ -1,5 +1,4 @@
 require "bosh/cli/commands/cf"
-require "fakeweb"
 
 describe Bosh::Cli::Command::CloudFoundry do
   include FileUtils
@@ -12,7 +11,6 @@ describe Bosh::Cli::Command::CloudFoundry do
   end
 
   before { setup_home_dir }
-  before { FakeWeb.allow_net_connect = false }
 
   it "shows help" do
     subject.cf_help
@@ -23,14 +21,23 @@ describe Bosh::Cli::Command::CloudFoundry do
       command.add_option(:config, home_file(".bosh_config"))
       command.add_option(:non_interactive, true)
       command.should_receive(:auth_required)
+
+      director = instance_double("Bosh::Cli::Director")
+      director.should_receive(:get_status).and_return({"uuid" => "UUID", "cpi" => "aws"})
+      command.stub(:director_client).and_return(director)
     end
 
     context "director does not already have release" do
       it "upload release" do
         release_yml = File.expand_path("../../bosh_release/releases/cf-release-133.yml", __FILE__)
-        release_cmd = mock("release_cmd")
+        release_cmd = instance_double("Bosh::Cli::Command::Release")
         release_cmd.should_receive(:upload).with(release_yml)
         command.stub(:release_cmd).and_return(release_cmd)
+
+        aws_full_stemcell_url = "http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/aws/latest-bosh-stemcell-aws.tgz"
+        stemcell_cmd = instance_double("Bosh::Cli::Command::Stemcell")
+        stemcell_cmd.should_receive(:upload).with(aws_full_stemcell_url)
+        command.stub(:stemcell_cmd).and_return(stemcell_cmd)
 
         command.prepare_cf
       end
@@ -42,16 +49,23 @@ describe Bosh::Cli::Command::CloudFoundry do
   end
 
   context "create cf" do
-    it "requires --ip 1.2.3.4" do
-      command.add_option(:dns, "mycloud.com")
-      command.add_option(:size, "xlarge")
-      expect { command.create_cf }.to raise_error(Bosh::Cli::CliError)
-    end
+    context "validation failures" do
+      before do
+        director = instance_double("Bosh::Cli::Director")
+        director.should_receive(:get_status).and_return({"uuid" => "UUID", "cpi" => "aws"})
+        command.stub(:director_client).and_return(director)
+      end
+      it "requires --ip 1.2.3.4" do
+        command.add_option(:dns, "mycloud.com")
+        command.add_option(:size, "xlarge")
+        expect { command.create_cf }.to raise_error(Bosh::Cli::CliError)
+      end
 
-    it "requires --dns" do
-      command.add_option(:ip, ["1.2.3.4"])
-      command.add_option(:size, "xlarge")
-      expect { command.create_cf }.to raise_error(Bosh::Cli::CliError)
+      it "requires --dns" do
+        command.add_option(:ip, ["1.2.3.4"])
+        command.add_option(:size, "xlarge")
+        expect { command.create_cf }.to raise_error(Bosh::Cli::CliError)
+      end
     end
 
     context "with requirements" do
@@ -65,7 +79,7 @@ describe Bosh::Cli::Command::CloudFoundry do
 
         command.should_receive(:auth_required)
 
-        director = mock("director_client")
+        director = instance_double("Bosh::Cli::Director")
         director.should_receive(:get_status).and_return({"uuid" => "UUID", "cpi" => "aws"})
         command.stub(:director_client).and_return(director)
 

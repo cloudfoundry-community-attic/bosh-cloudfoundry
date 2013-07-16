@@ -9,6 +9,8 @@ Bundler.setup(:default, :test)
 $:.unshift(File.expand_path("../../lib", __FILE__))
 
 require "rspec/core"
+require 'rspec/fire'
+
 require "tmpdir"
 
 # for the #sh helper
@@ -19,6 +21,13 @@ require "rake/file_utils"
 require "cli"
 
 require "bosh/cloudfoundry"
+
+require "fakeweb"
+FakeWeb.allow_net_connect = false
+
+RSpec.configure do |config|
+  config.include(RSpec::Fire)
+end
 
 # load all files in spec/support/* (but not lower down)
 Dir[File.dirname(__FILE__) + '/support/*'].each do |path|
