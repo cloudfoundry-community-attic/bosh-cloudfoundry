@@ -72,12 +72,11 @@ NOTE: By default, the `default` security group is used.
 You will be prompted to confirm that your chosen/default security group has ports `22`, `80`, `443` and `4222` open. To chose a different security group, use the `--security-group` option:
 
 ```
-$ bosh create redis --security-group cf-core
+$ bosh create cf --security-group cf-core
 ```
 
 * TODO - how to show available instance sizes
 * TODO - how to update Cloud Foundry servers to a different instance size/flavor
-* TODO - how to scale from a small deployment to a large deployment
 * TODO - how to update the persistent disks of the deployment
 
 ## Initializing Cloud Foundry
