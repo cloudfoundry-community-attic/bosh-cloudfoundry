@@ -18,7 +18,7 @@ The deployed Cloud Foundry does not include any data or messaging services for t
 
 ## Requirements
 
-You must use the same BOSH for deploying redis as you use to deploy Cloud Foundry (unless your DNS is configured to be shared across the two BOSH).
+You will also need an IP address, and a wildcard DNS A record that points to the IP address.
 
 It is also required that you have login access to the same BOSH being used to deploy your Cloud Foundry.
 
@@ -29,7 +29,14 @@ $ bosh status
 $ bosh deployments
 ```
 
-The former will confirm you are targeting a bosh. The latter will display the deployments. One of which should be your Cloud Foundry.
+The former will confirm you are targeting a BOSH. The latter will display the deployments. One of which should be your Cloud Foundry.
+
+To create your own BOSH on AWS or OpenStack:
+
+```
+$ gem install bosh-bootstrap
+$ bosh-bootstrap deploy
+```
 
 ## Installation
 
@@ -74,6 +81,22 @@ $ bosh create redis --security-group cf-core
 * TODO - how to update Cloud Foundry servers to a different instance size/flavor
 * TODO - how to scale from a small deployment to a large deployment
 * TODO - how to update the persistent disks of the deployment
+
+## Initializing Cloud Foundry
+
+Once Cloud Foundry is up and running, follow these steps to login (and discover your password) and create an initial organization and space:
+
+```
+$ cf target api.mycloud.com
+$ bosh show cf passwords
+Common password: 6d7fe84f828b
+$ cf login admin
+Password> 6d7fe84f828b
+
+$ cf create-org me
+$ cf create-space production
+$ cf switch-space production
+```
 
 ## Releasing new plugin gem versions
 
