@@ -21,16 +21,13 @@ The deployed Cloud Foundry does not include any data or messaging services for t
 
 You will also need an IP address, and a wildcard DNS A record that points to the IP address.
 
-It is also required that you have login access to the same BOSH being used to deploy your Cloud Foundry.
+It is also required that you have login access to a BOSH on AWS EC2 or OpenStack (please help with vSphere support).
 
 Confirm this by running:
 
 ```
 $ bosh status
-$ bosh deployments
 ```
-
-The former will confirm you are targeting a BOSH. The latter will display the deployments. One of which should be your Cloud Foundry.
 
 To create your own BOSH on AWS or OpenStack:
 
