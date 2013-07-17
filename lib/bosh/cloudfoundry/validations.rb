@@ -1,0 +1,1 @@
+require "bosh/cloudfoundry/validations/dns_ip_mapping_validation"

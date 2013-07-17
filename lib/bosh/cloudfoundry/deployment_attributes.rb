@@ -63,6 +63,25 @@ module Bosh::Cloudfoundry
       end
     end
 
+    # FIXME only supports a single ip_address
+    def validate_dns_mapping
+      validate_dns_a_record("api.#{dns}", ip_addresses.first)
+      validate_dns_a_record("demoapp.#{dns}", ip_addresses.first)
+    end
+
+    def validate_dns_a_record(domain, expected_ip_address)
+      dns_mapping = Bosh::Cloudfoundry::Validations::DnsIpMappingValidation.new(domain, expected_ip_address)
+      if dns_mapping.valid?
+        say "`#{dns_mapping.domain}' maps to #{dns_mapping.ip_address}".make_green
+      else
+        say "Validation errors:"
+        dns_mapping.errors.each do |error|
+          say "- %s" % [error]
+        end
+        err "`#{dns_mapping.domain}' does not map to #{dns_mapping.ip_address}"
+      end
+    end
+
     def format(attribute)
       value = attributes[attribute.to_sym].to_s
     end

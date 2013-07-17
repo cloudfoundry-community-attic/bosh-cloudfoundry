@@ -78,6 +78,7 @@ describe Bosh::Cli::Command::CloudFoundry do
         command.add_option(:common_password, "qwertyasdfgh")
 
         command.should_receive(:auth_required)
+        command.should_receive(:validate_dns_mapping)
 
         director = instance_double("Bosh::Cli::Director")
         director.should_receive(:get_status).and_return({"uuid" => "UUID", "cpi" => "aws"})
