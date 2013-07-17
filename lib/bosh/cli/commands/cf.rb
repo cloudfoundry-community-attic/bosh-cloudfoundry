@@ -77,6 +77,8 @@ module Bosh::Cli::Command
         attrs.validate(:deployment_size)
       end
 
+      validate_dns_mapping
+
       unless confirmed?("Security group #{attrs.validated_color(:security_group)} exists with ports #{attrs.required_ports.join(", ")}")
         cancel_deployment
       end
@@ -181,6 +183,10 @@ module Bosh::Cli::Command
         cmd.add_option key.to_sym, value
       end
       cmd
+    end
+
+    def validate_dns_mapping
+      attrs.validate_dns_mapping
     end
   end
 end
