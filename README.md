@@ -16,6 +16,50 @@ The deployed Cloud Foundry does not include any data or messaging services for t
 
 [![Build Status](https://travis-ci.org/cloudfoundry-community/bosh-cloudfoundry.png?branch=v0.7)](https://travis-ci.org/StarkAndWayne/bosh-cloudfoundry) [![Stories in Ready](http://badge.waffle.io/cloudfoundry-community/bosh-cloudfoundry.png)](http://waffle.io/cloudfoundry-community/bosh-cloudfoundry)
 
+## What gets created?
+
+The amount of resources used to run Cloud Foundry is determined by the `--deployment-size` you choose (defaults to medium) and the scale you grow it to over time.
+
+Currently there are two deployment sizes supported: medium & large.
+
+For a medium deployment the following VMs are created and have the following vitals after creation:
+
+```
+$ bosh create cf ... --deployment-size medium
+$ bosh vms --vitals
++-----------+---------+---------------+-------------------------------+-----------------------+------+------+------+----------------+------------+------------+------------+------------+
+| Job/index | State   | Resource Pool | IPs                           |         Load          | CPU  | CPU  | CPU  | Memory Usage   | Swap Usage | System     | Ephemeral  | Persistent |
+|           |         |               |                               | (avg01, avg05, avg15) | User | Sys  | Wait |                |            | Disk Usage | Disk Usage | Disk Usage |
++-----------+---------+---------------+-------------------------------+-----------------------+------+------+------+----------------+------------+------------+------------+------------+
+| api/0     | running | small         | 10.159.35.150, 54.225.102.129 | 0.06%, 0.08%, 0.13%   | 0.1% | 0.2% | 0.0% | 13.7% (227.8M) | 0.0% (0B)  | 49%        | 1%         | n/a        |
+| core/0    | running | small         | 10.118.153.76                 | 1.25%, 0.87%, 0.35%   | 0.0% | 0.0% | 0.1% | 23.6% (391.7M) | 0.0% (0B)  | 49%        | 1%         | n/a        |
+| data/0    | running | small         | 10.158.26.49                  | 0.02%, 0.02%, 0.07%   | 0.0% | 0.0% | 0.2% | 7.1% (118.9M)  | 0.0% (0B)  | 49%        | 1%         | 4%         |
+| dea/0     | running | small         | 10.235.53.185                 | 0.07%, 0.07%, 0.06%   | 0.1% | 0.2% | 0.0% | 19.2% (319.8M) | 0.0% (0B)  | 49%        | 2%         | n/a        |
+| uaa/0     | running | small         | 10.29.186.245                 | 0.09%, 0.10%, 0.08%   | 0.1% | 0.0% | 0.1% | 28.3% (469.7M) | 0.0% (0B)  | 49%        | 1%         | n/a        |
++-----------+---------+---------------+-------------------------------+-----------------------+------+------+------+----------------+------------+------------+------------+------------+
+```
+
+For a large deployment, all jobs (moving parts) of Cloud Foundry are isolated into their own VMs, and it includes a syslog aggregator:
+
+```
+$ bosh create cf ... --deployment-size large
+$ bosh vms --vitals
++---------------------+---------+---------------+------------------------------+-----------------------+------+------+-------+----------------+------------+------------+------------+------------+
+| Job/index           | State   | Resource Pool | IPs                          |         Load          | CPU  | CPU  | CPU   | Memory Usage   | Swap Usage | System     | Ephemeral  | Persistent |
+|                     |         |               |                              | (avg01, avg05, avg15) | User | Sys  | Wait  |                |            | Disk Usage | Disk Usage | Disk Usage |
++---------------------+---------+---------------+------------------------------+-----------------------+------+------+-------+----------------+------------+------------+------------+------------+
+| cloud_controller/0  | running | small         | 10.152.174.25                | 0.15%, 0.12%, 0.08%   | 0.0% | 0.0% | 0.3%  | 11.0% (183.2M) | 0.0% (0B)  | 49%        | 1%         | n/a        |
+| dea/0               | running | large         | 10.144.83.102                | 0.80%, 0.36%, 0.15%   | 0.0% | 0.0% | 0.0%  | 5.3% (400.5M)  | 0.0% (0B)  | 49%        | 1%         | n/a        |
+| health_manager/0    | running | small         | 10.147.214.194               | 0.07%, 0.12%, 0.13%   | 0.0% | 0.0% | 0.2%  | 7.1% (118.4M)  | 0.0% (0B)  | 49%        | 1%         | n/a        |
+| login/0             | running | small         | 10.144.157.79                | 0.06%, 0.27%, 0.17%   | 0.0% | 0.0% | 0.2%  | 18.9% (313.8M) | 0.0% (0B)  | 49%        | 1%         | n/a        |
+| nats/0              | running | small         | 10.152.188.72                | 0.04%, 0.14%, 0.13%   | 0.0% | 0.0% | 0.0%  | 5.9% (98.0M)   | 0.0% (0B)  | 49%        | 1%         | n/a        |
+| nfs_server/0        | running | small         | 10.164.22.218                | 0.03%, 0.09%, 0.09%   | 0.0% | 0.0% | 15.5% | 5.2% (87.8M)   | 0.0% (0B)  | 49%        | 1%         | 1%         |
+| postgres/0          | running | small         | 10.154.152.54                | 0.25%, 0.17%, 0.12%   | 0.0% | 0.1% | 0.1%  | 6.7% (111.2M)  | 0.0% (0B)  | 49%        | 1%         | 1%         |
+| router/0            | running | small         | 10.164.87.23, 54.225.102.129 | 0.04%, 0.09%, 0.07%   | 0.0% | 0.0% | 0.7%  | 5.6% (93.0M)   | 0.0% (0B)  | 49%        | 1%         | n/a        |
+| syslog_aggregator/0 | running | small         | 10.165.35.246                | 0.00%, 0.14%, 0.14%   | 0.0% | 0.0% | 0.8%  | 6.3% (105.0M)  | 0.0% (0B)  | 49%        | 1%         | 1%         |
+| uaa/0               | running | small         | 10.165.13.230                | 0.11%, 0.59%, 0.38%   | 0.0% | 0.0% | 0.0%  | 29.6% (491.4M) | 0.0% (0B)  | 49%        | 1%         | n/a        |
++---------------------+---------+---------------+------------------------------+-----------------------+------+------+-------+----------------+------------+------------+------------+------------+
+```
 
 ## Requirements
 
