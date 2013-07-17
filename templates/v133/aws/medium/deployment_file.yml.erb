@@ -68,7 +68,7 @@ compilation:
 resource_pools:
   - name: small
     network: default
-    size: 4
+    size: 5
     stemcell:
       name: bosh-stemcell
       version: latest
@@ -77,7 +77,7 @@ resource_pools:
 
   - name: medium
     network: default
-    size: 1
+    size: 0
     stemcell:
       name: bosh-stemcell
       version: latest
@@ -110,7 +110,7 @@ jobs:
       - collector
       - login
     instances: 1
-    resource_pool: medium
+    resource_pool: small
     networks:
     - name: default
       default:
