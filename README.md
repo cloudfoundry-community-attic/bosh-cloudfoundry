@@ -14,7 +14,8 @@ $ bosh delete cf
 
 The deployed Cloud Foundry does not include any data or messaging services for the user applications. These are available as add-ons coming soon.
 
-[![Build Status](https://travis-ci.org/StarkAndWayne/bosh-cloudfoundry.png?branch=v0.7)](https://travis-ci.org/StarkAndWayne/bosh-cloudfoundry)
+[![Build Status](https://travis-ci.org/cloudfoundry-community/bosh-cloudfoundry.png?branch=v0.7)](https://travis-ci.org/StarkAndWayne/bosh-cloudfoundry) [![Stories in Ready](http://badge.waffle.io/cloudfoundry-community/bosh-cloudfoundry.png)](http://waffle.io/cloudfoundry-community/bosh-cloudfoundry)
+
 
 ## Requirements
 
