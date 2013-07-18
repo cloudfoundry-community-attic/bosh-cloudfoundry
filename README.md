@@ -129,8 +129,10 @@ Once Cloud Foundry is up and running, follow these steps to login (and discover 
 
 ```
 $ cf target api.mycloud.com
-$ bosh show cf passwords
-Common password: 6d7fe84f828b
+$ bosh show cf properties
+...
+common_password: 6d7fe84f828b
+...
 $ cf login admin
 Password> 6d7fe84f828b
 
