@@ -62,12 +62,24 @@ module Bosh::Cloudfoundry
       release_version_cpi.immutable_attributes
     end
 
+    def mutable_attribute?(attribute)
+      mutable_attributes.include?(attribute.to_sym)
+    end
+
     def set_unless_nil(attribute, value)
       attributes[attribute.to_sym] = value if value
     end
 
     def set(attribute, value)
-      attributes[attribute.to_sym] = value if value
+      attributes[attribute.to_sym] = value
+    end
+
+    def set_mutable(attribute, value)
+      if mutable_attribute?(attribute)
+        attributes[attribute.to_sym] = value
+      else
+        false
+      end
     end
 
     def validate(attribute)
@@ -78,6 +90,12 @@ module Bosh::Cloudfoundry
         available_resources.include?(value)
       else
         true
+      end
+    end
+
+    def validate_deployment_size
+      step("Validating deployment size", "Available deployment sizes are #{available_deployment_sizes.join(', ')}", :fatal) do
+        validate(:deployment_size)
       end
     end
 

@@ -2,12 +2,13 @@
 
 This is a simple `bosh` CLI plugin to boot up Cloud Foundry and then grow and upgrade and maintain it. Initially runs on AWS or OpenStack via bosh.
 
-Example create/delete scenario:
+Example create/scale/delete scenario:
 
 ```
 $ bosh prepare cf
 $ bosh create cf --dns mycloud.com --public-ip 1.2.3.4
-
+...
+$ bosh change cf attributes persistent_disk=8192
 ...
 $ bosh delete cf
 ```
@@ -93,6 +94,8 @@ The `bosh_cli` gem is currently only available from S3, rather than RubyGem itse
 
 ## Usage
 
+### Create initial Cloud Foundry
+
 Each time you install the latest `bosh-cloudfoundry` gem you may want to re-upload the latest available Cloud Foundry bosh release to your bosh. If no newer release is available then nothing good nor bad will occur.
 
 ```
@@ -123,13 +126,13 @@ $ bosh create cf --security-group cf-core
 * TODO - how to update Cloud Foundry servers to a different instance size/flavor
 * TODO - how to update the persistent disks of the deployment
 
-## Initializing Cloud Foundry
+### Initializing Cloud Foundry
 
 Once Cloud Foundry is up and running, follow these steps to login (and discover your password) and create an initial organization and space:
 
 ```
 $ cf target api.mycloud.com
-$ bosh show cf properties
+$ bosh show cf attributes
 ...
 common_password: 6d7fe84f828b
 ...
@@ -140,6 +143,16 @@ $ cf create-org me
 $ cf create-space production
 $ cf switch-space production
 ```
+
+### Scaling Cloud Foundry
+
+If your persistent disks start filling up (monitor via `bosh vms --vitals`) then you can scale them up by running:
+
+```
+$ bosh change cf attributes persistent_disk=8192
+```
+
+The initial size of persistent disks is `4096` (4Gb).
 
 ## Releasing new plugin gem versions
 
