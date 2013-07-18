@@ -38,8 +38,8 @@ module Bosh::Cloudfoundry
     # name: NAME
     # director_uuid: 4ae3a0f0-70a5-4c0d-95f2-7fafaefe8b9e
     # releases:
-    #  - name: cf-release
-    #    version: 132
+    # - name: cf-release
+    #   version: 132
     # networks: {}
     # properties:
     #   cf:
@@ -111,8 +111,6 @@ module Bosh::Cloudfoundry
       end
       release_version = release["version"]
       release_version_cpi = ReleaseVersionCpi.new(release_version, bosh_cpi)
-      deployment_size = deployment_file["properties"]["deployment_size"]
-      release_version_cpi_size = ReleaseVersionCpiSize.new(release_version_cpi, deployment_size)
 
       attributes = deployment_file["properties"][properties_key]
       # convert string keys to symbol keys
@@ -120,6 +118,9 @@ module Bosh::Cloudfoundry
         k, v = key_value; mem[k.to_sym] = v; mem
       end
       deployment_attributes = DeploymentAttributes.new(director_client, bosh_status, release_version_cpi, attributes)
+
+      deployment_size = deployment_attributes.deployment_size
+      release_version_cpi_size = ReleaseVersionCpiSize.new(release_version_cpi, deployment_size)
 
       self.new(release_version_cpi_size, deployment_attributes, bosh_status)
     end
