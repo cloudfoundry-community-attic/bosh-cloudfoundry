@@ -113,9 +113,7 @@ describe Bosh::Cli::Command::CloudFoundry do
         deployment_file = instance_double("Bosh::Cloudfoundry::DeploymentFile")
         Bosh::Cloudfoundry::DeploymentFile.should_receive(:new).
           and_return(deployment_file)
-        deployment_file.should_receive(:prepare_environment)
-        deployment_file.should_receive(:create_deployment_file)
-        deployment_file.should_receive(:deploy)
+        deployment_file.should_receive(:perform)
 
         command.create_cf
       end
@@ -125,7 +123,7 @@ describe Bosh::Cli::Command::CloudFoundry do
   
   context "existing deployment" do
     before do
-      setup_deployment
+      @deployment_file_path = setup_deployment
 
       director.should_receive(:get_status).and_return({"uuid" => "UUID", "cpi" => "aws"})
       command.stub(:director_client).and_return(director)
@@ -136,11 +134,26 @@ describe Bosh::Cli::Command::CloudFoundry do
     end
 
     context "modifies attributes/properties and redeploys" do
+      let(:deployment_attributes) { instance_double("Bosh::Cloudfoundry::DeploymentAttributes")}
+      before do
+        deployment_file = instance_double("Bosh::Cloudfoundry::DeploymentFile")
+        Bosh::Cloudfoundry::DeploymentFile.should_receive(:new).
+          and_return(deployment_file)
+        deployment_file.should_receive(:deployment_attributes).and_return(deployment_attributes)
+        deployment_file.should_receive(:release_version_cpi_size)
+        deployment_file.should_receive(:perform)
+      end
+
       it "for single property" do
+        deployment_attributes.should_receive(:set).with("persistent_disk", "8192")
+
         command.change_cf_properties("persistent_disk=8192")
       end
 
       it "for multiple properties" do
+        deployment_attributes.should_receive(:set).with("persistent_disk", "8192")
+        deployment_attributes.should_receive(:set).with("security_group", "cf-core")
+
         command.change_cf_properties("persistent_disk=8192", "security_group=cf-core")
       end
     end

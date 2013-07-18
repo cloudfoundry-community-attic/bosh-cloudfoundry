@@ -88,11 +88,8 @@ module Bosh::Cli::Command
 
       raise Bosh::Cli::ValidationHalted unless errors.empty?
 
-      deployment_file = DeploymentFile.new(@release_version_cpi_size, attrs, bosh_status)
-      deployment_file.prepare_environment
-      deployment_file.create_deployment_file
-      deployment_file.deploy(options)
-
+      @deployment_file = DeploymentFile.new(@release_version_cpi_size, attrs, bosh_status)
+      perform_deploy(options)
     rescue Bosh::Cli::ValidationHalted
       errors.each do |error|
         say error.make_red
@@ -118,10 +115,17 @@ module Bosh::Cli::Command
 
     usage "change cf properties"
     desc "change deployment properties and perform bosh deploy"
-    def change_cf_properties(*key_value)
+    def change_cf_properties(*attribute_values)
       setup_deployment_attributes
       reconstruct_deployment_file
+      attribute_values.each do |attr_value|
+        attr_name, value = attr_value.split(/=/)
+        attrs.set(attr_name, value)
+      end
       
+      # TODO show validated attributes like "create cf"
+      # TODO validate attributes like "create cf"
+      perform_deploy(options)
     end
 
     protected
@@ -140,6 +144,10 @@ module Bosh::Cli::Command
       @deployment_file = DeploymentFile.reconstruct_from_deployment_file(deployment, director_client, bosh_status)
       @deployment_attributes = @deployment_file.deployment_attributes
       @release_version_cpi_size = @deployment_file.release_version_cpi_size
+    end
+
+    def perform_deploy(deploy_options={})
+      @deployment_file.perform(deploy_options)
     end
 
     def bosh_release_dir
