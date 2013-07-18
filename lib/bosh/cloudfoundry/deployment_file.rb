@@ -57,10 +57,10 @@ module Bosh::Cloudfoundry
           file << {
             "name" => deployment_attributes.name,
             "director_uuid" => bosh_uuid,
-            "releases" => {
+            "releases" => [{
               "name" => release_name,
               "version" => release_version_number
-            },
+            }],
             "networks" => {},
             "properties" => {
               self.class.properties_key => deployment_attributes.attributes_with_string_keys
