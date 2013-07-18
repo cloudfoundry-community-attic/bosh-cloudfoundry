@@ -33,7 +33,7 @@ module Bosh::Cloudfoundry
     end
 
     def spec
-      YAML.load_file(spec_path)
+      @spec ||= YAML.load_file(spec_path)
     end
 
     def available_deployment_sizes
@@ -50,6 +50,16 @@ module Bosh::Cloudfoundry
 
     def release_version_number
       release_version.version_number
+    end
+
+    # Attributes & their values that can be changed via setters & deployment re-deployed successfully
+    def mutable_attributes
+      release_version.mutable_attributes
+    end
+
+    # Attributes & their values that are not to be changed over time
+    def immutable_attributes
+      release_version.immutable_attributes
     end
   end
 end

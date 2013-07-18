@@ -3,6 +3,9 @@ module Bosh; module Cloudfoundry; end; end
 require "cli/core_ext"
 require "cli/validation"
 
+# For SecureRandom.hex
+require "securerandom"
+
 require "bosh/cloudfoundry/release_version"
 require "bosh/cloudfoundry/release_version_cpi"
 require "bosh/cloudfoundry/release_version_cpi_size"

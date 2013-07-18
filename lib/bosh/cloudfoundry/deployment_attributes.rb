@@ -6,12 +6,12 @@ module Bosh::Cloudfoundry
     include Bosh::Cli::Validation
 
     attr_reader :attributes
-    attr_reader :released_version_cpi
+    attr_reader :release_version_cpi
 
-    def initialize(director_client, bosh_status, released_version_cpi, attributes = {})
+    def initialize(director_client, bosh_status, release_version_cpi, attributes = {})
       @director_client = director_client
       @bosh_status = bosh_status
-      @released_version_cpi = released_version_cpi
+      @release_version_cpi = release_version_cpi
       @attributes = attributes
       @attributes[:name] ||= default_name
       @attributes[:deployment_size] ||= default_deployment_size
@@ -36,12 +36,30 @@ module Bosh::Cloudfoundry
       @attributes[:security_group]
     end
 
+    def common_password
+      @attributes[:common_password]
+    end
+
     def ip_addresses
       @attributes[:ip_addresses]
     end
 
     def dns
       @attributes[:dns]
+    end
+
+    def available_attributes
+      @attributes.keys
+    end
+
+    # Attributes & their values that can be changed via setters & deployment re-deployed successfully
+    def mutable_attributes
+      release_version_cpi.mutable_attributes
+    end
+
+    # Attributes & their values that are not to be changed over time
+    def immutable_attributes
+      release_version_cpi.immutable_attributes
     end
 
     def set_unless_nil(attribute, value)
@@ -95,18 +113,18 @@ module Bosh::Cloudfoundry
     # TODO move these validations into a "ValidatedSize" class or similar
     def available_resources
       @available_resources ||= begin
-        resources = released_version_cpi.spec["resources"]
+        resources = release_version_cpi.spec["resources"]
         if resources && resources.is_a?(Array) && resources.first.is_a?(String)
           resources
         else
-          err "template spec needs 'resources' key with list of resource pool names available; found #{released_version_cpi.spec.inspect}"
+          err "template spec needs 'resources' key with list of resource pool names available; found #{release_version_cpi.spec.inspect}"
         end
       end
     end
 
     def available_deployment_sizes
       @available_deployment_sizes ||= begin
-        deployment_sizes = released_version_cpi.spec["deployment_sizes"]
+        deployment_sizes = release_version_cpi.spec["deployment_sizes"]
         if deployment_sizes && deployment_sizes.is_a?(Array) && deployment_sizes.first.is_a?(String)
           deployment_sizes
         else

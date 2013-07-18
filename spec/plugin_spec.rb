@@ -98,11 +98,11 @@ describe Bosh::Cli::Command::CloudFoundry do
 
     end
 
-    it "displays the list of internal passwords" do
+    it "displays the list of attributes/properties" do
       command.add_option(:config, home_file(".bosh_config"))
       command.add_option(:non_interactive, true)
 
-      director = mock("director_client")
+      director = instance_double("Bosh::Cli::Director")
       director.should_receive(:get_status).and_return({"uuid" => "UUID", "cpi" => "aws"})
       command.stub(:director_client).and_return(director)
 
@@ -114,12 +114,20 @@ describe Bosh::Cli::Command::CloudFoundry do
           ],
           "properties" => {
             "cf" => {
-              "common_passwords" => "qwerty"
+              # immutable attributes (determined via ReleaseVersion via templates/vXYZ/spec)
+              "name" => "demo",
+              "deployment_size" => "medium",
+              "dns" => "mycloud.com",
+              "common_password" => "qwerty",
+              # mutable attributes (determined via ReleaseVersion via templates/vXYZ/spec)
+              "ip_addresses" => ["1.2.3.4"],
+              "persistent_disk" => 4096,
+              "security_group" => "cf"
             }
           }
         }.to_yaml
       end
-      command.show_cf_passwords
+      command.show_cf_properties
     end
   end
 

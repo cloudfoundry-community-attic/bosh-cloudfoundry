@@ -99,13 +99,21 @@ module Bosh::Cli::Command
       end
     end
 
-    usage "show cf passwords"
-    desc "display the internal passwords for deployment"
-    def show_cf_passwords
-
+    usage "show cf properties"
+    desc "display the deployment properties, indicate which are changable"
+    def show_cf_properties
       setup_deployment_attributes
       reconstruct_deployment_file
-      say "Common password: #{attrs.validated_color(:common_password)}"
+      nl
+      say "Immutable properties:"
+      attrs.immutable_attributes.each do |attr_name|
+        say "#{attr_name}: #{attrs.validated_color(attr_name.to_sym)}"
+      end
+      nl
+      say "Mutable (changable) properties:"
+      attrs.mutable_attributes.each do |attr_name|
+        say "#{attr_name}: #{attrs.validated_color(attr_name.to_sym)}"
+      end
     end
 
     protected
