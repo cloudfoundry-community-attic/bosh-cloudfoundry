@@ -4,13 +4,18 @@ describe Bosh::Cli::Command::CloudFoundry do
   include FileUtils
 
   let(:command) { Bosh::Cli::Command::CloudFoundry.new }
+  let(:director) { instance_double("Bosh::Cli::Director") }
 
   before(:all) do
     # Let us have pretty access to all protected methods which are protected from the bosh_cli plugin system.
     Bosh::Cli::Command::CloudFoundry.send(:public, *Bosh::Cli::Command::CloudFoundry.protected_instance_methods)
   end
 
-  before { setup_home_dir }
+  before do
+    setup_home_dir
+    command.add_option(:config, home_file(".bosh_config"))
+    command.add_option(:non_interactive, true)
+  end
 
   it "shows help" do
     subject.cf_help
@@ -18,11 +23,8 @@ describe Bosh::Cli::Command::CloudFoundry do
 
   context "prepare cf" do
     before do
-      command.add_option(:config, home_file(".bosh_config"))
-      command.add_option(:non_interactive, true)
       command.should_receive(:auth_required)
 
-      director = instance_double("Bosh::Cli::Director")
       director.should_receive(:get_status).and_return({"uuid" => "UUID", "cpi" => "aws"})
       command.stub(:director_client).and_return(director)
     end
@@ -51,7 +53,6 @@ describe Bosh::Cli::Command::CloudFoundry do
   context "create cf" do
     context "validation failures" do
       before do
-        director = instance_double("Bosh::Cli::Director")
         director.stub(:get_status).and_return({"uuid" => "UUID", "cpi" => "aws"})
         command.stub(:director_client).and_return(director)
       end
@@ -70,8 +71,6 @@ describe Bosh::Cli::Command::CloudFoundry do
 
     context "with requirements" do
       it "creates cf deployment" do
-        command.add_option(:config, home_file(".bosh_config"))
-        command.add_option(:non_interactive, true)
         command.add_option(:name, "demo")
         command.add_option(:ip, ["1.2.3.4"])
         command.add_option(:dns, "mycloud.com")
@@ -99,10 +98,6 @@ describe Bosh::Cli::Command::CloudFoundry do
     end
 
     it "displays the list of attributes/properties" do
-      command.add_option(:config, home_file(".bosh_config"))
-      command.add_option(:non_interactive, true)
-
-      director = instance_double("Bosh::Cli::Director")
       director.should_receive(:get_status).and_return({"uuid" => "UUID", "cpi" => "aws"})
       command.stub(:director_client).and_return(director)
 
@@ -130,5 +125,4 @@ describe Bosh::Cli::Command::CloudFoundry do
       command.show_cf_properties
     end
   end
-
 end
