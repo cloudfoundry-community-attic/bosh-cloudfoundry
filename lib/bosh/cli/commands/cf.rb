@@ -122,6 +122,7 @@ module Bosh::Cli::Command
 
       # TODO fail if setting immutable attributes
       attribute_values.each do |attr_value|
+        # FIXME check that correct format of input: xyz=123 and give feedback
         attr_name, value = attr_value.split(/=/)
         previous_value = attrs.validated_color(attr_name)
         step("Checking '#{attr_name}' is a valid mutable attribute",
