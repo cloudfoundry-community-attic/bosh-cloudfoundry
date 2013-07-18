@@ -19,6 +19,12 @@ module Bosh::Cloudfoundry
       @bosh_status = bosh_status
     end
 
+    def perform(deploy_options={})
+      prepare_environment
+      create_deployment_file
+      deploy(deploy_options)
+    end
+
     def prepare_environment
       step("Checking/creating #{deployment_file_dir} for deployment files",
            "Failed to create #{deployment_file_dir} for deployment files", :fatal) do

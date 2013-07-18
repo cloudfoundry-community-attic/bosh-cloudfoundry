@@ -73,11 +73,7 @@ module Bosh::Cli::Command
       say "Security group: #{attrs.validated_color(:security_group)}"
       nl
 
-      step("Validating deployment size", "Available deployment sizes are #{attrs.available_deployment_sizes.join(', ')}", :fatal) do
-        attrs.validate(:deployment_size)
-      end
-
-      validate_dns_mapping
+      validate_deployment_attributes
 
       unless confirmed?("Security group #{attrs.validated_color(:security_group)} exists with ports #{attrs.required_ports.join(", ")}")
         cancel_deployment
@@ -88,32 +84,62 @@ module Bosh::Cli::Command
 
       raise Bosh::Cli::ValidationHalted unless errors.empty?
 
-      deployment_file = DeploymentFile.new(@release_version_cpi_size, attrs, bosh_status)
-      deployment_file.prepare_environment
-      deployment_file.create_deployment_file
-      deployment_file.deploy(options)
+      @deployment_file = DeploymentFile.new(@release_version_cpi_size, attrs, bosh_status)
+      perform_deploy(options)
+    rescue Bosh::Cli::ValidationHalted
+      errors.each do |error|
+        say error.make_red
+      end
+      exit 1
+    end
+
+    usage "show cf attributes"
+    desc "display the deployment attributes, indicate which are changable"
+    def show_cf_attributes
+      setup_deployment_attributes
+      reconstruct_deployment_file
+      nl
+      say "Immutable attributes:"
+      attrs.immutable_attributes.each do |attr_name|
+        say "#{attr_name}: #{attrs.validated_color(attr_name.to_sym)}"
+      end
+      nl
+      say "Mutable (changable) attributes:"
+      attrs.mutable_attributes.each do |attr_name|
+        say "#{attr_name}: #{attrs.validated_color(attr_name.to_sym)}"
+      end
+    end
+
+    usage "change cf attributes"
+    desc "change deployment attributes and perform bosh deploy"
+    def change_cf_attributes(*attribute_values)
+      setup_deployment_attributes
+      reconstruct_deployment_file
+
+      # TODO fail if setting immutable attributes
+      attribute_values.each do |attr_value|
+        # FIXME check that correct format of input: xyz=123 and give feedback
+        attr_name, value = attr_value.split(/=/)
+        previous_value = attrs.validated_color(attr_name)
+        step("Checking '#{attr_name}' is a valid mutable attribute",
+             "Attribute '#{attr_name}' is not a valid mutable attribute (see 'bosh show cf attributes')", :non_fatal) do
+          attrs.mutable_attribute?(attr_name)
+        end
+        attrs.set_mutable(attr_name, value)
+      end
+
+      validate_deployment_attributes
+      # TODO show validated attributes like "create cf"
+
+      raise Bosh::Cli::ValidationHalted unless errors.empty?
+
+      perform_deploy(options)
 
     rescue Bosh::Cli::ValidationHalted
       errors.each do |error|
         say error.make_red
       end
-    end
-
-    usage "show cf properties"
-    desc "display the deployment properties, indicate which are changable"
-    def show_cf_properties
-      setup_deployment_attributes
-      reconstruct_deployment_file
-      nl
-      say "Immutable properties:"
-      attrs.immutable_attributes.each do |attr_name|
-        say "#{attr_name}: #{attrs.validated_color(attr_name.to_sym)}"
-      end
-      nl
-      say "Mutable (changable) properties:"
-      attrs.mutable_attributes.each do |attr_name|
-        say "#{attr_name}: #{attrs.validated_color(attr_name.to_sym)}"
-      end
+      exit 1
     end
 
     protected
@@ -132,6 +158,10 @@ module Bosh::Cli::Command
       @deployment_file = DeploymentFile.reconstruct_from_deployment_file(deployment, director_client, bosh_status)
       @deployment_attributes = @deployment_file.deployment_attributes
       @release_version_cpi_size = @deployment_file.release_version_cpi_size
+    end
+
+    def perform_deploy(deploy_options={})
+      @deployment_file.perform(deploy_options)
     end
 
     def bosh_release_dir
@@ -193,8 +223,10 @@ module Bosh::Cli::Command
       cmd
     end
 
-    def validate_dns_mapping
+    def validate_deployment_attributes
+      attrs.validate_deployment_size
       attrs.validate_dns_mapping
     end
+
   end
 end
