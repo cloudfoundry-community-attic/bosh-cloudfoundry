@@ -144,6 +144,8 @@ describe Bosh::Cli::Command::CloudFoundry do
         deployment_file.should_receive(:perform)
 
         command.should_receive(:validate_deployment_attributes)
+
+        deployment_attributes.stub(:mutable_attributes).and_return([:persistent_disk, :security_group])
       end
 
       it "for single property" do

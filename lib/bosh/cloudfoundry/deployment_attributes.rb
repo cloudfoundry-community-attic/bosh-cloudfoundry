@@ -54,12 +54,12 @@ module Bosh::Cloudfoundry
 
     # Attributes & their values that can be changed via setters & deployment re-deployed successfully
     def mutable_attributes
-      release_version_cpi.mutable_attributes
+      release_version_cpi.mutable_attributes.map(&:to_sym)
     end
 
     # Attributes & their values that are not to be changed over time
     def immutable_attributes
-      release_version_cpi.immutable_attributes
+      release_version_cpi.immutable_attributes.map(&:to_sym)
     end
 
     def mutable_attribute?(attribute)
