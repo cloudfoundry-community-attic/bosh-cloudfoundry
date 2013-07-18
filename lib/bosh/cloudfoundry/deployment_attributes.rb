@@ -48,6 +48,20 @@ module Bosh::Cloudfoundry
       @attributes[:dns]
     end
 
+    def available_attributes
+      @attributes.keys
+    end
+
+    # Attributes & their values that can be changed via setters & deployment re-deployed successfully
+    def mutable_attributes
+      release_version_cpi.mutable_attributes
+    end
+
+    # Attributes & their values that are not to be changed over time
+    def immutable_attributes
+      release_version_cpi.immutable_attributes
+    end
+
     def set_unless_nil(attribute, value)
       attributes[attribute.to_sym] = value if value
     end
