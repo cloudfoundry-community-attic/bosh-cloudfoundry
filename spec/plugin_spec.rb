@@ -6,6 +6,32 @@ describe Bosh::Cli::Command::CloudFoundry do
   let(:command) { Bosh::Cli::Command::CloudFoundry.new }
   let(:director) { instance_double("Bosh::Cli::Director") }
 
+  def setup_deployment
+    deployment_file = home_file("deployment.yml")
+    command.stub(:deployment).and_return(deployment_file)
+    File.open(deployment_file, "w") do |f|
+      f << {
+        "releases" => [
+          {"name" => "cf-release", "version" => 132}
+        ],
+        "properties" => {
+          "cf" => {
+            # immutable attributes (determined via ReleaseVersion via templates/vXYZ/spec)
+            "name" => "demo",
+            "deployment_size" => "medium",
+            "dns" => "mycloud.com",
+            "common_password" => "qwerty",
+            # mutable attributes (determined via ReleaseVersion via templates/vXYZ/spec)
+            "ip_addresses" => ["1.2.3.4"],
+            "persistent_disk" => 4096,
+            "security_group" => "cf"
+          }
+        }
+      }.to_yaml
+    end
+    deployment_file
+  end
+
   before(:all) do
     # Let us have pretty access to all protected methods which are protected from the bosh_cli plugin system.
     Bosh::Cli::Command::CloudFoundry.send(:public, *Bosh::Cli::Command::CloudFoundry.protected_instance_methods)
@@ -79,13 +105,12 @@ describe Bosh::Cli::Command::CloudFoundry do
         command.should_receive(:auth_required)
         command.should_receive(:validate_dns_mapping)
 
-        director = instance_double("Bosh::Cli::Director")
         director.should_receive(:get_status).and_return({"uuid" => "UUID", "cpi" => "aws"})
         command.stub(:director_client).and_return(director)
 
         command.stub(:deployment).and_return(home_file("deployments/cf/demo.yml"))
 
-        deployment_file = mock("deployment_file")
+        deployment_file = instance_double("Bosh::Cloudfoundry::DeploymentFile")
         Bosh::Cloudfoundry::DeploymentFile.should_receive(:new).
           and_return(deployment_file)
         deployment_file.should_receive(:prepare_environment)
@@ -96,33 +121,28 @@ describe Bosh::Cli::Command::CloudFoundry do
       end
 
     end
+  end
+  
+  context "existing deployment" do
+    before do
+      setup_deployment
 
-    it "displays the list of attributes/properties" do
       director.should_receive(:get_status).and_return({"uuid" => "UUID", "cpi" => "aws"})
       command.stub(:director_client).and_return(director)
+    end
 
-      command.stub(:deployment).and_return(home_file("deployment.yml"))
-      File.open(home_file("deployment.yml"), "w") do |f|
-        f << {
-          "releases" => [
-            {"name" => "cf-release", "version" => 132}
-          ],
-          "properties" => {
-            "cf" => {
-              # immutable attributes (determined via ReleaseVersion via templates/vXYZ/spec)
-              "name" => "demo",
-              "deployment_size" => "medium",
-              "dns" => "mycloud.com",
-              "common_password" => "qwerty",
-              # mutable attributes (determined via ReleaseVersion via templates/vXYZ/spec)
-              "ip_addresses" => ["1.2.3.4"],
-              "persistent_disk" => 4096,
-              "security_group" => "cf"
-            }
-          }
-        }.to_yaml
-      end
+    it "displays the list of attributes/properties" do
       command.show_cf_properties
+    end
+
+    context "modifies attributes/properties and redeploys" do
+      it "for single property" do
+        command.change_cf_properties("persistent_disk=8192")
+      end
+
+      it "for multiple properties" do
+        command.change_cf_properties("persistent_disk=8192", "security_group=cf-core")
+      end
     end
   end
 end

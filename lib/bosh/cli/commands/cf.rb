@@ -116,6 +116,14 @@ module Bosh::Cli::Command
       end
     end
 
+    usage "change cf properties"
+    desc "change deployment properties and perform bosh deploy"
+    def change_cf_properties(*key_value)
+      setup_deployment_attributes
+      reconstruct_deployment_file
+      
+    end
+
     protected
     def setup_deployment_attributes
       @release_version_cpi = ReleaseVersionCpi.latest_for_cpi(bosh_cpi)
