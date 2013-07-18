@@ -73,10 +73,7 @@ module Bosh::Cli::Command
       say "Security group: #{attrs.validated_color(:security_group)}"
       nl
 
-      step("Validating deployment size", "Available deployment sizes are #{attrs.available_deployment_sizes.join(', ')}", :fatal) do
-        attrs.validate(:deployment_size)
-      end
-
+      validate_deployment_size
       validate_dns_mapping
 
       unless confirmed?("Security group #{attrs.validated_color(:security_group)} exists with ports #{attrs.required_ports.join(", ")}")
@@ -224,6 +221,10 @@ module Bosh::Cli::Command
         cmd.add_option key.to_sym, value
       end
       cmd
+    end
+
+    def validate_deployment_size
+      attrs.validate_deployment_size
     end
 
     def validate_dns_mapping

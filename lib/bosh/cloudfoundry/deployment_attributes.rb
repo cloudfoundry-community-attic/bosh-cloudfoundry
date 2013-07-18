@@ -93,6 +93,12 @@ module Bosh::Cloudfoundry
       end
     end
 
+    def validate_deployment_size
+      step("Validating deployment size", "Available deployment sizes are #{available_deployment_sizes.join(', ')}", :fatal) do
+        validate(:deployment_size)
+      end
+    end
+
     # FIXME only supports a single ip_address
     def validate_dns_mapping
       validate_dns_a_record("api.#{dns}", ip_addresses.first)
