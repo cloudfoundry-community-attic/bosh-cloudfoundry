@@ -130,7 +130,7 @@ describe Bosh::Cli::Command::CloudFoundry do
     end
 
     it "displays the list of attributes/properties" do
-      command.show_cf_properties
+      command.show_cf_attributes
     end
 
     context "modifies attributes/properties and redeploys" do
@@ -149,7 +149,7 @@ describe Bosh::Cli::Command::CloudFoundry do
         deployment_attributes.should_receive(:mutable_attribute?).with("persistent_disk").and_return(true)
         deployment_attributes.should_receive(:set_mutable).with("persistent_disk", "8192")
 
-        command.change_cf_properties("persistent_disk=8192")
+        command.change_cf_attributes("persistent_disk=8192")
       end
 
       it "for multiple properties" do
@@ -160,7 +160,7 @@ describe Bosh::Cli::Command::CloudFoundry do
         deployment_attributes.should_receive(:set_mutable).with("persistent_disk", "8192")
         deployment_attributes.should_receive(:set_mutable).with("security_group", "cf-core")
 
-        command.change_cf_properties("persistent_disk=8192", "security_group=cf-core")
+        command.change_cf_attributes("persistent_disk=8192", "security_group=cf-core")
       end
     end
   end

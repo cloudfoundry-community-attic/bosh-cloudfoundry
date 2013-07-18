@@ -97,26 +97,26 @@ module Bosh::Cli::Command
       exit 1
     end
 
-    usage "show cf properties"
-    desc "display the deployment properties, indicate which are changable"
-    def show_cf_properties
+    usage "show cf attributes"
+    desc "display the deployment attributes, indicate which are changable"
+    def show_cf_attributes
       setup_deployment_attributes
       reconstruct_deployment_file
       nl
-      say "Immutable properties:"
+      say "Immutable attributes:"
       attrs.immutable_attributes.each do |attr_name|
         say "#{attr_name}: #{attrs.validated_color(attr_name.to_sym)}"
       end
       nl
-      say "Mutable (changable) properties:"
+      say "Mutable (changable) attributes:"
       attrs.mutable_attributes.each do |attr_name|
         say "#{attr_name}: #{attrs.validated_color(attr_name.to_sym)}"
       end
     end
 
-    usage "change cf properties"
-    desc "change deployment properties and perform bosh deploy"
-    def change_cf_properties(*attribute_values)
+    usage "change cf attributes"
+    desc "change deployment attributes and perform bosh deploy"
+    def change_cf_attributes(*attribute_values)
       setup_deployment_attributes
       reconstruct_deployment_file
 
@@ -125,7 +125,7 @@ module Bosh::Cli::Command
         attr_name, value = attr_value.split(/=/)
         previous_value = attrs.validated_color(attr_name)
         step("Checking '#{attr_name}' is a valid mutable attribute",
-             "Attribute '#{attr_name}' is not a valid mutable attribute (see 'bosh show cf properties')", :non_fatal) do
+             "Attribute '#{attr_name}' is not a valid mutable attribute (see 'bosh show cf attributes')", :non_fatal) do
           attrs.mutable_attribute?(attr_name)
         end
         attrs.set_mutable(attr_name, value)
