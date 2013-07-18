@@ -145,14 +145,20 @@ describe Bosh::Cli::Command::CloudFoundry do
       end
 
       it "for single property" do
-        deployment_attributes.should_receive(:set).with("persistent_disk", "8192")
+        deployment_attributes.should_receive(:validated_color).with("persistent_disk")
+        deployment_attributes.should_receive(:mutable_attribute?).with("persistent_disk").and_return(true)
+        deployment_attributes.should_receive(:set_mutable).with("persistent_disk", "8192")
 
         command.change_cf_properties("persistent_disk=8192")
       end
 
       it "for multiple properties" do
-        deployment_attributes.should_receive(:set).with("persistent_disk", "8192")
-        deployment_attributes.should_receive(:set).with("security_group", "cf-core")
+        deployment_attributes.should_receive(:validated_color).with("persistent_disk")
+        deployment_attributes.should_receive(:validated_color).with("security_group")
+        deployment_attributes.should_receive(:mutable_attribute?).with("persistent_disk").and_return(true)
+        deployment_attributes.should_receive(:mutable_attribute?).with("security_group").and_return(true)
+        deployment_attributes.should_receive(:set_mutable).with("persistent_disk", "8192")
+        deployment_attributes.should_receive(:set_mutable).with("security_group", "cf-core")
 
         command.change_cf_properties("persistent_disk=8192", "security_group=cf-core")
       end

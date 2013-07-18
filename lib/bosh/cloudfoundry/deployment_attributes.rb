@@ -62,11 +62,19 @@ module Bosh::Cloudfoundry
       release_version_cpi.immutable_attributes
     end
 
+    def mutable_attribute?(attribute)
+      mutable_attributes.include?(attribute.to_sym)
+    end
+
     def set_unless_nil(attribute, value)
       attributes[attribute.to_sym] = value if value
     end
 
     def set(attribute, value)
+      attributes[attribute.to_sym] = value if value
+    end
+
+    def set_mutable(attribute, value)
       attributes[attribute.to_sym] = value if value
     end
 

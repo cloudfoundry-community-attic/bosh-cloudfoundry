@@ -38,14 +38,28 @@ describe Bosh::Cloudfoundry::DeploymentAttributes do
       subject.immutable_attributes.should == immutable_attributes
     end
 
-    # mutable_attributes ultimately determined by ReleaseVersion (from templates/vXYZ/spec)
-    it "mutable_attributes derived from release_version[_cpi]" do
-      mutable_attributes = %w[ip_addresses persistent_disk security_group].map(&:to_sym)
-      release_version_cpi.should_receive(:mutable_attributes).and_return(mutable_attributes)
-      subject = Bosh::Cloudfoundry::DeploymentAttributes.new(director, bosh_status, release_version_cpi, {
-        dns: "mycloud.com", ip_addresses: ["1.2.3.4"]
-      })
-      subject.mutable_attributes.should == mutable_attributes
+    context "mutable attributes" do
+      let(:mutable_attributes) { %w[ip_addresses persistent_disk security_group].map(&:to_sym) }
+      before { release_version_cpi.should_receive(:mutable_attributes).and_return(mutable_attributes) }
+
+      subject do
+        Bosh::Cloudfoundry::DeploymentAttributes.new(director, bosh_status, release_version_cpi, {
+          dns: "mycloud.com", ip_addresses: ["1.2.3.4"]
+        })
+      end
+
+      # mutable_attributes ultimately determined by ReleaseVersion (from templates/vXYZ/spec)
+      it "mutable_attributes derived from release_version[_cpi]" do
+        subject.mutable_attributes.should == mutable_attributes
+      end
+
+      it "mutable_attribute? is true for mutable attributes" do
+        subject.should be_mutable_attribute("persistent_disk")
+      end
+
+      it "mutable_attribute? is false for immutable attributes" do
+        subject.should_not be_mutable_attribute("name")
+      end
     end
   end
 end

@@ -94,6 +94,7 @@ module Bosh::Cli::Command
       errors.each do |error|
         say error.make_red
       end
+      exit 1
     end
 
     usage "show cf properties"
@@ -118,14 +119,29 @@ module Bosh::Cli::Command
     def change_cf_properties(*attribute_values)
       setup_deployment_attributes
       reconstruct_deployment_file
+
+      # TODO fail if setting immutable attributes
       attribute_values.each do |attr_value|
         attr_name, value = attr_value.split(/=/)
-        attrs.set(attr_name, value)
+        previous_value = attrs.validated_color(attr_name)
+        step("Checking '#{attr_name}' is a valid mutable attribute",
+             "Attribute '#{attr_name}' is not a valid mutable attribute (see 'bosh show cf properties')", :non_fatal) do
+          attrs.mutable_attribute?(attr_name)
+        end
+        attrs.set_mutable(attr_name, value)
       end
-      
+
+      raise Bosh::Cli::ValidationHalted unless errors.empty?
+
       # TODO show validated attributes like "create cf"
       # TODO validate attributes like "create cf"
       perform_deploy(options)
+
+    rescue Bosh::Cli::ValidationHalted
+      errors.each do |error|
+        say error.make_red
+      end
+      exit 1
     end
 
     protected
