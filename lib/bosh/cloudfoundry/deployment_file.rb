@@ -37,9 +37,6 @@ module Bosh::Cloudfoundry
     # ---
     # name: NAME
     # director_uuid: 4ae3a0f0-70a5-4c0d-95f2-7fafaefe8b9e
-    # releases:
-    # - name: cf-release
-    #   version: 132
     # networks: {}
     # properties:
     #   cf:
@@ -57,10 +54,6 @@ module Bosh::Cloudfoundry
           file << {
             "name" => deployment_attributes.name,
             "director_uuid" => bosh_uuid,
-            "releases" => [{
-              "name" => release_name,
-              "version" => release_version_number
-            }],
             "networks" => {},
             "properties" => {
               self.class.properties_key => deployment_attributes.attributes_with_string_keys
