@@ -46,6 +46,24 @@ module Bosh::Cloudfoundry
       @release_name = "cf-release" # TODO determine from release file
     end
 
+    # Attributes & their values that can be changed via setters & deployment re-deployed successfully
+    def mutable_attributes
+      spec["mutable_attributes"]
+    end
+
+    # Attributes & their values that are not to be changed over time
+    def immutable_attributes
+      spec["immutable_attributes"]
+    end
+
+    def available_cpi_names
+      spec["available_cpi"]
+    end
+
+    def valid_cpi?(cpi)
+      available_cpi_names.include?(cpi)
+    end
+
     def self.base_template_dir
       File.expand_path("../../../../templates", __FILE__)
     end
@@ -54,14 +72,13 @@ module Bosh::Cloudfoundry
       File.join(self.class.base_template_dir, "v#{version_number}")
     end
 
-    def available_cpi_names
-      @available_cpi_names ||= begin
-        Dir[File.join(template_dir, "*")].map {|dir| File.basename(dir)}
-      end
+    def spec_path
+      File.join(template_dir, "spec")
     end
 
-    def valid_cpi?(cpi)
-      available_cpi_names.include?(cpi)
+    def spec
+      @spec ||= YAML.load_file(spec_path)
     end
+
   end
 end
