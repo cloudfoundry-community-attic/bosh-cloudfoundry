@@ -45,9 +45,19 @@ module Bosh::Cloudfoundry::Validations
 
     protected
     def resolve_dns(domain)
+      domain += "." if domain[-1] != "."
       packet = Net::DNS::Resolver.start(domain, Net::DNS::A)
-      resolved_a_records = packet.answer.map(&:value)
-      [(packet.answer.size > 0), resolved_a_records]
+      resolved_a_records = packet.answer.select { |record|
+        record.name == domain
+      }.map { |record|
+        case record.type
+        when "CNAME"
+          resolve_dns(record.value)[1]
+        when "A"
+          record.value
+        end
+      }.flatten
+      [(resolved_a_records.size > 0), resolved_a_records]
     end
   end
 end
