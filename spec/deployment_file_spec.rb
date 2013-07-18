@@ -76,18 +76,18 @@ describe Bosh::Cloudfoundry::DeploymentFile do
         subject.deploy(non_interactive: true)
       end
     end
-  # 
-  # it "generates a large deployment" do
-  #   in_home_dir do
-  #     command.add_option(:deployment_size, "large")
-  # 
-  #     command.create_cf
-  #     files_match(spec_asset("v132/aws/large.yml"), command.deployment_file)
-  # 
-  #     manifest = YAML.load_file(command.deployment_file)
-  #     Bosh::Cli::DeploymentManifest.new(manifest).normalize
-  #   end
-  # end
+
+    # it "large size" do
+    #   in_home_dir do
+    #     command.add_option(:deployment_size, "large")
+    # 
+    #     command.create_cf
+    #     files_match(spec_asset("v133/aws/large.yml"), command.deployment_file)
+    # 
+    #     manifest = YAML.load_file(command.deployment_file)
+    #     Bosh::Cli::DeploymentManifest.new(manifest).normalize
+    #   end
+    # end
   # 
   # it "specifies core size" do
   #   in_home_dir do
