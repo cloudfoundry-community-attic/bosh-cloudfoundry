@@ -103,7 +103,7 @@ describe Bosh::Cli::Command::CloudFoundry do
         command.add_option(:common_password, "qwertyasdfgh")
 
         command.should_receive(:auth_required)
-        command.should_receive(:validate_dns_mapping)
+        command.should_receive(:validate_deployment_attributes)
 
         director.should_receive(:get_status).and_return({"uuid" => "UUID", "cpi" => "aws"})
         command.stub(:director_client).and_return(director)
@@ -142,6 +142,8 @@ describe Bosh::Cli::Command::CloudFoundry do
         deployment_file.should_receive(:deployment_attributes).and_return(deployment_attributes)
         deployment_file.should_receive(:release_version_cpi_size)
         deployment_file.should_receive(:perform)
+
+        command.should_receive(:validate_deployment_attributes)
       end
 
       it "for single property" do

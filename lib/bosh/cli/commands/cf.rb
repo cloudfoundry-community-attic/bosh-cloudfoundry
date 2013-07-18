@@ -73,8 +73,7 @@ module Bosh::Cli::Command
       say "Security group: #{attrs.validated_color(:security_group)}"
       nl
 
-      validate_deployment_size
-      validate_dns_mapping
+      validate_deployment_attributes
 
       unless confirmed?("Security group #{attrs.validated_color(:security_group)} exists with ports #{attrs.required_ports.join(", ")}")
         cancel_deployment
@@ -129,10 +128,11 @@ module Bosh::Cli::Command
         attrs.set_mutable(attr_name, value)
       end
 
+      validate_deployment_attributes
+      # TODO show validated attributes like "create cf"
+
       raise Bosh::Cli::ValidationHalted unless errors.empty?
 
-      # TODO show validated attributes like "create cf"
-      # TODO validate attributes like "create cf"
       perform_deploy(options)
 
     rescue Bosh::Cli::ValidationHalted
@@ -223,12 +223,10 @@ module Bosh::Cli::Command
       cmd
     end
 
-    def validate_deployment_size
+    def validate_deployment_attributes
       attrs.validate_deployment_size
-    end
-
-    def validate_dns_mapping
       attrs.validate_dns_mapping
     end
+
   end
 end
