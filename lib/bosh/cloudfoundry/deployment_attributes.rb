@@ -71,11 +71,15 @@ module Bosh::Cloudfoundry
     end
 
     def set(attribute, value)
-      attributes[attribute.to_sym] = value if value
+      attributes[attribute.to_sym] = value
     end
 
     def set_mutable(attribute, value)
-      attributes[attribute.to_sym] = value if value
+      if mutable_attribute?(attribute)
+        attributes[attribute.to_sym] = value
+      else
+        false
+      end
     end
 
     def validate(attribute)
