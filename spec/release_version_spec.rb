@@ -1,4 +1,6 @@
 describe Bosh::Cloudfoundry::ReleaseVersion do
+  let(:latest_release_version_number) { 134 }
+
   it "cannot accept versions lower than 132" do
     expect { Bosh::Cloudfoundry::ReleaseVersion.for_version(131) }.to raise_error(RuntimeError)
   end
@@ -8,15 +10,15 @@ describe Bosh::Cloudfoundry::ReleaseVersion do
   end
 
   it "finds an next available version match" do
-    Bosh::Cloudfoundry::ReleaseVersion.for_version(134).version_number.should == 133
+    Bosh::Cloudfoundry::ReleaseVersion.for_version(200).version_number.should == latest_release_version_number
   end
 
   it "knows available versions" do
-    Bosh::Cloudfoundry::ReleaseVersion.available_versions.should == [132, 133]
+    Bosh::Cloudfoundry::ReleaseVersion.available_versions.should == [132, 133, 134]
   end
 
   it "knows latest version number" do
-    Bosh::Cloudfoundry::ReleaseVersion.latest_version_number.should == 133
+    Bosh::Cloudfoundry::ReleaseVersion.latest_version_number.should == latest_release_version_number
   end
 
   context "for v132" do

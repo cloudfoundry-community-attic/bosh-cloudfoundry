@@ -1,5 +1,4 @@
 describe Bosh::Cloudfoundry::DeploymentFile do
-
   def initial_deployment_file(properties = {})
     FileUtils.mkdir_p(home_file("deployments/cf"))
     file = home_file("deployments/cf/demo.yml")
@@ -50,7 +49,7 @@ describe Bosh::Cloudfoundry::DeploymentFile do
       common_password: "qwertyasdfgh",
       deployment_size: "medium"
     } }
-    let(:release_version_cpi) { Bosh::Cloudfoundry::ReleaseVersionCpi.latest_for_cpi(bosh_cpi) }
+    let(:release_version_cpi) { Bosh::Cloudfoundry::ReleaseVersionCpi.for_cpi(133, bosh_cpi) }
     let(:release_version_cpi_medium) { Bosh::Cloudfoundry::ReleaseVersionCpiSize.new(release_version_cpi, "medium") }
     let(:deployment_attributes) do
       Bosh::Cloudfoundry::DeploymentAttributes.new(mock("director"), bosh_status, release_version_cpi_medium, attributes)
