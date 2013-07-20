@@ -7,10 +7,19 @@ module Bosh::Cli::Command
 
     usage "prepare cf"
     desc "upload latest Cloud Foundry release to bosh"
+    option "--release-version version", "Upload a specific older version"
     def prepare_cf
       auth_required
 
-      release_yml = Dir[File.join(bosh_release_dir, "releases", "*-#{latest_release_version}.yml")].first
+      release_version = options[:release_version] || latest_release_version
+
+      # Support:
+      # * --release-version v132
+      # * --release-version 132
+      if release_version.to_s =~ /(\d+)/
+        release_version = $1
+      end
+      release_yml = Dir[File.join(bosh_release_dir, "releases", "*-#{release_version}.yml")].first
       release_cmd(non_interactive: true).upload(release_yml)
 
       stemcell_url = "http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/#{bosh_cpi}/latest-bosh-stemcell-#{bosh_cpi}.tgz"

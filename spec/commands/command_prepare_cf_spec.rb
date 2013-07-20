@@ -4,6 +4,7 @@ describe Bosh::Cli::Command::PrepareBoshForCloudFoundry do
   let(:command) { Bosh::Cli::Command::PrepareBoshForCloudFoundry.new }
   let(:director) { instance_double("Bosh::Cli::Director") }
   let(:latest_release_version_number) { 133 }
+  let(:aws_full_stemcell_url)  { "http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/aws/latest-bosh-stemcell-aws.tgz" }
 
   before do
     setup_home_dir
@@ -25,7 +26,6 @@ describe Bosh::Cli::Command::PrepareBoshForCloudFoundry do
       release_cmd.should_receive(:upload).with(release_yml)
       command.stub(:release_cmd).and_return(release_cmd)
 
-      aws_full_stemcell_url = "http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/aws/latest-bosh-stemcell-aws.tgz"
       stemcell_cmd = instance_double("Bosh::Cli::Command::Stemcell")
       stemcell_cmd.should_receive(:upload).with(aws_full_stemcell_url)
       command.stub(:stemcell_cmd).and_return(stemcell_cmd)
@@ -33,7 +33,37 @@ describe Bosh::Cli::Command::PrepareBoshForCloudFoundry do
       command.prepare_cf
     end
 
-    it "upload specific release"
+    it "upload specific release: --release-version 132" do
+      version = "132"
+      command.add_option(:release_version, version)
+
+      release_yml = File.expand_path("../../../bosh_release/releases/cf-release-#{version}.yml", __FILE__)
+      release_cmd = instance_double("Bosh::Cli::Command::Release")
+      release_cmd.should_receive(:upload).with(release_yml)
+      command.stub(:release_cmd).and_return(release_cmd)
+
+      stemcell_cmd = instance_double("Bosh::Cli::Command::Stemcell")
+      stemcell_cmd.should_receive(:upload).with(aws_full_stemcell_url)
+      command.stub(:stemcell_cmd).and_return(stemcell_cmd)
+
+      command.prepare_cf
+    end
+
+    it "upload specific release: --release-version v132" do
+      version = "132"
+      command.add_option(:release_version, "v#{version}")
+
+      release_yml = File.expand_path("../../../bosh_release/releases/cf-release-#{version}.yml", __FILE__)
+      release_cmd = instance_double("Bosh::Cli::Command::Release")
+      release_cmd.should_receive(:upload).with(release_yml)
+      command.stub(:release_cmd).and_return(release_cmd)
+
+      stemcell_cmd = instance_double("Bosh::Cli::Command::Stemcell")
+      stemcell_cmd.should_receive(:upload).with(aws_full_stemcell_url)
+      command.stub(:stemcell_cmd).and_return(stemcell_cmd)
+
+      command.prepare_cf
+    end
 
     it "errors if specific requested release does not exist"
 
