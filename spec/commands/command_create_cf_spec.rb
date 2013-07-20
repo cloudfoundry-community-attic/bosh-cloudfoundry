@@ -47,7 +47,7 @@ describe Bosh::Cli::Command::CloudFoundry do
     context "validation failures" do
       before do
         director.stub(:get_status).and_return({"uuid" => "UUID", "cpi" => "aws"})
-        command.stub(:director_client).and_return(director)
+        command.stub(:director).and_return(director)
       end
       it "requires --ip 1.2.3.4" do
         command.add_option(:dns, "mycloud.com")
@@ -73,7 +73,7 @@ describe Bosh::Cli::Command::CloudFoundry do
         command.should_receive(:validate_deployment_attributes)
 
         director.should_receive(:get_status).and_return({"uuid" => "UUID", "cpi" => "aws"})
-        command.stub(:director_client).and_return(director)
+        command.stub(:director).and_return(director)
 
         command.stub(:deployment).and_return(home_file("deployments/cf/demo.yml"))
 
@@ -93,7 +93,7 @@ describe Bosh::Cli::Command::CloudFoundry do
       @deployment_file_path = setup_deployment
 
       director.should_receive(:get_status).and_return({"uuid" => "UUID", "cpi" => "aws"})
-      command.stub(:director_client).and_return(director)
+      command.stub(:director).and_return(director)
     end
 
     it "displays the list of attributes/properties" do

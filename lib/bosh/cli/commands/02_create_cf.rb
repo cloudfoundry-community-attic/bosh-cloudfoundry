@@ -121,7 +121,7 @@ module Bosh::Cli::Command
     protected
     def setup_deployment_attributes
       @release_version_cpi = ReleaseVersionCpi.latest_for_cpi(bosh_cpi)
-      @deployment_attributes = DeploymentAttributes.new(director_client, bosh_status, @release_version_cpi)
+      @deployment_attributes = DeploymentAttributes.new(director, bosh_status, @release_version_cpi)
     end
 
     def attrs
@@ -131,7 +131,7 @@ module Bosh::Cli::Command
     # After a deployment is created, the input properties/attributes are stored within the generated
     # deployment file. Therefore, to update a deployment, first we must load in the attributes.
     def reconstruct_deployment_file
-      @deployment_file = DeploymentFile.reconstruct_from_deployment_file(deployment, director_client, bosh_status)
+      @deployment_file = DeploymentFile.reconstruct_from_deployment_file(deployment, director, bosh_status)
       @deployment_attributes = @deployment_file.deployment_attributes
       @release_version_cpi_size = @deployment_file.release_version_cpi_size
     end
@@ -140,14 +140,10 @@ module Bosh::Cli::Command
       @deployment_file.perform(deploy_options)
     end
 
-    def director_client
-      director
-    end
-
     def bosh_status
       @bosh_status ||= begin
         step("Fetching bosh information", "Cannot fetch bosh information", :fatal) do
-           @bosh_status = director_client.get_status
+           @bosh_status = director.get_status
         end
         @bosh_status
       end
