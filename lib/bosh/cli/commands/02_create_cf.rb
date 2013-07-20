@@ -7,30 +7,6 @@ module Bosh::Cli::Command
     include Bosh::Cli::Validation
     include Bosh::Cloudfoundry
 
-    usage "cf"
-    desc  "show micro cf sub-commands"
-    def cf_help
-      say("bosh cf sub-commands:")
-      nl
-      cmds = Bosh::Cli::Config.commands.values.find_all {|c|
-        c.usage =~ /cf/
-      }
-      Bosh::Cli::Command::Help.list_commands(cmds)
-    end
-
-    usage "prepare cf"
-    desc "upload latest Cloud Foundry release to bosh"
-    def prepare_cf
-      auth_required
-      bosh_status # preload
-
-      release_yml = Dir[File.join(bosh_release_dir, "releases", "*-#{latest_release_version}.yml")].first
-      release_cmd(non_interactive: true).upload(release_yml)
-
-      stemcell_url = "http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/#{bosh_cpi}/latest-bosh-stemcell-#{bosh_cpi}.tgz"
-      stemcell_cmd(non_interactive: true).upload(stemcell_url)
-    end
-
     usage "create cf"
     desc "create a deployment file for Cloud Foundry and deploy it"
     option "--dns mycloud.com", "Primary domain"
@@ -164,31 +140,6 @@ module Bosh::Cli::Command
       @deployment_file.perform(deploy_options)
     end
 
-    def bosh_release_dir
-      File.expand_path("../../../../../bosh_release", __FILE__)
-    end
-
-    def latest_release_version
-      # the releases/index.yml contains all the available release versions in an unordered
-      # hash of hashes in YAML format:
-      #     --- 
-      #     builds: 
-      #       af61f03c5ad6327e0795402f1c458f2fc6f21201: 
-      #         version: 3
-      #       39c029d0af9effc6913f3333434b894ff6433638: 
-      #         version: 1
-      #       5f5d0a7fb577fec3c09408c94f7abbe2d52a042c: 
-      #         version: 4
-      #       f044d47e0183f084db9dac5a6ef00d7bd21c8451: 
-      #         version: 2
-      release_index = YAML.load_file(File.join(bosh_release_dir, "releases/index.yml"))
-      latest_version = release_index["builds"].values.inject(0) do |max_version, release|
-        version = release["version"]
-        max_version < version ? version : max_version
-      end
-      latest_version
-    end
-
     def director_client
       director
     end
@@ -204,23 +155,6 @@ module Bosh::Cli::Command
 
     def bosh_cpi
       bosh_status["cpi"]
-    end
-
-    # TODO move into PrepareBosh class
-    def release_cmd(options = {})
-      cmd ||= Bosh::Cli::Command::Release.new
-      options.each do |key, value|
-        cmd.add_option key.to_sym, value
-      end
-      cmd
-    end
-
-    def stemcell_cmd(options = {})
-      cmd ||= Bosh::Cli::Command::Stemcell.new
-      options.each do |key, value|
-        cmd.add_option key.to_sym, value
-      end
-      cmd
     end
 
     def validate_deployment_attributes
