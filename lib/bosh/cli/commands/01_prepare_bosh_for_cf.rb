@@ -10,6 +10,7 @@ module Bosh::Cli::Command
     option "--release-version version", "Upload a specific older version"
     def prepare_cf
       auth_required
+      bosh_status
 
       release_version = options[:release_version] || latest_release_version
 
@@ -20,13 +21,40 @@ module Bosh::Cli::Command
         release_version = $1
       end
       release_yml = Dir[File.join(bosh_release_dir, "releases", "*-#{release_version}.yml")].first
-      release_cmd(non_interactive: true).upload(release_yml)
 
-      stemcell_url = "http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/#{bosh_cpi}/latest-bosh-stemcell-#{bosh_cpi}.tgz"
-      stemcell_cmd(non_interactive: true).upload(stemcell_url)
+      release_name = YAML.load_file(release_yml)["name"]
+
+      release_exists = nil
+      step("Checking bosh already has release #{release_name} #{release_version}",
+            "Currently bosh does not have #{release_name} #{release_version}, uploading...", :non_fatal) do
+        release_exists = director.list_releases.find do |existing_release|
+          existing_release["name"] == release_name && existing_release["version"].to_s == release_version.to_s
+        end
+      end
+      unless errors.empty?
+        say errors.shift.make_yellow
+        release_cmd(non_interactive: true).upload(release_yml)
+      end
+
+      stemcell_exists = nil
+      step("Checking bosh already has base stemcell",
+            "Currently bosh does not have base stemcell, uploading...", :non_fatal) do
+        stemcell_exists = director.list_stemcells.find do |existing_stemcell|
+          existing_stemcell["name"] == stemcell_name
+        end
+      end
+      unless errors.empty?
+        say errors.shift.make_yellow
+        stemcell_url = "http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/#{bosh_cpi}/latest-bosh-stemcell-#{bosh_cpi}.tgz"
+        stemcell_cmd(non_interactive: true).upload(stemcell_url)
+      end
     end
 
     protected
+    def stemcell_name
+      "bosh-stemcell"
+    end
+
     def bosh_release_dir
       File.expand_path("../../../../../bosh_release", __FILE__)
     end
