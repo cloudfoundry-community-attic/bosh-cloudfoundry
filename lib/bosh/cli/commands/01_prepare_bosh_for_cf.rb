@@ -28,7 +28,11 @@ module Bosh::Cli::Command
       step("Checking bosh already has release #{release_name} #{release_version}",
             "Currently bosh does not have #{release_name} #{release_version}, uploading...", :non_fatal) do
         release_exists = director.list_releases.find do |existing_release|
-          existing_release["name"] == release_name && existing_release["version"].to_s == release_version.to_s
+          next false unless existing_release["name"] == release_name
+          versions = existing_release["release_versions"]
+          versions.find do |version|
+            version["version"].to_s == release_version.to_s
+          end
         end
       end
       unless errors.empty?

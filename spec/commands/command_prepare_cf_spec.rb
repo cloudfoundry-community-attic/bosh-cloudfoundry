@@ -80,7 +80,8 @@ describe Bosh::Cli::Command::PrepareBoshForCloudFoundry do
 
     it "do not upload release if bosh already has that release" do
       command.add_option(:release_version, "132")
-      director.should_receive(:list_releases).and_return([{"name" => "cf-release", "version" => 132}])
+      director.should_receive(:list_releases).and_return([
+        {"name" => "cf-release", "release_versions"=>[{"version"=>"132"}]}])
       director.should_receive(:list_stemcells).and_return([])
 
       stemcell_cmd = instance_double("Bosh::Cli::Command::Stemcell")
