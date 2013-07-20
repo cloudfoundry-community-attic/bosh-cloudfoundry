@@ -1,9 +1,10 @@
 require "bosh/cli/commands/01_prepare_bosh_for_cf"
 
 describe Bosh::Cli::Command::PrepareBoshForCloudFoundry do
+  let(:latest_release_version_number) { 134 }
+
   let(:command) { Bosh::Cli::Command::PrepareBoshForCloudFoundry.new }
   let(:director) { instance_double("Bosh::Cli::Director") }
-  let(:latest_release_version_number) { 133 }
   let(:aws_full_stemcell_url)  { "http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/aws/latest-bosh-stemcell-aws.tgz" }
 
   before do
