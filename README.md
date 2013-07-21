@@ -174,6 +174,12 @@ If you use the [dnsimple.com](https://dnsimple.com/r/af515bc1b6ffc9) service (th
 
 <a href="https://dnsimple.com/r/af515bc1b6ffc9"><img src=https://www.evernote.com/shard/s3/sh/a5d22b7e-efef-4c4d-abf6-bac0d343f260/21a09151a6da40e189db349107e6baf0/deep/0/drniccloud.com%20Records%20-%20DNSimple.png /></a>
 
+If you have already deployed Cloud Foundry using the default xip.io DNS service, you can upgrade your Cloud Foundry deployment to use your new custom DNS:
+
+```
+$ bosh change cf attributes dns=cf.mycloud.com
+```
+
 ## Releasing new plugin gem versions
 
 There are two reasons to release new versions of this plugin.
