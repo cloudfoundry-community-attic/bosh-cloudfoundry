@@ -13,6 +13,24 @@ describe Bosh::Cloudfoundry::DeploymentAttributes do
     it { subject.common_password.should == "qwertyqwerty" }
   end
 
+  context "delayed default values" do
+    subject { Bosh::Cloudfoundry::DeploymentAttributes.new(director, bosh_status, release_version_cpi) }
+    it "dns nil default until ip_addresses set" do
+      subject.dns.should be_nil
+    end
+
+    it "dns defaults to FIRST_IP_ADDRESS.xip.io if ip_addresses has 1+ addresses" do
+      subject.set(:ip_addresses, ["1.2.3.4"])
+      subject.dns.should == "1.2.3.4.xip.io"
+    end
+
+    it "dns has custom value if set" do
+      subject.set(:ip_addresses, ["1.2.3.4"])
+      subject.set(:dns, "mycloud.com")
+      subject.dns.should == "mycloud.com"
+    end
+  end
+
   context "attributes" do
     it "returns default attributes" do
       subject = Bosh::Cloudfoundry::DeploymentAttributes.new(director, bosh_status, release_version_cpi)
