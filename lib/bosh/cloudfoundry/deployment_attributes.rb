@@ -72,11 +72,16 @@ module Bosh::Cloudfoundry
 
     def set(attribute, value)
       attributes[attribute.to_sym] = value
+
+      case attribute.to_sym
+      when :ip_addresses
+        set_default_dns
+      end
     end
 
     def set_mutable(attribute, value)
       if mutable_attribute?(attribute)
-        attributes[attribute.to_sym] = value
+        set(attribute, value)
       else
         false
       end
@@ -184,6 +189,13 @@ module Bosh::Cloudfoundry
 
     def default_security_group
       "default"
+    end
+
+    def set_default_dns
+      if dns.nil?
+        first_ip_address = ip_addresses.first
+        set(:dns, "#{first_ip_address}.xip.io")
+      end
     end
 
     def bosh_uuid
