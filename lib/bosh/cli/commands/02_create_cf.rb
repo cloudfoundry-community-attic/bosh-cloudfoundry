@@ -26,11 +26,8 @@ module Bosh::Cli::Command
       err("Only one IP address is supported currently. Please create an issue to mention you need more.") if ip_addresses.size > 1
       attrs.set(:ip_addresses, ip_addresses)
 
-      dns = options[:dns]
-      err("USAGE: bosh create cf --dns mycloud.com -- please provide a base DNS that has a '*' A record referencing IPs") unless dns
-      attrs.set(:dns, dns)
-
       attrs.set_unless_nil(:name, options[:name])
+      attrs.set_unless_nil(:dns, options[:dns])
       attrs.set_unless_nil(:persistent_disk, options[:disk])
       attrs.set_unless_nil(:security_group, options[:security_group])
       attrs.set_unless_nil(:common_password, options[:common_password])

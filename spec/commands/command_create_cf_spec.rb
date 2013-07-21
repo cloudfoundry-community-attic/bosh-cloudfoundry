@@ -19,7 +19,6 @@ describe Bosh::Cli::Command::CloudFoundry do
             # immutable attributes (determined via ReleaseVersion via templates/vXYZ/spec)
             "name" => "demo",
             "deployment_size" => "medium",
-            "dns" => "mycloud.com",
             "common_password" => "qwerty",
             # mutable attributes (determined via ReleaseVersion via templates/vXYZ/spec)
             "ip_addresses" => ["1.2.3.4"],
@@ -49,14 +48,9 @@ describe Bosh::Cli::Command::CloudFoundry do
         director.stub(:get_status).and_return({"uuid" => "UUID", "cpi" => "aws"})
         command.stub(:director).and_return(director)
       end
+
       it "requires --ip 1.2.3.4" do
         command.add_option(:dns, "mycloud.com")
-        command.add_option(:size, "xlarge")
-        expect { command.create_cf }.to raise_error(Bosh::Cli::CliError)
-      end
-
-      it "requires --dns" do
-        command.add_option(:ip, ["1.2.3.4"])
         command.add_option(:size, "xlarge")
         expect { command.create_cf }.to raise_error(Bosh::Cli::CliError)
       end
@@ -66,7 +60,6 @@ describe Bosh::Cli::Command::CloudFoundry do
       it "creates cf deployment" do
         command.add_option(:name, "demo")
         command.add_option(:ip, ["1.2.3.4"])
-        command.add_option(:dns, "mycloud.com")
         command.add_option(:common_password, "qwertyasdfgh")
 
         command.should_receive(:auth_required)
@@ -84,7 +77,6 @@ describe Bosh::Cli::Command::CloudFoundry do
 
         command.create_cf
       end
-
     end
   end
   
