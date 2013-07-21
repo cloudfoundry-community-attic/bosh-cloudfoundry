@@ -6,7 +6,7 @@ Example create/scale/delete scenario:
 
 ```
 $ bosh prepare cf
-$ bosh create cf --dns mycloud.com --public-ip 1.2.3.4
+$ bosh create cf --public-ip 1.2.3.4
 ...
 $ bosh change cf attributes persistent_disk=8192
 ...
@@ -106,11 +106,21 @@ Uploading new cf release to bosh...
 To create/provision a new Cloud Foundry you run the following command. By default, it will select the smallest possible deployment size.
 
 ```
-$ bosh create cf --dns mycloud.com --public-ip 1.2.3.4
-$ bosh create cf --dns mycloud.com --public-ip 1.2.3.4 --size medium
-$ bosh create cf --dns mycloud.com --public-ip 1.2.3.4 --size large
-$ bosh create cf --dns mycloud.com --public-ip 1.2.3.4 --size xlarge
+$ bosh create cf --public-ip 1.2.3.4
+$ bosh create cf --public-ip 1.2.3.4 --size medium
+$ bosh create cf --public-ip 1.2.3.4 --size large
+$ bosh create cf --public-ip 1.2.3.4 --size xlarge
 ```
+
+It is strongly recommended that you provide your own domain, such as `mycloud.com`. You can purchase and manage your domain through any DNS provider (see below for what needs to be setup), such as [dnsimple.com](https://dnsimple.com/r/af515bc1b6ffc9) (the beloved DNS manager used by Stark & Wayne; as a bonus its an affiliate link so Dr Nic gets free stuff).
+
+To specify a domain:
+
+```
+$ bosh create cf --domain mycloud.com --public-ip 1.2.3.4
+```
+
+By default, it will configure you to use http://xip.io (a lovely service sponsored by 37signals). You root domain will be `1.2.3.4.xip.io` (where `1.2.3.4` is your IP address).
 
 By default the core Cloud Foundry server is assigned a 4096 Mb persistent volume/disk. This can be changed later as your Cloud Foundry deployment grows.
 
@@ -153,6 +163,16 @@ $ bosh change cf attributes persistent_disk=8192
 ```
 
 The initial size of persistent disks is `4096` (4Gb).
+
+## DNS
+
+It is strongly suggested to provide a custom DNS (rather than rely on the free http://xip.io service) as the default DNS for all your applications (including the public API "cloud controller").
+
+You can use the root domain (such as `mycloud.com`) or a subdomain (such as `cf.mycloud.com`).
+
+If you use the [dnsimple.com](https://dnsimple.com/r/af515bc1b6ffc9) service (the beloved DNS manager used by Stark & Wayne; as a bonus it is an affiliate link so Dr Nic gets free stuff) then you will set up your DNS as follows:
+
+<a href="https://dnsimple.com/r/af515bc1b6ffc9"><img src=https://www.evernote.com/shard/s3/sh/a5d22b7e-efef-4c4d-abf6-bac0d343f260/21a09151a6da40e189db349107e6baf0/deep/0/drniccloud.com%20Records%20-%20DNSimple.png /></a>
 
 ## Releasing new plugin gem versions
 
