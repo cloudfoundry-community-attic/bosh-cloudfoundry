@@ -10,6 +10,7 @@ There are four requirements:
 * Credit on the credit card attached to your AWS account for $1 or so
 * Ruby 1.9.3 or Ruby 2.0.0 installed on your local machine
 * Internet access
+* About an hour of your time (about 5 minutes of your human activity)
 
 Optionally:
 
@@ -36,6 +37,8 @@ $ gem install inception-server
 $ inception deploy
 ```
 
+This will take about 15 minutes.
+
 This will prompt you for your AWS credentials and then automatically do everything to provision and configure an Ubuntu server ready to be used for deploying a bosh server and subsequent bosh releases.
 
 Now finish the preparation of the inception server (there are outstanding bugs to be fixed for each of the steps below):
@@ -43,7 +46,7 @@ Now finish the preparation of the inception server (there are outstanding bugs t
 ```
 $ inception ssh
 > ubuntu user
-$ ssh-keygen
+$ ssh-keygen -N '' -f ~/.ssh/id_rsa
 $ sudo usermod -a -G rvm ubuntu
 $ sudo chmod g+w /usr/local/rvm -R
 $ exit
@@ -65,13 +68,45 @@ $ gem install bosh-cloudfoundry --pre
 
 ## Bootstrap a bosh server
 
+The `bosh-bootstrap` tool (pre-installed on inception server) makes it very simple to get a bosh server running in your AWS region. Within the inception server, a `~/.fog` file is provided with the same credentials you provided above. You type `1` at the first prompt below.
+
+If you are not using an inception server, you will provide your AWS credentials at the first set of prompts.
+
+This section takes about 10 minutes inside us-east-1. It takes about 15 minutes in other regions (as a new AMI must be created).
+
 ```
 $ bosh-bootstrap deploy
-WARNING! Your target has been changed to `https://IPADDRESS:25555'!
+Auto-detected infrastructure API credentials at ~/.fog (override with $FOG)
+1. AWS (default)
+2. Alternate credentials
+Choose an auto-detected infrastructure:  1
 
-$ bosh target https://IPADDRESS:25555
-$ bosh login admin admin
+Using provider AWS
+
+
+1. *US East (Northern Virginia) Region (us-east-1)
+2. US West (Oregon) Region (us-west-2)
+3. US West (Northern California) Region (us-west-1)
+4. EU (Ireland) Region (eu-west-1)
+5. Asia Pacific (Singapore) Region (ap-southeast-1)
+6. Asia Pacific (Sydney) Region (ap-southeast-2)
+7. Asia Pacific (Tokyo) Region (ap-northeast-1)
+8. South America (Sao Paulo) Region (sa-east-1)
+Choose AWS region: 1
+
+Confirming: Using AWS/us-east-1
+Acquiring a public IP address... IP.ADD.RE.SS
+
+...
+
+WARNING! Your target has been changed to `https://IP.ADD.RE.SS:25555'!
+
+$ bosh target https://IP.ADD.RE.SS:25555
+Your username: admin
+Enter password: admin
 ```
+
+The default username/password is `admin/admin`.
 
 ## Deploy Cloud Foundry
 
