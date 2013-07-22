@@ -117,6 +117,8 @@ $ bosh prepare cf
 $ bosh create cf --ip 1.2.3.4 --name tutorial --security-group cf
 ```
 
+The `prepare cf` step takes about 25 minutes to upload the entire set of Cloud Foundry packages (including a base ISO for warden containers) and the base VM stemcell image (700Mb).
+
 ## Initialize Cloud Foundry
 
 ```
