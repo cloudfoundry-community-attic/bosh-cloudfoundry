@@ -190,26 +190,6 @@ properties:
 
   dea_next: *dea
 
-  service_lifecycle:
-    serialization_data_server:
-    - 0.core.default.<%= name %>.microbosh
-
-  syslog_aggregator:
-    address: 0.core.default.<%= name %>.microbosh
-    port: 54321
-
-  serialization_data_server:
-    port: 8080
-    logging_level: debug
-    upload_token: <%= common_password %>
-    upload_timeout: 10
-
-  collector:
-    deployment_name: cf
-    use_tsdb: false
-    use_aws_cloudwatch: false
-    use_datadog: false
-
   nfs_server:
     address: 0.data.default.<%= name %>.microbosh
     #network: "*.<%= name %>.microbosh"
@@ -291,13 +271,6 @@ properties:
 
   ccng: *cc
 
-  login:
-    protocol: <%= protocol %>
-    links:
-      home: <%= protocol %>://console.<%= dns %>
-      passwd: <%= protocol %>://console.<%= dns %>/password_resets/new
-      signup: <%= protocol %>://console.<%= dns %>/register
-
   uaa:
     url: <%= protocol %>://uaa.<%= dns %>
     spring_profiles: postgresql
@@ -343,13 +316,6 @@ properties:
         - support-signon
         - login
     clients:
-      login:
-        override: true
-        scope: openid
-        authorities: oauth.login
-        secret: <%= common_password %>
-        authorized-grant-types: authorization_code,client_credentials,refresh_token
-        redirect-uri: <%= protocol %>://login.<%= dns %>
       support-services:
         scope: scim.write,scim.read,openid,cloud_controller.read,cloud_controller.write
         secret: <%= common_password %>
