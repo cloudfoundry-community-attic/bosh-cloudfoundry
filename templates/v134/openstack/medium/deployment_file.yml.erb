@@ -316,14 +316,6 @@ properties:
         - support-signon
         - login
     clients:
-      support-services:
-        scope: scim.write,scim.read,openid,cloud_controller.read,cloud_controller.write
-        secret: <%= common_password %>
-        authorized-grant-types: authorization_code,client_credentials
-        redirect-uri: <%= protocol %>://support-signon.<%= dns %>
-        authorities: portal.users.read
-        access-token-validity: 1209600
-        refresh-token-validity: 1209600
       oauth2service:
         secret: <%= common_password %>
         scope: openid,cloud_controller.read,cloud_controller.write

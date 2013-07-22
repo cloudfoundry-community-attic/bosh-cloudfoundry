@@ -153,26 +153,6 @@ properties:
 
   dea_next: *dea
 
-  service_lifecycle:
-    serialization_data_server:
-    - 0.core.default.demo.microbosh
-
-  syslog_aggregator:
-    address: 0.core.default.demo.microbosh
-    port: 54321
-
-  serialization_data_server:
-    port: 8080
-    logging_level: debug
-    upload_token: qwertyasdfgh
-    upload_timeout: 10
-
-  collector:
-    deployment_name: cf
-    use_tsdb: false
-    use_aws_cloudwatch: false
-    use_datadog: false
-
   nfs_server:
     address: 0.data.default.demo.microbosh
     #network: "*.demo.microbosh"
@@ -254,13 +234,6 @@ properties:
 
   ccng: *cc
 
-  login:
-    protocol: http
-    links:
-      home: http://console.mycloud.com
-      passwd: http://console.mycloud.com/password_resets/new
-      signup: http://console.mycloud.com/register
-
   uaa:
     url: http://uaa.mycloud.com
     spring_profiles: postgresql
@@ -306,21 +279,6 @@ properties:
         - support-signon
         - login
     clients:
-      login:
-        override: true
-        scope: openid
-        authorities: oauth.login
-        secret: qwertyasdfgh
-        authorized-grant-types: authorization_code,client_credentials,refresh_token
-        redirect-uri: http://login.mycloud.com
-      support-services:
-        scope: scim.write,scim.read,openid,cloud_controller.read,cloud_controller.write
-        secret: qwertyasdfgh
-        authorized-grant-types: authorization_code,client_credentials
-        redirect-uri: http://support-signon.mycloud.com
-        authorities: portal.users.read
-        access-token-validity: 1209600
-        refresh-token-validity: 1209600
       oauth2service:
         secret: qwertyasdfgh
         scope: openid,cloud_controller.read,cloud_controller.write
