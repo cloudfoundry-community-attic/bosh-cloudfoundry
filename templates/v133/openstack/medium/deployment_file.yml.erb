@@ -271,6 +271,9 @@ properties:
 
   ccng: *cc
 
+  login:
+    enabled: false
+
   uaa:
     url: <%= protocol %>://uaa.<%= dns %>
     spring_profiles: postgresql
@@ -314,7 +317,6 @@ properties:
         - my
         - micro
         - support-signon
-        - login
     clients:
       oauth2service:
         secret: <%= common_password %>
