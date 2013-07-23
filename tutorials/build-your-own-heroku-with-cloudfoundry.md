@@ -190,6 +190,32 @@ $ cd cf-env
 $ bundle
 
 $ cf push env
+Instances> 1
+
+1: 128M
+2: 256M
+3: 512M
+4: 1G
+Memory Limit> 1
+
+Creating env... OK
+
+1: env
+2: none
+Subdomain> env
+
+1: 1.2.3.4.xip.io
+2: none
+Domain> 1.2.3.4.xip.io
+
+Creating route env.1.2.3.4.xip.io... OK
+Binding env.1.2.3.4.xip.io to env... OK
+
+Create services for application?> n
+
+Save configuration?> n
+...
+
 ```
 
 Open in a browser: http://env.1.2.3.4.xip.io
