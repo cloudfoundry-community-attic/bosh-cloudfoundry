@@ -22,7 +22,7 @@ To scale the app and run out of RAM:
 
 ```
 $ cf scale env
-Instances> 20
+Instances> 10
 
 1: 128M
 2: 256M
@@ -30,10 +30,32 @@ Instances> 20
 4: 1G
 Memory Limit> 128M
 
-Scaling env... FAILED
-CFoundry::AppMemoryQuotaExceeded: 100005: You have exceeded your organization's memory limit. Please login to your account and upgrade. If you are trying to scale down and you are receiving this error, you can either delete an app or contact support.
-cat ~/.cf/crash # for more details
+Scaling env2... OK
+Stopping env2... OK
+
+Preparing to start env2... OK
+Checking status of app 'env2'...
+   0 of 10 instances running (10 down)
+   0 of 10 instances running (10 down)
+   0 of 10 instances running (10 down)
+   0 of 10 instances running (10 down)
+   0 of 10 instances running (10 down)
+   0 of 10 instances running (10 down)
+   0 of 10 instances running (10 down)
+   0 of 10 instances running (10 starting)
+   0 of 10 instances running (6 starting, 4 down)
+   0 of 10 instances running (3 starting, 7 down)
+   3 of 10 instances running (3 running, 7 starting)
+   3 of 10 instances running (3 running, 7 starting)
+   6 of 10 instances running (6 running, 4 down)
+   8 of 10 instances running (8 running, 2 starting)
+   9 of 10 instances running (9 running, 1 starting)
+   7 of 10 instances running (7 running, 3 down)
+   6 of 10 instances running (6 running, 4 down)
+   7 of 10 instances running (7 running, 3 down)
 ```
+
+And it never quite finishes. This is the current sign that there isn't enough capacity for your application's scale.
 
 To scale up the number of DEA servers, edit the following sections of your deployment file (via `bosh edit deploment`).
 
@@ -102,6 +124,50 @@ And later...
 ```
 Updating job dea
 dea/1 (canary)                      |ooooooooo               | 0/2 00:00:04  ETA: --:--:--          
+```
+
+Now scale the app again to 10 instances:
+
+```
+$ cf scale env
+Instances> 10
+
+1: 128M
+2: 256M
+3: 512M
+4: 1G
+Memory Limit> 1 
+
+Scaling env2... OK
+Stopping env2... OK
+
+Preparing to start env... OK
+Checking status of app 'env2'...
+   0 of 10 instances running (10 down)
+   0 of 10 instances running (10 down)
+   0 of 10 instances running (10 down)
+   0 of 10 instances running (10 down)
+   0 of 10 instances running (10 down)
+   0 of 10 instances running (10 down)
+   0 of 10 instances running (10 down)
+   0 of 10 instances running (10 starting)
+   0 of 10 instances running (6 starting, 4 down)
+   0 of 10 instances running (3 starting, 7 down)
+   3 of 10 instances running (3 running, 7 starting)
+   3 of 10 instances running (3 running, 7 starting)
+   6 of 10 instances running (6 running, 4 down)
+   8 of 10 instances running (8 running, 2 starting)
+   9 of 10 instances running (9 running, 1 starting)
+   7 of 10 instances running (7 running, 3 down)
+   6 of 10 instances running (6 running, 4 down)
+   7 of 10 instances running (7 running, 3 down)
+   6 of 10 instances running (6 running, 4 down)
+   7 of 10 instances running (7 running, 3 down)
+   6 of 10 instances running (6 running, 4 down)
+   7 of 10 instances running (7 running, 3 down)
+   6 of 10 instances running (6 running, 4 down)
+  10 of 10 instances running (10 running)
+Push successful! App 'env2' available at http://env.1.2.3.4.xip.io
 ```
 
 
