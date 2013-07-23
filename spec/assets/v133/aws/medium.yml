@@ -69,10 +69,8 @@ jobs:
   - name: core
     release: cf-release
     template:
-      - syslog_aggregator
       - nats
       - health_manager_next
-      - collector
       - uaa
     instances: 1
     resource_pool: small
