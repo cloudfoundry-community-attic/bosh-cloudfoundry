@@ -188,6 +188,10 @@ properties:
 
   dea_next: *dea
 
+  syslog_aggregator:
+    address: 0.syslog-aggregator.default.<%= name %>.microbosh
+    port: 54321
+
   nfs_server:
     address: 0.data.default.<%= name %>.microbosh
     #network: "*.<%= name %>.microbosh"
