@@ -9,8 +9,8 @@ Manually edit your deployment to run the Cloud Controller on its own dedicated s
 ## Tips
 
 1. to edit your deployment file run `bosh edit deployment`
+1. to make a backup of your deployment file, get its path from `bosh deployment`
 1. to apply the new deployment file changes run `bosh deploy`
-1. your deployment file is at `deployments/cf/tutorial.yml` if you want to make a backup of it first
 1. the Cloud Controller is the `cloud_controller_ng` job template within the `api` job in the deployment file.
 1. remove `- cloud_controller_ng` from the `name: api` job; and create a new job that looks similar to the `name: core` job
 1. your new `cloud_controller` job needs a `properties.db` set to `databases` to tell it where in the `properties` to find the database connections. The `api` job no longer needs these properties.
