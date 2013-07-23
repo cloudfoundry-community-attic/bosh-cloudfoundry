@@ -2,21 +2,23 @@
 
 In the default "medium" deployment (used in the step-by-step tutorial), the Cloud Controller is collocated with the front-end router on the `api/0` server.
 
-Activity: manually edit your deployment to run the Cloud Controller on its own dedicated server. Then run two Cloud Controller servers. Then revert back to running it on the same server as the router (and which also has the public IP attached).
+## Activity
 
-Tip: to edit your deployment file run `bosh edit deployment`
+Manually edit your deployment to run the Cloud Controller on its own dedicated server. Then run two Cloud Controller servers. Then revert back to running it on the same server as the router (and which also has the public IP attached).
 
-Tip: your deployment file is at `deployments/cf/tutorial.yml` if you want to make a backup of it first
+## Tips
 
-Tip: the Cloud Controller is the `cloud_controller_ng` job template within the `api` job in the deployment file.
+1. to edit your deployment file run `bosh edit deployment`
+1. to apply the new deployment file changes run `bosh deploy`
+1. your deployment file is at `deployments/cf/tutorial.yml` if you want to make a backup of it first
+1. the Cloud Controller is the `cloud_controller_ng` job template within the `api` job in the deployment file.
+1. remove `- cloud_controller_ng` from the `name: api` job; and create a new job that looks similar to the `name: core` job
+1. your new `cloud_controller` job needs a `properties.db` set to `databases` to tell it where in the `properties` to find the database connections. The `api` job no longer needs these properties.
 
-Tip: remove `- cloud_controller_ng` from the `name: api` job; and create a new job that looks similar to the `name: core` job
 
-Tip: your new `cloud_controller` job needs a `properties.db` set to `databases` to tell it where in the `properties` to find the database connections. The `api` job no longer needs these properties.
+## Solution
 
-Tip: run `bosh deploy` to apply the new deployment file changes
-
-Solution: add the `cloud_controller` job above the `api` job; and remove `cloud_controller_ng` from the `api` job.
+Add the `cloud_controller` job above the `api` job; and remove `cloud_controller_ng` from the `api` job.
 
 Convert the following `api` job:
 
