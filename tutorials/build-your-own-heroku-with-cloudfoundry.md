@@ -108,16 +108,49 @@ Enter password: admin
 
 The default username/password is `admin/admin`.
 
+## Upload assets to bosh
+
+```
+$ bosh prepare cf
+```
+
+The `prepare cf` step takes about 25 minutes to upload the entire set of Cloud Foundry packages (including a base ISO for warden containers) and the base VM stemcell image (700Mb).
+
+## Request a public IP
+
+Whether you have a custom DNS or are going to fall back to the free & flexible http://xip.io (the default), all the traffic into your Cloud Foundry - the main components and the applications it hosts - will go in through one or more public IP addresses.
+
+Visit the [AWS Console for IP Addresses](https://console.aws.amazon.com/ec2/home?region=us-east-1#s=Addresses) (change the region to your target region if not us-east-1), and click "Allocate New Address".
+
+The IP address that is shown will replace all instances of "1.2.3.4" in the remainder of the tutorial below.
+
+## Setup security group
+
+Visit the [AWS Console for Security Groups](https://console.aws.amazon.com/ec2/home?region=us-east-1#s=SecurityGroups) and click "Create Security Group".
+
+Name it `cf`.
+
+Add TCP ports:
+
+* 22 (ssh)
+* 80 (http)
+* 443 (https)
+* 4222 (nats)
+
 ## Deploy Cloud Foundry
 
 You're finally ready to deploy and initialize Cloud Foundry.
 
 ```
-$ bosh prepare cf
 $ bosh create cf --ip 1.2.3.4 --name tutorial --security-group cf
 ```
 
-The `prepare cf` step takes about 25 minutes to upload the entire set of Cloud Foundry packages (including a base ISO for warden containers) and the base VM stemcell image (700Mb).
+The first time you deploy Cloud Foundry it will take approximately 30 minutes. Half of this is compiling the 20+ packages that come with all-included release that was uploaded earlier (`bosh prepare cf`). If you were to delete this deployment and redeploy it would take less than 15 minutes.
+
+```
+$ bosh delete deployment tutorial
+$ bosh deploy
+```
 
 ## Initialize Cloud Foundry
 
