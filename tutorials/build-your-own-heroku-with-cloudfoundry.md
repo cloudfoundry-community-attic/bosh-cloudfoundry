@@ -9,6 +9,7 @@ There are some requirements:
 * AWS account, with access credentials, and capacity to provision 6 servers & 2 elastic IPs
 * Credit on the credit card attached to your AWS account for $1 or so
 * Ruby 1.9.3 or Ruby 2.0.0 installed on your local machine
+* Git (1.8+) installed on your local machine
 * Internet access
 * About an hour of your time (about 5 minutes of your human activity)
 * Possibly doesn't support Windows (please let me know if you have any success or failure)
