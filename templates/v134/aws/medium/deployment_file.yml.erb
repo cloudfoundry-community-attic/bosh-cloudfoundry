@@ -312,18 +312,7 @@ properties:
     client:
       autoapprove:
         - cf
-        - my
-        - micro
-        - support-signon
     clients:
-      oauth2service:
-        secret: <%= common_password %>
-        scope: openid,cloud_controller.read,cloud_controller.write
-        authorities: uaa.resource,oauth.service,clients.read,clients.write,clients.secret
-        authorized-grant-types: client_credentials,implicit
-        redirect-uri: <%= protocol %>://rewritten-later.cloudfoundry.com/whatever
-        override: true
-        autoapprove: true
       cf:
         override: true
         authorized-grant-types: password,implicit,refresh_token
@@ -331,14 +320,6 @@ properties:
         scope: cloud_controller.read,cloud_controller.write,openid,password.write,cloud_controller.admin,scim.read,scim.write
         access-token-validity: 7200
         refresh-token-validity: 1209600
-      servicesmgmt:
-        override: true
-        secret: <%= common_password %>
-        scope: openid,cloud_controller.read,cloud_controller.write
-        authorities: uaa.resource,oauth.service,clients.read,clients.write,clients.secret
-        authorized-grant-types: authorization_code,client_credentials,password,implicit
-        redirect-uri: <%= protocol %>://servicesmgmt.mycloud.com/auth/cloudfoundry/callback
-        autoapprove: true
     scim:
       users:
       - admin|<%= common_password %>|scim.write,scim.read,openid,cloud_controller.admin

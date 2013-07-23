@@ -14,7 +14,7 @@ networks:
   type: dynamic
   cloud_properties:
     security_groups:
-    - cf
+    - default
 
 compilation:
   workers: 6
@@ -33,7 +33,7 @@ update:
 resource_pools:
   - name: small
     network: default
-    size: 9
+    size: 8
     stemcell:
       name: bosh-stemcell
       version: latest
@@ -105,16 +105,6 @@ jobs:
       - name: default
         default: [dns, gateway]           
 
-  - name: login
-    release: cf-release
-    template: 
-      - login
-    instances: 1
-    resource_pool: small
-    networks:
-      - name: default
-        default: [dns, gateway]
-
   - name: cloud_controller
     release: cf-release
     template: 
@@ -164,8 +154,8 @@ properties:
     name: demo
     dns: mycloud.com
     ip_addresses: ["1.2.3.4"]
-    deployment_size: medium
-    security_group: cf
+    deployment_size: large
+    security_group: default
     persistent_disk: 4096
     common_password: qwertyasdfgh
 
@@ -202,24 +192,14 @@ properties:
 
   dea_next: *dea
 
-  service_lifecycle:
-    serialization_data_server:
-    - 169.254.1.1 
-
   syslog_aggregator:
     address: 0.syslog-aggregator.default.demo.microbosh
     port: 54321
 
-  serialization_data_server:
-    port: 8080
-    logging_level: debug
-    upload_token: qwertyasdfgh
-    upload_timeout: 10
-
   nfs_server:
     address: 0.nfs-server.default.demo.microbosh
-    # network: "*.demo.microbosh"
-    # idmapd_domain: mycloud.com
+    network: "*.demo.microbosh"
+    idmapd_domain: mycloud.com
 
   debian_nfs_server:
     no_root_squash: true
@@ -298,11 +278,7 @@ properties:
   ccng: *cc
 
   login:
-    protocol: http
-    links:
-      home: http://console.mycloud.com
-      passwd: http://console.mycloud.com/password_resets/new
-      signup: http://console.mycloud.com/register
+    enabled: false
 
   uaa:
     url: http://uaa.mycloud.com
@@ -344,34 +320,7 @@ properties:
     client:
       autoapprove:
         - cf
-        - my
-        - micro
-        - support-signon
-        - login
     clients:
-      login:
-        override: true
-        scope: openid
-        authorities: oauth.login
-        secret: qwertyasdfgh
-        authorized-grant-types: authorization_code,client_credentials,refresh_token
-        redirect-uri: http://login.mycloud.com
-      support-services:
-        scope: scim.write,scim.read,openid,cloud_controller.read,cloud_controller.write
-        secret: qwertyasdfgh
-        authorized-grant-types: authorization_code,client_credentials
-        redirect-uri: http://support-signon.mycloud.com
-        authorities: portal.users.read
-        access-token-validity: 1209600
-        refresh-token-validity: 1209600
-      oauth2service:
-        secret: qwertyasdfgh
-        scope: openid,cloud_controller.read,cloud_controller.write
-        authorities: uaa.resource,oauth.service,clients.read,clients.write,clients.secret
-        authorized-grant-types: client_credentials,implicit
-        redirect-uri: http://rewritten-later.cloudfoundry.com/whatever
-        override: true
-        autoapprove: true
       cf:
         override: true
         authorized-grant-types: password,implicit,refresh_token
@@ -379,14 +328,6 @@ properties:
         scope: cloud_controller.read,cloud_controller.write,openid,password.write,cloud_controller.admin,scim.read,scim.write
         access-token-validity: 7200
         refresh-token-validity: 1209600
-      servicesmgmt:
-        override: true
-        secret: qwertyasdfgh
-        scope: openid,cloud_controller.read,cloud_controller.write
-        authorities: uaa.resource,oauth.service,clients.read,clients.write,clients.secret
-        authorized-grant-types: authorization_code,client_credentials,password,implicit
-        redirect-uri: http://servicesmgmt.mycloud.com/auth/cloudfoundry/callback
-        autoapprove: true
     scim:
       users:
       - admin|qwertyasdfgh|scim.write,scim.read,openid,cloud_controller.admin
