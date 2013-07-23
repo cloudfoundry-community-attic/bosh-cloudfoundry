@@ -4,13 +4,14 @@ In this hands on tutorial you will deploy and scale the incredible Cloud Foundry
 
 ## Requirements
 
-There are four requirements:
+There are some requirements:
 
 * AWS account, with access credentials, and capacity to provision 6 servers & 2 elastic IPs
 * Credit on the credit card attached to your AWS account for $1 or so
 * Ruby 1.9.3 or Ruby 2.0.0 installed on your local machine
 * Internet access
 * About an hour of your time (about 5 minutes of your human activity)
+* Possibly doesn't support Windows (please let me know if you have any success or failure)
 
 Optionally:
 
@@ -145,7 +146,15 @@ You're finally ready to deploy and initialize Cloud Foundry.
 $ bosh create cf --ip 1.2.3.4 --name tutorial --security-group cf
 ```
 
-The first time you deploy Cloud Foundry it will take approximately 30 minutes. Half of this is compiling the 20+ packages that come with all-included release that was uploaded earlier (`bosh prepare cf`). If you were to delete this deployment and redeploy it would take less than 15 minutes.
+If you have a custom DNS that has a `*` A record pointed at your public IP, then use the `--dns` flag:
+
+```
+$ bosh create cf --ip 1.2.3.4 --name tutorial --security-group cf --dns mycloud.com
+```
+
+The first time you deploy Cloud Foundry it will take approximately 30 minutes. Half of this is compiling the 20+ packages that come with all-included release that was uploaded earlier (`bosh prepare cf`).
+
+If you were to delete this deployment and redeploy it would take less than 15 minutes. (NOTE: you do not have to do this now)
 
 ```
 $ bosh delete deployment tutorial
