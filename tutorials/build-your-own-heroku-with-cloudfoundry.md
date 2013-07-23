@@ -64,7 +64,7 @@ The inception server above already installs the following gems. If you skipped t
 ```
 $ gem install bosh_cli -v "~> 1.5.0.pre" --source https://s3.amazonaws.com/bosh-jenkins-gems/ 
 $ gem install bosh-bootstrap
-$ gem install bosh-cloudfoundry --pre
+$ gem install bosh-cloudfoundry
 ```
 
 
