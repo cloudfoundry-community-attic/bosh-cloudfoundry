@@ -6,6 +6,22 @@ In the default "medium" deployment (used in the step-by-step tutorial), the Clou
 
 Manually edit your deployment to run the Cloud Controller on its own dedicated server. Then run two Cloud Controller servers. Then revert back to running it on the same server as the router (and which also has the public IP attached).
 
+You will see the following when running `bosh vms`:
+
+```
+$ bosh vms
++--------------------+---------+---------------+------------------------------+
+| Job/index          | State   | Resource Pool | IPs                          |
++--------------------+---------+---------------+------------------------------+
+| api/0              | running | small         | 10.159.41.142, 50.19.127.213 |
+| cloud_controller/0 | running | small         | 10.85.1.115                  |
+| cloud_controller/1 | running | small         | 10.116.133.188               |
+| core/0             | running | small         | 10.170.15.85                 |
+| data/0             | running | small         | 10.168.20.214                |
+| dea/0              | running | small         | 10.158.75.168                |
++--------------------+---------+---------------+------------------------------+
+```
+
 ## Tips
 
 1. to edit your deployment file run `bosh edit deployment`
