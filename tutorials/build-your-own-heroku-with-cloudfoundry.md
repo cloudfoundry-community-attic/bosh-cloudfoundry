@@ -12,7 +12,7 @@ There are some requirements:
 * Git (1.8+) installed on your local machine
 * Internet access
 * About an hour of your time (about 5 minutes of your human activity)
-* Possibly doesn't support Windows (please let me know if you have any success or failure)
+* Doesn't support Windows (lack of rsync for windows)
 
 Optionally:
 
