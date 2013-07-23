@@ -137,7 +137,13 @@ Add TCP ports:
 * 22 (ssh)
 * 80 (http)
 * 443 (https)
-* 4222 (nats)
+* 1-65535 (for security group VMs only)
+
+Add UDP ports:
+
+* 1-65535 (for security group VMs only)
+
+<img src="https://www.evernote.com/shard/s3/sh/f7ae24ef-8af2-48e5-86a1-474946dcc811/4d26d2f25608dcf9cd3049994ebff037/deep/0/EC2%20Management%20Console.png">
 
 ## Deploy Cloud Foundry
 
