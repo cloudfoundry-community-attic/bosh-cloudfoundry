@@ -1,0 +1,14 @@
+---
+available_cpi:
+- aws
+- openstack
+
+mutable_attributes:
+- ip_addresses
+- persistent_disk
+- security_group
+- dns
+immutable_attributes:
+- common_password
+- deployment_size
+- name

@@ -6,7 +6,6 @@ module Bosh::Cloudfoundry
   # From this class you can navigate to ReleaseVersionCpi for the CPI specific aspect of a release version;
   # and from ReleaseVersionCpi you can navigate to one or more ReleaseVersionCpiSizes (deployment sizes).
   class ReleaseVersion
-    attr_reader :release_name
     attr_reader :version_number
 
     def self.for_version(version_number)
@@ -43,7 +42,13 @@ module Bosh::Cloudfoundry
 
     def initialize(version_number)
       @version_number = version_number
-      @release_name = "cf-release" # TODO determine from release file
+    end
+
+    def release_name
+      @release_name ||= begin
+        release_yml = Dir[File.join(bosh_release_dir, "releases", "*-#{release_version}.yml")].first
+        YAML.load_file(release_yml)["name"]
+      end
     end
 
     # Attributes & their values that can be changed via setters & deployment re-deployed successfully
@@ -62,6 +67,10 @@ module Bosh::Cloudfoundry
 
     def valid_cpi?(cpi)
       available_cpi_names.include?(cpi)
+    end
+
+    def bosh_release_dir
+      File.expand_path("../../../../bosh_release", __FILE__)
     end
 
     def self.base_template_dir
