@@ -8,11 +8,14 @@ module Bosh::Cli::Command
     usage "prepare cf"
     desc "upload latest Cloud Foundry release to bosh"
     option "--release-version version", "Upload a specific older version"
+    option "--base-stemcell-url http://example.com/stemcell.tgz", "Specify an alternate stemcell"
     def prepare_cf
       auth_required
       bosh_status
 
       release_version = options[:release_version] || latest_release_version
+      stemcell_url = options[:base_stemcell_url] ||
+          "http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/#{bosh_cpi}/latest-bosh-stemcell-#{bosh_cpi}.tgz"
 
       # Support:
       # * --release-version v132
@@ -49,7 +52,6 @@ module Bosh::Cli::Command
       end
       unless errors.empty?
         say errors.shift.make_yellow
-        stemcell_url = "http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/#{bosh_cpi}/latest-bosh-stemcell-#{bosh_cpi}.tgz"
         stemcell_cmd(non_interactive: true).upload(stemcell_url)
       end
     end
