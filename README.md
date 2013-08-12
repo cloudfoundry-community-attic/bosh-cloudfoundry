@@ -15,7 +15,7 @@ $ bosh delete cf
 
 The deployed Cloud Foundry does not include any data or messaging services for the user applications. These are available as add-ons coming soon.
 
-[![Build Status](https://travis-ci.org/cloudfoundry-community/bosh-cloudfoundry.png?branch=v0.7)](https://travis-ci.org/cloudfoundry-community/bosh-cloudfoundry) [![Stories in Ready](https://badge.waffle.io/cloudfoundry-community/bosh-cloudfoundry.png)](https://waffle.io/cloudfoundry-community/bosh-cloudfoundry) [![Code Climate](https://codeclimate.com/github/cloudfoundry-community/bosh-cloudfoundry.png)](https://codeclimate.com/github/cloudfoundry-community/bosh-cloudfoundry)
+[![Build Status](https://travis-ci.org/cloudfoundry-community/bosh-cloudfoundry.png)](https://travis-ci.org/cloudfoundry-community/bosh-cloudfoundry) [![Stories in Ready](https://badge.waffle.io/cloudfoundry-community/bosh-cloudfoundry.png)](https://waffle.io/cloudfoundry-community/bosh-cloudfoundry) [![Code Climate](https://codeclimate.com/github/cloudfoundry-community/bosh-cloudfoundry.png)](https://codeclimate.com/github/cloudfoundry-community/bosh-cloudfoundry)
 
 ## What gets created?
 
