@@ -6,7 +6,7 @@ Example create/scale/delete scenario:
 
 ```
 $ bosh prepare cf
-$ bosh create cf --public-ip 1.2.3.4
+$ bosh create cf --ip 1.2.3.4
 ...
 $ bosh change cf attributes persistent_disk=8192
 ...
@@ -104,10 +104,10 @@ Uploading new cf release to bosh...
 To create/provision a new Cloud Foundry you run the following command. By default, it will select the smallest possible deployment size.
 
 ```
-$ bosh create cf --public-ip 1.2.3.4
-$ bosh create cf --public-ip 1.2.3.4 --size medium
-$ bosh create cf --public-ip 1.2.3.4 --size large
-$ bosh create cf --public-ip 1.2.3.4 --size xlarge
+$ bosh create cf --ip 1.2.3.4
+$ bosh create cf --ip 1.2.3.4 --size medium
+$ bosh create cf --ip 1.2.3.4 --size large
+$ bosh create cf --ip 1.2.3.4 --size xlarge
 ```
 
 It is strongly recommended that you provide your own domain, such as `mycloud.com`. You can purchase and manage your domain through any DNS provider (see below for what needs to be setup), such as [dnsimple.com](https://dnsimple.com/r/af515bc1b6ffc9) (the beloved DNS manager used by Stark & Wayne; as a bonus its an affiliate link so Dr Nic gets free stuff).
@@ -115,7 +115,7 @@ It is strongly recommended that you provide your own domain, such as `mycloud.co
 To specify a domain:
 
 ```
-$ bosh create cf --domain mycloud.com --public-ip 1.2.3.4
+$ bosh create cf --domain mycloud.com --ip 1.2.3.4
 ```
 
 By default, it will configure you to use http://xip.io (a lovely service sponsored by 37signals). You root domain will be `1.2.3.4.xip.io` (where `1.2.3.4` is your IP address).
