@@ -15,6 +15,7 @@ module Bosh::Cli::Command
     option "--disk 4096", Integer, "Size of persistent disk (Mb)"
     option "--security-group default", String, "Security group to assign to provisioned VMs"
     option "--deployment-size medium", String, "Size of deployment - medium or large"
+    option "--skip-dns-validation", "Skip DNS validation"
     def create_cf
       auth_required
       bosh_status # preload
@@ -32,6 +33,7 @@ module Bosh::Cli::Command
       attrs.set_unless_nil(:security_group, options[:security_group])
       attrs.set_unless_nil(:common_password, options[:common_password])
       attrs.set_unless_nil(:deployment_size, options[:deployment_size])
+      attrs.set_unless_nil(:skip_dns_validation, options[:skip_dns_validation])
 
       release_version = ReleaseVersion.latest_version_number
       @release_version_cpi_size = 
