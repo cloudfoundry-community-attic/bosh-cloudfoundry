@@ -35,8 +35,10 @@ In us-east-1 and us-west-2 ([the two cheapest regions](http://aws.amazon.com/ec2
 If you have a slow local internet (say at home or a conference/workshop) OR if you are deploying to any other region than us-east-1, you should create an inception server.
 
 ```
-$ gem install inception-server
-$ inception deploy
+git clone https://github.com/cloudfoundry-community/inception-server.git
+cd inception-server
+bundle
+bundle exec bin/inception deploy
 ```
 
 This will take about 15 minutes.
