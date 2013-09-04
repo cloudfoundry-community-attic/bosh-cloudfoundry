@@ -48,7 +48,6 @@ Now finish the preparation of the inception server (there are outstanding bugs t
 ```
 $ inception ssh
 > ubuntu user
-$ ssh-keygen -N '' -f ~/.ssh/id_rsa
 $ sudo usermod -a -G rvm ubuntu
 $ sudo chmod g+w /usr/local/rvm -R
 $ exit
