@@ -1,4 +1,5 @@
 require "yaml"
+require "ip"
 require "bosh/cloudfoundry"
 
 module Bosh::Cli::Command
@@ -15,7 +16,13 @@ module Bosh::Cli::Command
     option "--disk 4096", Integer, "Size of persistent disk (Mb)"
     option "--security-group default", String, "Security group to assign to provisioned VMs"
     option "--deployment-size medium", String, "Size of deployment - medium or large"
+    option "--ip-range 1.2.3.0/24", String, "Subnet IP Range (CIDR)"
+    option "--reserved-ip-range 1.2.3.0,1.2.3.10", Array, "Subnet IP's to reserve (protect from BOSH)"
+    option "--gateway-ip 1.2.3.2", String, "IP for Default Gateway"
+    option "--dns-ip 1.2.3.2", String, "IP for DNS"
+    option "--vsphere-port-group VMNetwork", String, "vCenter Port Group (vSphere CPI)"
     option "--skip-dns-validation", "Skip DNS validation"
+
     def create_cf
       auth_required
       bosh_status # preload
@@ -35,8 +42,30 @@ module Bosh::Cli::Command
       attrs.set_unless_nil(:deployment_size, options[:deployment_size])
       attrs.set_unless_nil(:skip_dns_validation, options[:skip_dns_validation])
 
+      ip_range = options[:ip_range]
+      if (!!ip_range)
+        attrs.set(:ip_range, ip_range)
+        ip_range_cidr = IP::CIDR.new(ip_range)
+
+        reserved_ip_range = options[:reserved_ip_range]
+        attrs.set(:reserved_ip_range, "#{reserved_ip_range[0]} - #{reserved_ip_range[1]}")
+
+        ip_range_array = ip_range_cidr.range
+
+        last_reserved_index = ip_range_array.find_index(IP::Address::IPv4.new(reserved_ip_range[1]))
+        attrs.set(:static_ip_range, "#{ip_range_array[last_reserved_index + 1].ip_address} - #{ip_range_array[last_reserved_index + 20].ip_address}")
+
+        attrs.set(:data_ip, ip_range_array[last_reserved_index + 2].ip_address)
+        attrs.set(:core_ip, ip_range_array[last_reserved_index + 3].ip_address)
+        attrs.set(:dea_ip, ip_range_array[last_reserved_index + 4].ip_address)
+      end
+
+      attrs.set_unless_nil(:gateway_ip_address, options[:gateway_ip])
+      attrs.set_unless_nil(:dns_ip_address, options[:dns_ip])
+      attrs.set_unless_nil(:vsphere_port_group, options[:vsphere_port_group])
+
       release_version = ReleaseVersion.latest_version_number
-      @release_version_cpi_size = 
+      @release_version_cpi_size =
         ReleaseVersionCpiSize.new(@release_version_cpi, attrs.deployment_size)
 
       nl

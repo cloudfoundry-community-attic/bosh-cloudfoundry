@@ -2,6 +2,7 @@
 available_cpi:
 - aws
 - openstack
+- vsphere
 
 mutable_attributes:
 - ip_addresses
