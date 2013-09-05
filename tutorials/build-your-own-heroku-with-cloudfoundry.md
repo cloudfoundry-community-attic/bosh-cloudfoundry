@@ -45,15 +45,9 @@ This will take about 15 minutes.
 
 This will prompt you for your AWS credentials and then automatically do everything to provision and configure an Ubuntu server ready to be used for deploying a bosh server and subsequent bosh releases.
 
-Now finish the preparation of the inception server (there are outstanding bugs to be fixed for each of the steps below):
+You can now ssh into your inception server:
 
 ```
-$ inception ssh
-> ubuntu user
-$ sudo usermod -a -G rvm ubuntu
-$ sudo chmod g+w /usr/local/rvm -R
-$ exit
-
 $ inception ssh
 > ubuntu user
 ```
