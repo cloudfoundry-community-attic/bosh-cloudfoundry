@@ -6,7 +6,7 @@
 # director_uuid: 4ae3a0f0-70a5-4c0d-95f2-7fafaefe8b9e
 # releases:
 #  - name: cf
-#    version: 136
+#    version: 141
 # networks: {}
 # properties:
 #   cf:
@@ -24,6 +24,8 @@
 #
 #     $ bosh diff deployment_file.yml.erb
 #
+no_ssl          = true
+protocol        = no_ssl ? "http" : "https"
 name            = find("name")
 dns             = find("properties.cf.dns")
 ip_addresses    = find("properties.cf.ip_addresses")
@@ -31,15 +33,13 @@ security_group  = find("properties.cf.security_group")
 deployment_size = find("properties.cf.deployment_size")
 persistent_disk = find("properties.cf.persistent_disk")
 common_password = find("properties.cf.common_password")
-no_ssl          = true
-protocol        = no_ssl ? "http" : "https"
 -%>
 name: <%= name %>
 director_uuid: <%= find("director_uuid") %>
 
 releases:
  - name: cf
-   version: 136
+   version: 141
 
 networks:
 - name: floating
@@ -51,13 +51,6 @@ networks:
     security_groups:
     - <%= security_group %>
 
-compilation:
-  workers: 6
-  network: default
-  reuse_compilation_vms: true
-  cloud_properties:
-    instance_type: m1.medium
-
 update:
   canaries: 1
   canary_watch_time: 30000-600000
@@ -65,126 +58,92 @@ update:
   max_in_flight: 4
   max_errors: 1
 
+compilation:
+  workers: 6
+  network: default
+  reuse_compilation_vms: true
+  cloud_properties:
+    instance_type: m1.medium
+
 resource_pools:
   - name: small
     network: default
-    size: 8
+    size: 4
     stemcell:
       name: bosh-stemcell
       version: latest
     cloud_properties:
       instance_type: m1.small
 
-  - name: large
+  - name: medium
     network: default
-    size: 1
+    size: 0
     stemcell:
       name: bosh-stemcell
       version: latest
     cloud_properties:
-      instance_type: m1.large
+      instance_type: m1.medium
 
 jobs:
-  - name: syslog_aggregator
-    release: cf-release
-    template: 
-      - syslog_aggregator
-    instances: 1
-    resource_pool: small
-    persistent_disk: 65536
-    networks:
-      - name: default
-        default: [dns, gateway]
-      
-  - name: postgres
-    release: cf-release
-    template: 
-      - postgres
-    instances: 1
-    resource_pool: small
-    persistent_disk: 65536
-    networks:
-      - name: default
-        default: [dns, gateway]
-    properties:
-      db: databases
-
-  - name: nfs_server
+  - name: data
     release: cf-release
     template:
+      - postgres
       - debian_nfs_server
     instances: 1
     resource_pool: small
-    persistent_disk: 65536
+    persistent_disk: <%= persistent_disk %>
     networks:
-      - name: default
-        default: [dns, gateway]            
+    - name: default
+      default:
+      - dns
+      - gateway
+    properties:
+      db: databases
 
-  - name: nats
+  - name: core
     release: cf-release
-    template: 
+    template:
       - nats
-    instances: 1
-    resource_pool: small
-    networks:
-      - name: default
-        default: [dns, gateway]            
-            
-  - name: uaa
-    release: cf-release
-    template: 
+      - health_manager_next
       - uaa
     instances: 1
     resource_pool: small
     networks:
-      - name: default
-        default: [dns, gateway]           
+    - name: default
+      default:
+      - dns
+      - gateway
 
-  - name: cloud_controller
+  - name: api
     release: cf-release
-    template: 
+    template:
       - cloud_controller_ng
-    instances: 1
-    resource_pool: small
-    networks:
-      - name: default
-        default: [dns, gateway]
-    properties:
-      ccdb: ccdb
-
-  - name: router
-    release: cf-release
-    template: 
       - gorouter
     instances: 1
     resource_pool: small
     networks:
-      - name: default
-        default: [dns, gateway]
-      - name: floating
-        static_ips:
-        <%- ip_addresses.each do |ip| -%>
-        - <%= ip %>
-        <%- end -%>
+    - name: default
+      default:
+      - dns
+      - gateway
+    - name: floating
+      static_ips:
+      <%- ip_addresses.each do |ip| -%>
+      - <%= ip %>
+      <%- end -%>
+    properties:
+      db: databases
 
-  - name: health_manager
+  - name: dea
     release: cf-release
-    template: 
-      - health_manager_next
+    template:
+      - dea_next
     instances: 1
     resource_pool: small
     networks:
       - name: default
         default: [dns, gateway]
-       
-  - name: dea
-    release: cf-release
-    template: dea_next
-    instances: 1
-    resource_pool: large
-    networks:
-      - name: default
-        default: [dns, gateway]            
 
 properties:
   cf:
@@ -197,8 +156,8 @@ properties:
     common_password: <%= common_password %>
 
   domain: <%= dns %>
-  system_domain: <%= dns %>
-  system_domain_organization: <%= dns %>
+  system_domain: <%= dns %>.com
+  system_domain_organization: system_domain
   app_domains:
     - <%= dns %>
 
@@ -207,7 +166,7 @@ properties:
     management: default
 
   nats:
-    address: 0.nats.default.<%= name %>.microbosh
+    address: 0.core.default.<%= name %>.microbosh
     port: 4222
     user: nats
     password: <%= common_password %>
@@ -222,9 +181,9 @@ properties:
 
   dea: &dea
     max_memory: 4096
-    memory_mb: 4096
+    memory_mb: 4084
     memory_overcommit_factor: 4
-    disk_mb: 16384
+    disk_mb: 4096
     disk_overcommit_factor: 4
 
   dea_next: *dea
@@ -234,16 +193,16 @@ properties:
     port: 54321
 
   nfs_server:
-    address: 0.nfs-server.default.<%= name %>.microbosh
-    network: "*.<%= name %>.microbosh"
-    idmapd_domain: <%= dns %>
+    address: 0.data.default.<%= name %>.microbosh
+    #network: "*.<%= name %>.microbosh"
+    #idmapd_domain: <%= dns %>
 
   debian_nfs_server:
     no_root_squash: true
 
   databases: &databases
     db_scheme: postgres
-    address: 0.postgres.default.<%= name %>.microbosh
+    address: 0.data.default.<%= name %>.microbosh
     port: 5524
     roles:
       - tag: admin
@@ -262,7 +221,7 @@ properties:
 
   ccdb: &ccdb
     db_scheme: postgres
-    address: 0.postgres.default.<%= name %>.microbosh
+    address: 0.data.default.<%= name %>.microbosh
     port: 5524
     roles:
       - tag: admin
@@ -277,7 +236,7 @@ properties:
 
   uaadb: 
     db_scheme: postgresql
-    address: 0.postgres.default.<%= name %>.microbosh
+    address: 0.data.default.<%= name %>.microbosh
     port: 5524
     roles:
       - tag: admin
