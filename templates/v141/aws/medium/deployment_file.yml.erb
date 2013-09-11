@@ -184,6 +184,7 @@ properties:
   dea: &dea
     memory_mb: <%= dea_server_ram %>
     disk_mb: <%= dea_ephemeral_disk %>
+    directory_server_protocol: <%= protocol %>
 
   dea_next: *dea
 
