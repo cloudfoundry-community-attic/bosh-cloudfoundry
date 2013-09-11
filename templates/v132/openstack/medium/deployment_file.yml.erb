@@ -212,8 +212,8 @@ properties:
 
   nfs_server:
     address: 0.core.default.<%= name %>.microbosh
-    #network: "*.<%= name %>.microbosh"
-    #idmapd_domain: <%= dns %>
+    network: "*.<%= name %>.microbosh"
+    idmapd_domain: <%= dns %>
 
   debian_nfs_server:
     no_root_squash: true

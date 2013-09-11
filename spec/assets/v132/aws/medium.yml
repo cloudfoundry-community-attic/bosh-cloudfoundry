@@ -175,8 +175,8 @@ properties:
 
   nfs_server:
     address: 0.core.default.demo.microbosh
-    #network: "*.demo.microbosh"
-    #idmapd_domain: mycloud.com
+    network: "*.demo.microbosh"
+    idmapd_domain: mycloud.com
 
   debian_nfs_server:
     no_root_squash: true
