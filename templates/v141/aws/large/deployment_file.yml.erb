@@ -85,6 +85,16 @@ resource_pools:
       instance_type: m1.large
 
 jobs:
+  - name: nats
+    release: cf-release
+    template: 
+      - nats
+    instances: 1
+    resource_pool: small
+    networks:
+      - name: default
+        default: [dns, gateway]            
+            
   - name: syslog_aggregator
     release: cf-release
     template: 
@@ -120,16 +130,6 @@ jobs:
       - name: default
         default: [dns, gateway]            
 
-  - name: nats
-    release: cf-release
-    template: 
-      - nats
-    instances: 1
-    resource_pool: small
-    networks:
-      - name: default
-        default: [dns, gateway]            
-            
   - name: uaa
     release: cf-release
     template: 
