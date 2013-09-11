@@ -1,43 +1,6 @@
 ---
-<%-
-# Example source deployment file that can be used:
-# ---
-# name: NAME
-# director_uuid: 4ae3a0f0-70a5-4c0d-95f2-7fafaefe8b9e
-# releases:
-#  - name: cf
-#    version: 141
-# networks: {}
-# properties:
-#   cf:
-#     dns: mycloud.com
-#     ip_addresses: ['1.2.3.4']
-#     deployment_size: medium
-#     security_group: cf
-#     persistent_disk: 4096
-#
-# Then target that deployment file:
-#
-#     $ bosh deployment path/to/file/above
-#
-# Then apply this template:
-#
-#     $ bosh diff deployment_file.yml.erb
-#
-no_ssl          = true
-protocol        = no_ssl ? "http" : "https"
-name            = find("name")
-dns             = find("properties.cf.dns")
-ip_addresses    = find("properties.cf.ip_addresses")
-security_group  = find("properties.cf.security_group")
-deployment_size = find("properties.cf.deployment_size")
-persistent_disk = find("properties.cf.persistent_disk")
-common_password = find("properties.cf.common_password")
-dea_server_ram  = 1500 # common ram available on small VM
-dea_container_disk = 10*1024 # 10G is common minimal root or ephemeral disk size for all IaaS
--%>
-name: <%= name %>
-director_uuid: <%= find("director_uuid") %>
+name: demo
+director_uuid: UUID
 
 releases:
  - name: cf
@@ -51,7 +14,7 @@ networks:
   type: dynamic
   cloud_properties:
     security_groups:
-    - <%= security_group %>
+    - default
 
 update:
   canaries: 1
@@ -93,7 +56,7 @@ jobs:
       - debian_nfs_server
     instances: 1
     resource_pool: small
-    persistent_disk: <%= persistent_disk %>
+    persistent_disk: 4096
     networks:
     - name: default
       default:
@@ -130,9 +93,7 @@ jobs:
       - gateway
     - name: floating
       static_ips:
-      <%- ip_addresses.each do |ip| -%>
-      - <%= ip %>
-      <%- end -%>
+      - 1.2.3.4
     properties:
       db: databases
 
@@ -148,29 +109,29 @@ jobs:
 
 properties:
   cf:
-    name: <%= name %>
-    dns: <%= dns %>
-    ip_addresses: <%= ip_addresses.inspect %>
-    deployment_size: <%= deployment_size %>
-    security_group: <%= security_group %>
-    persistent_disk: <%= persistent_disk %>
-    common_password: <%= common_password %>
+    name: demo
+    dns: mycloud.com
+    ip_addresses: ["1.2.3.4"]
+    deployment_size: medium
+    security_group: default
+    persistent_disk: 4096
+    common_password: qwertyasdfgh
 
-  domain: <%= dns %>
-  system_domain: <%= dns %>.com
+  domain: mycloud.com
+  system_domain: mycloud.com.com
   system_domain_organization: system_domain
   app_domains:
-    - <%= dns %>
+    - mycloud.com
 
   networks:
     apps: default
     management: default
 
   nats:
-    address: 0.core.default.<%= name %>.microbosh
+    address: 0.core.default.demo.microbosh
     port: 4222
     user: nats
-    password: <%= common_password %>
+    password: qwertyasdfgh
     authorization_timeout: 5
 
   router:
@@ -178,38 +139,38 @@ properties:
     status:
       port: 8080
       user: gorouter
-      password: <%= common_password %>
+      password: qwertyasdfgh
 
   dea: &dea
-    memory_mb: <%= dea_server_ram %>
-    disk_mb: <%= dea_container_disk %>
-    directory_server_protocol: <%= protocol %>
+    memory_mb: 1500
+    disk_mb: 10240
+    directory_server_protocol: http
 
   dea_next: *dea
 
   syslog_aggregator:
-    address: 0.syslog-aggregator.default.<%= name %>.microbosh
+    address: 0.syslog-aggregator.default.demo.microbosh
     port: 54321
 
   nfs_server:
-    address: 0.data.default.<%= name %>.microbosh
-    network: "*.<%= name %>.microbosh"
-    idmapd_domain: <%= dns %>
+    address: 0.data.default.demo.microbosh
+    network: "*.demo.microbosh"
+    idmapd_domain: mycloud.com
 
   debian_nfs_server:
     no_root_squash: true
 
   databases: &databases
     db_scheme: postgres
-    address: 0.data.default.<%= name %>.microbosh
+    address: 0.data.default.demo.microbosh
     port: 5524
     roles:
       - tag: admin
         name: ccadmin
-        password: <%= common_password %>
+        password: qwertyasdfgh
       - tag: admin
         name: uaaadmin
-        password: <%= common_password %>
+        password: qwertyasdfgh
     databases:
       - tag: cc
         name: ccdb
@@ -220,12 +181,12 @@ properties:
 
   ccdb: &ccdb
     db_scheme: postgres
-    address: 0.data.default.<%= name %>.microbosh
+    address: 0.data.default.demo.microbosh
     port: 5524
     roles:
       - tag: admin
         name: ccadmin
-        password: <%= common_password %>
+        password: qwertyasdfgh
     databases:
       - tag: cc
         name: ccdb
@@ -235,12 +196,12 @@ properties:
 
   uaadb: 
     db_scheme: postgresql
-    address: 0.data.default.<%= name %>.microbosh
+    address: 0.data.default.demo.microbosh
     port: 5524
     roles:
       - tag: admin
         name: uaaadmin
-        password: <%= common_password %>
+        password: qwertyasdfgh
     databases:
       - tag: uaa
         name: uaadb
@@ -251,14 +212,14 @@ properties:
   cc: &cc
     logging_level: debug
     external_host: ccng
-    srv_api_uri: <%= protocol %>://api.<%= dns %>
+    srv_api_uri: http://api.mycloud.com
     cc_partition: default
-    db_encryption_key: <%= common_password %>
-    bootstrap_admin_email: admin@<%= dns %>
-    bulk_api_password: <%= common_password %>
+    db_encryption_key: qwertyasdfgh
+    bootstrap_admin_email: admin@mycloud.com
+    bulk_api_password: qwertyasdfgh
     uaa_resource_id: cloud_controller
     staging_upload_user: uploaduser
-    staging_upload_password: <%= common_password %>
+    staging_upload_password: qwertyasdfgh
     resource_pool:
       resource_directory_key: cc-resources
       # Local provider when using NFS
@@ -277,9 +238,9 @@ properties:
     enabled: false
 
   uaa:
-    url: <%= protocol %>://uaa.<%= dns %>
+    url: http://uaa.mycloud.com
     spring_profiles: postgresql
-    no_ssl: <%= no_ssl %>
+    no_ssl: true
     catalina_opts: -Xmx768m -XX:MaxPermSize=256m
     resource_id: account_manager
     jwt:
@@ -307,12 +268,12 @@ properties:
         spULZVNRxq7veq/fzwIDAQAB
         -----END PUBLIC KEY-----
     cc:
-      client_secret: <%= common_password %>
+      client_secret: qwertyasdfgh
     admin:
-      client_secret: <%= common_password %>
+      client_secret: qwertyasdfgh
     batch:
       username: batchuser
-      password: <%= common_password %>
+      password: qwertyasdfgh
     client:
       autoapprove:
         - cf
@@ -326,5 +287,5 @@ properties:
         refresh-token-validity: 1209600
     scim:
       users:
-      - admin|<%= common_password %>|scim.write,scim.read,openid,cloud_controller.admin
-      - services|<%= common_password %>|scim.write,scim.read,openid,cloud_controller.admin
+      - admin|qwertyasdfgh|scim.write,scim.read,openid,cloud_controller.admin
+      - services|qwertyasdfgh|scim.write,scim.read,openid,cloud_controller.admin

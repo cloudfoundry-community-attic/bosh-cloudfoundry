@@ -63,7 +63,6 @@ update:
   canary_watch_time: 30000-600000
   update_watch_time: 30000-600000
   max_in_flight: 4
-  max_errors: 1
 
 resource_pools:
   - name: small
@@ -86,7 +85,7 @@ resource_pools:
 
 jobs:
   - name: syslog_aggregator
-    release: cf-release
+    release: cf
     template: 
       - syslog_aggregator
     instances: 1
@@ -97,7 +96,7 @@ jobs:
         default: [dns, gateway]
       
   - name: postgres
-    release: cf-release
+    release: cf
     template: 
       - postgres
     instances: 1
@@ -110,7 +109,7 @@ jobs:
       db: databases
 
   - name: nfs_server
-    release: cf-release
+    release: cf
     template:
       - debian_nfs_server
     instances: 1
@@ -121,7 +120,7 @@ jobs:
         default: [dns, gateway]            
 
   - name: nats
-    release: cf-release
+    release: cf
     template: 
       - nats
     instances: 1
@@ -131,7 +130,7 @@ jobs:
         default: [dns, gateway]            
             
   - name: uaa
-    release: cf-release
+    release: cf
     template: 
       - uaa
     instances: 1
@@ -141,7 +140,7 @@ jobs:
         default: [dns, gateway]           
 
   - name: cloud_controller
-    release: cf-release
+    release: cf
     template: 
       - cloud_controller_ng
     instances: 1
@@ -153,7 +152,7 @@ jobs:
       ccdb: ccdb
 
   - name: router
-    release: cf-release
+    release: cf
     template: 
       - gorouter
     instances: 1
@@ -168,7 +167,7 @@ jobs:
         <%- end -%>
 
   - name: health_manager
-    release: cf-release
+    release: cf
     template: 
       - health_manager_next
     instances: 1
@@ -178,7 +177,7 @@ jobs:
         default: [dns, gateway]
        
   - name: dea
-    release: cf-release
+    release: cf
     template: dea_next
     instances: 1
     resource_pool: large

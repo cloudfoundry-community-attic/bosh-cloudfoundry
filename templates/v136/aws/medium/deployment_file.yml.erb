@@ -56,7 +56,6 @@ update:
   canary_watch_time: 30000-600000
   update_watch_time: 30000-600000
   max_in_flight: 4
-  max_errors: 1
 
 compilation:
   workers: 6
@@ -86,7 +85,7 @@ resource_pools:
 
 jobs:
   - name: data
-    release: cf-release
+    release: cf
     template:
       - postgres
       - debian_nfs_server
@@ -102,7 +101,7 @@ jobs:
       db: databases
 
   - name: core
-    release: cf-release
+    release: cf
     template:
       - nats
       - health_manager_next
@@ -116,7 +115,7 @@ jobs:
       - gateway
 
   - name: api
-    release: cf-release
+    release: cf
     template:
       - cloud_controller_ng
       - gorouter
@@ -136,7 +135,7 @@ jobs:
       db: databases
 
   - name: dea
-    release: cf-release
+    release: cf
     template:
       - dea_next
     instances: 1
@@ -194,8 +193,8 @@ properties:
 
   nfs_server:
     address: 0.data.default.<%= name %>.microbosh
-    #network: "*.<%= name %>.microbosh"
-    #idmapd_domain: <%= dns %>
+    network: "*.<%= name %>.microbosh"
+    idmapd_domain: <%= dns %>
 
   debian_nfs_server:
     no_root_squash: true

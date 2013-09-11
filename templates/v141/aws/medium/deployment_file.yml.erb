@@ -33,7 +33,7 @@ security_group  = find("properties.cf.security_group")
 deployment_size = find("properties.cf.deployment_size")
 persistent_disk = find("properties.cf.persistent_disk")
 common_password = find("properties.cf.common_password")
-dea_server_ram  = 1500 # common ram available on small VM
+dea_server_ram  = 1500 # expected ram available on dea server
 dea_container_disk = 10*1024 # 10G is common minimal root or ephemeral disk size for all IaaS
 -%>
 name: <%= name %>
@@ -58,7 +58,6 @@ update:
   canary_watch_time: 30000-600000
   update_watch_time: 30000-600000
   max_in_flight: 4
-  max_errors: 1
 
 compilation:
   workers: 6
@@ -88,7 +87,7 @@ resource_pools:
 
 jobs:
   - name: data
-    release: cf-release
+    release: cf
     template:
       - postgres
       - debian_nfs_server
@@ -104,7 +103,7 @@ jobs:
       db: databases
 
   - name: core
-    release: cf-release
+    release: cf
     template:
       - nats
       - health_manager_next
@@ -118,7 +117,7 @@ jobs:
       - gateway
 
   - name: api
-    release: cf-release
+    release: cf
     template:
       - cloud_controller_ng
       - gorouter
@@ -138,7 +137,7 @@ jobs:
       db: databases
 
   - name: dea
-    release: cf-release
+    release: cf
     template:
       - dea_next
     instances: 1
@@ -183,7 +182,7 @@ properties:
 
   dea: &dea
     memory_mb: <%= dea_server_ram %>
-    disk_mb: <%= dea_ephemeral_disk %>
+    disk_mb: <%= dea_container_disk %>
     directory_server_protocol: <%= protocol %>
 
   dea_next: *dea
@@ -194,8 +193,8 @@ properties:
 
   nfs_server:
     address: 0.data.default.<%= name %>.microbosh
-    #network: "*.<%= name %>.microbosh"
-    #idmapd_domain: <%= dns %>
+    network: "*.<%= name %>.microbosh"
+    idmapd_domain: <%= dns %>
 
   debian_nfs_server:
     no_root_squash: true
