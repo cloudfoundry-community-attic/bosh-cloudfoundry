@@ -9,7 +9,7 @@ Bundler.setup(:default, :test)
 $:.unshift(File.expand_path("../../lib", __FILE__))
 
 def latest_cf_release_version
-  136
+  141
 end
 
 require "rspec/core"

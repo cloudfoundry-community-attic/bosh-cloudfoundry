@@ -33,6 +33,8 @@ security_group  = find("properties.cf.security_group")
 deployment_size = find("properties.cf.deployment_size")
 persistent_disk = find("properties.cf.persistent_disk")
 common_password = find("properties.cf.common_password")
+dea_server_ram  = 1500 # common ram available on small VM
+dea_container_disk = 10*1024 # 10G is common minimal root or ephemeral disk size for all IaaS
 -%>
 name: <%= name %>
 director_uuid: <%= find("director_uuid") %>
@@ -180,11 +182,8 @@ properties:
       password: <%= common_password %>
 
   dea: &dea
-    max_memory: 4096
-    memory_mb: 4084
-    memory_overcommit_factor: 4
-    disk_mb: 4096
-    disk_overcommit_factor: 4
+    memory_mb: <%= dea_server_ram %>
+    disk_mb: <%= dea_ephemeral_disk %>
 
   dea_next: *dea
 

@@ -12,7 +12,7 @@ describe Bosh::Cloudfoundry::ReleaseVersion do
   end
 
   it "knows available versions" do
-    Bosh::Cloudfoundry::ReleaseVersion.available_versions.should == [132, 133, 134, 136]
+    Bosh::Cloudfoundry::ReleaseVersion.available_versions.should == [132, 133, 134, 136, 141]
   end
 
   it "knows latest version number" do
