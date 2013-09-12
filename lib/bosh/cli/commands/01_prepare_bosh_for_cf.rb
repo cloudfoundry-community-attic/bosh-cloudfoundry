@@ -49,7 +49,7 @@ module Bosh::Cli::Command
       end
       unless errors.empty?
         say errors.shift.make_yellow
-        stemcell_url = "http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/#{bosh_cpi}/latest-bosh-stemcell-#{bosh_cpi}.tgz"
+        stemcell_url = "http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/#{bosh_cpi}/bosh-stemcell-latest-#{bosh_cpi}-#{bosh_cpi_hypervisor}-ubuntu.tgz"
         stemcell_cmd(non_interactive: true).upload(stemcell_url)
       end
     end
@@ -96,6 +96,16 @@ module Bosh::Cli::Command
     # The CPI (aws/openstack/etc) of the target bosh
     def bosh_cpi
       bosh_status["cpi"]
+    end
+
+    # The CPI (aws/openstack/etc) of the target bosh
+    def bosh_cpi_hypervisor
+      case bosh_status["cpi"]
+      when "aws"
+        "xen"
+      when "openstack"
+        "kvm"
+      end
     end
 
     # Helper to invoke the Release command's actions

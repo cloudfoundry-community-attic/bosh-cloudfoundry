@@ -3,7 +3,7 @@ require "bosh/cli/commands/01_prepare_bosh_for_cf"
 describe Bosh::Cli::Command::PrepareBoshForCloudFoundry do
   let(:command) { Bosh::Cli::Command::PrepareBoshForCloudFoundry.new }
   let(:director) { instance_double("Bosh::Cli::Director") }
-  let(:aws_full_stemcell_url)  { "http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/aws/latest-bosh-stemcell-aws.tgz" }
+  let(:aws_full_stemcell_url)  { "http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/aws/bosh-stemcell-latest-aws-xen-ubuntu.tgz" }
 
   before do
     setup_home_dir
