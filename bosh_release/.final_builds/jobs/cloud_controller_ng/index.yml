@@ -34,3 +34,13 @@ builds:
     version: 8
     sha1: !binary |-
       Y2U2MjQ5MDUyMzA4ZmZjZDQ5ZDcwYTAxNTI5ZmJiNmE5NjY2NTg1MQ==
+  !binary "MTdhM2MyZjc4YWVlNzIxZTI4MjZkMGFjYTFkYzUxNGE3NmY3ZGNlOA==":
+    blobstore_id: 194d9e55-ab4a-45c7-998b-d03062d2bcac
+    version: 9
+    sha1: !binary |-
+      YTg0ZjAyNGU1YjRhMzY1OGM3ZGU3MDAyNWU1MGNkZTUzYzgzYzliMQ==
+  !binary "YTYzNzUwNTI5YmYxOWY4YzBiMGY2OWJmN2Q4ZjY0OGFhZmVlYzI4Yw==":
+    blobstore_id: 386f1580-3588-4361-8e69-573a56698f9f
+    version: 10
+    sha1: !binary |-
+      NzkzODIzZGVlNDJlM2RkOThjMDk1NDQ2NGIxYzZlNDg1YTYzOGUxZg==
