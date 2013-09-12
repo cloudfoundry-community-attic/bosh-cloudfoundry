@@ -19,5 +19,6 @@ The rewrite introduces some new implementation/feature concepts:
 * different sizes of deployments (orders of magnitude), such as small, medium & large: `bosh create cf --deployment-size large`
 * mutable/changable properties (and immutable properties) for each template version: `bosh change cf attributes persistent_disk=8192`
 * can initially use public http://xip.io for DNS and change to custom DNS later: `bosh change cf attributes dns=cf.mycloud.com`
+* v141 cf release & template fixes [v0.7.1]
 
 The latter means that new versions of this rubygem can be published that are backwards compatible with aging deployments of Cloud Foundry. There should not be any forced coupling of old `bosh-cloudfoundry` to old `cf-release` final releases.
