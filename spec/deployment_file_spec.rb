@@ -50,30 +50,32 @@ describe Bosh::Cloudfoundry::DeploymentFile do
         common_password: "qwertyasdfgh",
         deployment_size: deployment_size
       } }
-      let(:release_version_cpi) { Bosh::Cloudfoundry::ReleaseVersionCpi.for_cpi(133, bosh_cpi) }
-      let(:release_version_cpi_size) { Bosh::Cloudfoundry::ReleaseVersionCpiSize.new(release_version_cpi, deployment_size) }
-      let(:deployment_attributes) do
-        Bosh::Cloudfoundry::DeploymentAttributes.new(mock("director"), bosh_status, release_version_cpi_size, attributes)
-      end
+      # [133, 141].each do |release_version|
+      [141].each do |release_version|
+        let(:release_version_cpi) { Bosh::Cloudfoundry::ReleaseVersionCpi.for_cpi(release_version, bosh_cpi) }
+        let(:release_version_cpi_size) { Bosh::Cloudfoundry::ReleaseVersionCpiSize.new(release_version_cpi, deployment_size) }
+        let(:deployment_attributes) do
+          Bosh::Cloudfoundry::DeploymentAttributes.new(mock("director"), bosh_status, release_version_cpi_size, attributes)
+        end
 
-      subject { Bosh::Cloudfoundry::DeploymentFile.new(release_version_cpi_size, deployment_attributes, bosh_status) }
+        subject { Bosh::Cloudfoundry::DeploymentFile.new(release_version_cpi_size, deployment_attributes, bosh_status) }
 
-      before do
-        subject.biff.stub(:deployment).and_return(home_file("deployments/cf/demo.yml"))
-        deployment_cmd = mock("deployment_cmd")
-        deployment_cmd.stub(:set_current).with(home_file("deployments/cf/demo.yml"))
-        deployment_cmd.stub(:perform)
-        subject.stub(:deployment_cmd).and_return(deployment_cmd)
-      end
+        before do
+          subject.biff.stub(:deployment).and_return(home_file("deployments/cf/demo.yml"))
+          deployment_cmd = mock("deployment_cmd")
+          deployment_cmd.stub(:set_current).with(home_file("deployments/cf/demo.yml"))
+          deployment_cmd.stub(:perform)
+          subject.stub(:deployment_cmd).and_return(deployment_cmd)
+        end
 
-      it "#{deployment_size} size" do
-        in_home_dir do
-          subject.prepare_environment
+        it "#{deployment_size} size for v#{release_version}" do
+          in_home_dir do
+            subject.prepare_environment
+            subject.create_deployment_file
+            files_match(spec_asset("v#{release_version}/aws/#{deployment_size}.yml"), subject.deployment_file)
 
-          subject.create_deployment_file
-          files_match(spec_asset("v133/aws/#{deployment_size}.yml"), subject.deployment_file)
-
-          subject.deploy(non_interactive: true)
+            subject.deploy(non_interactive: true)
+          end
         end
       end
     end
