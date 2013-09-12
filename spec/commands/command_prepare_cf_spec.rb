@@ -1,11 +1,9 @@
 require "bosh/cli/commands/01_prepare_bosh_for_cf"
 
 describe Bosh::Cli::Command::PrepareBoshForCloudFoundry do
-  let(:latest_release_version_number) { 134 }
-
   let(:command) { Bosh::Cli::Command::PrepareBoshForCloudFoundry.new }
   let(:director) { instance_double("Bosh::Cli::Director") }
-  let(:aws_full_stemcell_url)  { "http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/aws/latest-bosh-stemcell-aws.tgz" }
+  let(:aws_full_stemcell_url)  { "http://bosh-jenkins-artifacts.s3.amazonaws.com/bosh-stemcell/aws/bosh-stemcell-latest-aws-xen-ubuntu.tgz" }
 
   before do
     setup_home_dir
@@ -25,7 +23,7 @@ describe Bosh::Cli::Command::PrepareBoshForCloudFoundry do
       director.should_receive(:list_releases).and_return([])
       director.should_receive(:list_stemcells).and_return([])
 
-      release_yml = File.expand_path("../../../bosh_release/releases/cf-release-#{latest_release_version_number}.yml", __FILE__)
+      release_yml = File.expand_path("../../../bosh_release/releases/cf-#{latest_cf_release_version}.yml", __FILE__)
       release_cmd = instance_double("Bosh::Cli::Command::Release")
       release_cmd.should_receive(:upload).with(release_yml)
       command.stub(:release_cmd).and_return(release_cmd)
@@ -96,7 +94,7 @@ describe Bosh::Cli::Command::PrepareBoshForCloudFoundry do
       director.should_receive(:list_releases).and_return([])
       director.should_receive(:list_stemcells).and_return([{"name" => "bosh-stemcell", "version" => "something"}])
       
-      release_yml = File.expand_path("../../../bosh_release/releases/cf-release-#{latest_release_version_number}.yml", __FILE__)
+      release_yml = File.expand_path("../../../bosh_release/releases/cf-#{latest_cf_release_version}.yml", __FILE__)
       release_cmd = instance_double("Bosh::Cli::Command::Release")
       release_cmd.should_receive(:upload).with(release_yml)
       command.stub(:release_cmd).and_return(release_cmd)
