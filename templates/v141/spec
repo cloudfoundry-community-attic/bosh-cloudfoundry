@@ -9,6 +9,7 @@ mutable_attributes:
 - security_group
 - dns
 - dea_server_ram
+- dea_container_depot_disk
 immutable_attributes:
 - common_password
 - deployment_size
