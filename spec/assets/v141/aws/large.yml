@@ -157,6 +157,7 @@ properties:
     security_group: default
     persistent_disk: 4096
     common_password: qwertyasdfgh
+    dea_server_ram: 1500
 
   domain: mycloud.com
   system_domain: mycloud.com

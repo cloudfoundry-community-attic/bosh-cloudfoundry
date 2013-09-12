@@ -19,6 +19,7 @@ module Bosh::Cloudfoundry
       @attributes[:security_group] ||= default_security_group
       @attributes[:common_password] ||= random_string(12, :common)
       @attributes[:skip_dns_validation] ||= default_skip_dns_validation
+      @attributes[:dea_server_ram] ||= default_dea_server_ram
     end
 
     def name
@@ -47,6 +48,10 @@ module Bosh::Cloudfoundry
 
     def dns
       @attributes[:dns]
+    end
+
+    def dea_server_ram
+      @attributes[:dea_server_ram]
     end
 
     def available_attributes
@@ -196,6 +201,10 @@ module Bosh::Cloudfoundry
 
     def default_skip_dns_validation
       false
+    end
+
+    def default_dea_server_ram
+      1500
     end
 
     def set_default_dns

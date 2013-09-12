@@ -8,6 +8,7 @@ mutable_attributes:
 - persistent_disk
 - security_group
 - dns
+- dea_server_ram
 immutable_attributes:
 - common_password
 - deployment_size
