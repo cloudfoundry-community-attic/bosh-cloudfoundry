@@ -12,6 +12,7 @@ describe Bosh::Cloudfoundry::DeploymentAttributes do
     it { subject.security_group.should == "default" }
     it { subject.common_password.should == "qwertyqwerty" }
     it { subject.dea_server_ram.should == 1500 }
+    it { subject.dea_container_depot_disk.should == 10240 }
   end
 
   context "delayed default values" do
@@ -36,7 +37,7 @@ describe Bosh::Cloudfoundry::DeploymentAttributes do
     it "returns default attributes" do
       subject = Bosh::Cloudfoundry::DeploymentAttributes.new(director, bosh_status, release_version_cpi)
       subject.available_attributes.sort.should ==
-        %w[common_password dea_server_ram deployment_size name persistent_disk security_group skip_dns_validation].map(&:to_sym)
+        %w[common_password dea_container_depot_disk dea_server_ram deployment_size name persistent_disk security_group skip_dns_validation].map(&:to_sym)
     end
 
     it "returns additional attributes" do
@@ -44,7 +45,7 @@ describe Bosh::Cloudfoundry::DeploymentAttributes do
         dns: "mycloud.com", ip_addresses: ["1.2.3.4"]
       })
       subject.available_attributes.sort.should ==
-        %w[common_password dea_server_ram deployment_size dns ip_addresses name persistent_disk security_group skip_dns_validation].map(&:to_sym)
+        %w[common_password dea_container_depot_disk dea_server_ram deployment_size dns ip_addresses name persistent_disk security_group skip_dns_validation].map(&:to_sym)
     end
 
     # immutable_attributes ultimately determined by ReleaseVersion (from templates/vXYZ/spec)

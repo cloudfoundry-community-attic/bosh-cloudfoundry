@@ -34,7 +34,7 @@ common_password = find("properties.cf.common_password")
 no_ssl          = true
 protocol        = no_ssl ? "http" : "https"
 dea_server_ram  = find("properties.cf.dea_server_ram") # expected ram available on dea server
-dea_container_depot_disk = 10*1024 # 10G is common minimal root or ephemeral disk size for all IaaS
+dea_container_depot_disk = find("properties.cf.dea_container_depot_disk")
 -%>
 name: <%= name %>
 director_uuid: <%= find("director_uuid") %>
@@ -197,6 +197,7 @@ properties:
     persistent_disk: <%= persistent_disk %>
     common_password: <%= common_password %>
     dea_server_ram: <%= dea_server_ram %>
+    dea_container_depot_disk: <%= dea_container_depot_disk %>
 
   domain: <%= dns %>
   system_domain: <%= dns %>
