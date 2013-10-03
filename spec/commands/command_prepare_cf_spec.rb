@@ -90,16 +90,20 @@ describe Bosh::Cli::Command::PrepareBoshForCloudFoundry do
       command.prepare_cf
     end
 
-    it "do not upload stemcell if bosh already has stemcell" do
-      director.should_receive(:list_releases).and_return([])
-      director.should_receive(:list_stemcells).and_return([{"name" => "bosh-stemcell", "version" => "something"}])
+    %w[aws-xen openstack-kvm].each do |cpi_hyper|
+      it "do not upload #{cpi_hyper} stemcell if bosh already has stemcell" do
+        cpi, _ = cpi_hyper.split("-")
+        director.should_receive(:list_releases).and_return([])
+        director.should_receive(:get_status).and_return({"uuid" => "UUID", "cpi" => cpi})
+        director.should_receive(:list_stemcells).and_return([{"name" => "bosh-#{cpi_hyper}-ubuntu", "version" => "something"}])
       
-      release_yml = File.expand_path("../../../bosh_release/releases/cf-#{latest_cf_release_version}.yml", __FILE__)
-      release_cmd = instance_double("Bosh::Cli::Command::Release")
-      release_cmd.should_receive(:upload).with(release_yml)
-      command.stub(:release_cmd).and_return(release_cmd)
+        release_yml = File.expand_path("../../../bosh_release/releases/cf-#{latest_cf_release_version}.yml", __FILE__)
+        release_cmd = instance_double("Bosh::Cli::Command::Release")
+        release_cmd.should_receive(:upload).with(release_yml)
+        command.stub(:release_cmd).and_return(release_cmd)
 
-      command.prepare_cf
+        command.prepare_cf
+      end
     end
   end
 

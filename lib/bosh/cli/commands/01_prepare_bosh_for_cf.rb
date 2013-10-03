@@ -56,7 +56,18 @@ module Bosh::Cli::Command
 
     protected
     def stemcell_name
-      "bosh-stemcell"
+      case director_cpi.to_sym
+      when :aws
+        "bosh-aws-xen-ubuntu"
+      when :openstack
+        "bosh-openstack-kvm-ubuntu"
+      else
+        error "Please implement stemcell name support for #{director_cpi} in bosh-cloudfoundry"
+      end
+    end
+
+    def director_cpi
+      director.get_status["cpi"]
     end
 
     def bosh_release_dir
