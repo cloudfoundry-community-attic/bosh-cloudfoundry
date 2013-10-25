@@ -190,7 +190,7 @@ $ git clone https://github.com/cloudfoundry-community/cf-env.git
 $ cd cf-env
 $ bundle
 
-$ cf push env
+$ cf push
 Instances> 1
 
 1: 128M
