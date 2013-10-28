@@ -213,7 +213,7 @@ properties:
 
   cc: &cc
     logging_level: debug
-    external_host: ccng
+    external_host: api
     srv_api_uri: http://api.mycloud.com
     cc_partition: default
     db_encryption_key: qwertyasdfgh
