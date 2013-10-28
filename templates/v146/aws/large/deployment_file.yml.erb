@@ -1,0 +1,373 @@
+---
+<%-
+# Example source deployment file that can be used:
+# ---
+# name: NAME
+# director_uuid: 4ae3a0f0-70a5-4c0d-95f2-7fafaefe8b9e
+# releases:
+#  - name: cf
+#    version: 146
+# networks: {}
+# properties:
+#   cf:
+#     dns: mycloud.com
+#     ip_addresses: ['1.2.3.4']
+#     deployment_size: medium
+#     security_group: cf
+#     persistent_disk: 4096
+#
+# Then target that deployment file:
+#
+#     $ bosh deployment path/to/file/above
+#
+# Then apply this template:
+#
+#     $ bosh diff deployment_file.yml.erb
+#
+name            = find("name")
+dns             = find("properties.cf.dns")
+ip_addresses    = find("properties.cf.ip_addresses")
+security_group  = find("properties.cf.security_group")
+deployment_size = find("properties.cf.deployment_size")
+persistent_disk = find("properties.cf.persistent_disk")
+common_password = find("properties.cf.common_password")
+no_ssl          = true
+protocol        = no_ssl ? "http" : "https"
+dea_server_ram  = find("properties.cf.dea_server_ram") # expected ram available on dea server
+dea_container_depot_disk = find("properties.cf.dea_container_depot_disk")
+-%>
+name: <%= name %>
+director_uuid: <%= find("director_uuid") %>
+
+releases:
+ - name: cf
+   version: 146
+
+networks:
+- name: floating
+  type: vip
+  cloud_properties: {}
+- name: default
+  type: dynamic
+  cloud_properties:
+    security_groups:
+    - <%= security_group %>
+
+compilation:
+  workers: 6
+  network: default
+  reuse_compilation_vms: true
+  cloud_properties:
+    instance_type: m1.medium
+
+update:
+  canaries: 1
+  canary_watch_time: 30000-60000
+  update_watch_time: 30000-60000
+  max_in_flight: 4
+
+resource_pools:
+  - name: small
+    network: default
+    size: 8
+    stemcell:
+      name: bosh-aws-xen-ubuntu
+      version: latest
+    cloud_properties:
+      instance_type: m1.small
+
+  - name: large
+    network: default
+    size: 1
+    stemcell:
+      name: bosh-aws-xen-ubuntu
+      version: latest
+    cloud_properties:
+      instance_type: m1.large
+
+jobs:
+  - name: nats
+    release: cf
+    template: 
+      - nats
+    instances: 1
+    resource_pool: small
+    networks:
+      - name: default
+        default: [dns, gateway]            
+            
+  - name: syslog_aggregator
+    release: cf
+    template: 
+      - syslog_aggregator
+    instances: 1
+    resource_pool: small
+    persistent_disk: 65536
+    networks:
+      - name: default
+        default: [dns, gateway]
+      
+  - name: postgres
+    release: cf
+    template: 
+      - postgres
+    instances: 1
+    resource_pool: small
+    persistent_disk: 65536
+    networks:
+      - name: default
+        default: [dns, gateway]
+    properties:
+      db: databases
+
+  - name: nfs_server
+    release: cf
+    template:
+      - debian_nfs_server
+    instances: 1
+    resource_pool: small
+    persistent_disk: 65536
+    networks:
+      - name: default
+        default: [dns, gateway]            
+
+  - name: uaa
+    release: cf
+    template: 
+      - uaa
+    instances: 1
+    resource_pool: small
+    networks:
+      - name: default
+        default: [dns, gateway]           
+
+  - name: cloud_controller
+    release: cf
+    template: 
+      - cloud_controller_ng
+    instances: 1
+    resource_pool: small
+    networks:
+      - name: default
+        default: [dns, gateway]
+    properties:
+      ccdb: ccdb
+
+  - name: router
+    release: cf
+    template: 
+      - gorouter
+    instances: 1
+    resource_pool: small
+    networks:
+      - name: default
+        default: [dns, gateway]
+      - name: floating
+        static_ips:
+        <%- ip_addresses.each do |ip| -%>
+        - <%= ip %>
+        <%- end -%>
+
+  - name: health_manager
+    release: cf
+    template: 
+      - health_manager_next
+    instances: 1
+    resource_pool: small
+    networks:
+      - name: default
+        default: [dns, gateway]
+       
+  - name: dea
+    release: cf
+    template: dea_next
+    instances: 1
+    resource_pool: large
+    networks:
+      - name: default
+        default: [dns, gateway]            
+
+properties:
+  cf:
+    name: <%= name %>
+    dns: <%= dns %>
+    ip_addresses: <%= ip_addresses.inspect %>
+    deployment_size: <%= deployment_size %>
+    security_group: <%= security_group %>
+    persistent_disk: <%= persistent_disk %>
+    common_password: <%= common_password %>
+    dea_server_ram: <%= dea_server_ram %>
+    dea_container_depot_disk: <%= dea_container_depot_disk %>
+
+  domain: <%= dns %>
+  system_domain: <%= dns %>
+  system_domain_organization: <%= dns %>
+  app_domains:
+    - <%= dns %>
+
+  networks:
+    apps: default
+    management: default
+
+  nats:
+    address: 0.nats.default.<%= name %>.microbosh
+    port: 4222
+    user: nats
+    password: <%= common_password %>
+    authorization_timeout: 5
+
+  router:
+    port: 8081
+    status:
+      port: 8080
+      user: gorouter
+      password: <%= common_password %>
+
+  dea: &dea
+    memory_mb: <%= dea_server_ram %>
+    disk_mb: <%= dea_container_depot_disk %>
+    directory_server_protocol: <%= protocol %>
+
+  dea_next: *dea
+
+  syslog_aggregator:
+    address: 0.syslog-aggregator.default.<%= name %>.microbosh
+    port: 54321
+
+  nfs_server:
+    address: 0.nfs-server.default.<%= name %>.microbosh
+    network: "*.<%= name %>.microbosh"
+    idmapd_domain: <%= dns %>
+
+  debian_nfs_server:
+    no_root_squash: true
+
+  databases: &databases
+    db_scheme: postgres
+    address: 0.postgres.default.<%= name %>.microbosh
+    port: 5524
+    roles:
+      - tag: admin
+        name: ccadmin
+        password: <%= common_password %>
+      - tag: admin
+        name: uaaadmin
+        password: <%= common_password %>
+    databases:
+      - tag: cc
+        name: ccdb
+        citext: true
+      - tag: uaa
+        name: uaadb
+        citext: true
+
+  ccdb: &ccdb
+    db_scheme: postgres
+    address: 0.postgres.default.<%= name %>.microbosh
+    port: 5524
+    roles:
+      - tag: admin
+        name: ccadmin
+        password: <%= common_password %>
+    databases:
+      - tag: cc
+        name: ccdb
+        citext: true
+
+  ccdb_ng: *ccdb
+
+  uaadb: 
+    db_scheme: postgresql
+    address: 0.postgres.default.<%= name %>.microbosh
+    port: 5524
+    roles:
+      - tag: admin
+        name: uaaadmin
+        password: <%= common_password %>
+    databases:
+      - tag: uaa
+        name: uaadb
+        citext: true
+
+  cc_api_version: v2
+
+  cc: &cc
+    logging_level: debug
+    external_host: api
+    srv_api_uri: <%= protocol %>://api.<%= dns %>
+    cc_partition: default
+    db_encryption_key: <%= common_password %>
+    bootstrap_admin_email: admin@<%= dns %>
+    bulk_api_password: <%= common_password %>
+    uaa_resource_id: cloud_controller
+    staging_upload_user: uploaduser
+    staging_upload_password: <%= common_password %>
+    resource_pool:
+      resource_directory_key: cc-resources
+      # Local provider when using NFS
+      fog_connection:
+        provider: Local
+        local_root: /var/vcap/shared
+    packages:
+      app_package_directory_key: cc-packages
+    droplets:
+      droplet_directory_key: cc-droplets
+    default_quota_definition: runaway
+
+  ccng: *cc
+
+  login:
+    enabled: false
+
+  uaa:
+    url: <%= protocol %>://uaa.<%= dns %>
+    spring_profiles: postgresql
+    no_ssl: <%= no_ssl %>
+    catalina_opts: -Xmx768m -XX:MaxPermSize=256m
+    resource_id: account_manager
+    jwt:
+      signing_key: |
+        -----BEGIN RSA PRIVATE KEY-----
+        MIICXAIBAAKBgQDHFr+KICms+tuT1OXJwhCUmR2dKVy7psa8xzElSyzqx7oJyfJ1
+        JZyOzToj9T5SfTIq396agbHJWVfYphNahvZ/7uMXqHxf+ZH9BL1gk9Y6kCnbM5R6
+        0gfwjyW1/dQPjOzn9N394zd2FJoFHwdq9Qs0wBugspULZVNRxq7veq/fzwIDAQAB
+        AoGBAJ8dRTQFhIllbHx4GLbpTQsWXJ6w4hZvskJKCLM/o8R4n+0W45pQ1xEiYKdA
+        Z/DRcnjltylRImBD8XuLL8iYOQSZXNMb1h3g5/UGbUXLmCgQLOUUlnYt34QOQm+0
+        KvUqfMSFBbKMsYBAoQmNdTHBaz3dZa8ON9hh/f5TT8u0OWNRAkEA5opzsIXv+52J
+        duc1VGyX3SwlxiE2dStW8wZqGiuLH142n6MKnkLU4ctNLiclw6BZePXFZYIK+AkE
+        xQ+k16je5QJBAN0TIKMPWIbbHVr5rkdUqOyezlFFWYOwnMmw/BKa1d3zp54VP/P8
+        +5aQ2d4sMoKEOfdWH7UqMe3FszfYFvSu5KMCQFMYeFaaEEP7Jn8rGzfQ5HQd44ek
+        lQJqmq6CE2BXbY/i34FuvPcKU70HEEygY6Y9d8J3o6zQ0K9SYNu+pcXt4lkCQA3h
+        jJQQe5uEGJTExqed7jllQ0khFJzLMx0K6tj0NeeIzAaGCQz13oo2sCdeGRHO4aDh
+        HH6Qlq/6UOV5wP8+GAcCQFgRCcB+hrje8hfEEefHcFpyKH+5g1Eu1k0mLrxK2zd+
+        4SlotYRHgPCEubokb2S1zfZDWIXW3HmggnGgM949TlY=
+        -----END RSA PRIVATE KEY-----
+      verification_key: |
+        -----BEGIN PUBLIC KEY-----
+        MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDHFr+KICms+tuT1OXJwhCUmR2d
+        KVy7psa8xzElSyzqx7oJyfJ1JZyOzToj9T5SfTIq396agbHJWVfYphNahvZ/7uMX
+        qHxf+ZH9BL1gk9Y6kCnbM5R60gfwjyW1/dQPjOzn9N394zd2FJoFHwdq9Qs0wBug
+        spULZVNRxq7veq/fzwIDAQAB
+        -----END PUBLIC KEY-----
+    cc:
+      client_secret: <%= common_password %>
+    admin:
+      client_secret: <%= common_password %>
+    batch:
+      username: batchuser
+      password: <%= common_password %>
+    client:
+      autoapprove:
+        - cf
+    clients:
+      cf:
+        override: true
+        authorized-grant-types: password,implicit,refresh_token
+        authorities: uaa.none
+        scope: cloud_controller.read,cloud_controller.write,openid,password.write,cloud_controller.admin,scim.read,scim.write
+        access-token-validity: 7200
+        refresh-token-validity: 1209600
+    scim:
+      users:
+      - admin|<%= common_password %>|scim.write,scim.read,openid,cloud_controller.admin
+      - services|<%= common_password %>|scim.write,scim.read,openid,cloud_controller.admin
