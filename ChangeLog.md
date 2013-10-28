@@ -21,5 +21,6 @@ The rewrite introduces some new implementation/feature concepts:
 * can initially use public http://xip.io for DNS and change to custom DNS later: `bosh change cf attributes dns=cf.mycloud.com`
 * v141 cf release & template fixes [v0.7.1]
 * bosh stemcells now have cpi/hypervisor in name [v0.7.2]
+* cc.external_host is assumed to be 'api' [v0.7.3]
 
 The latter means that new versions of this rubygem can be published that are backwards compatible with aging deployments of Cloud Foundry. There should not be any forced coupling of old `bosh-cloudfoundry` to old `cf-release` final releases.
