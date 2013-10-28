@@ -1,0 +1,12 @@
+---
+builds:
+  !binary "ODI2ZTU5YWM0ZDZhMDdkOTFlYTEzZGE0N2MxZGQ1MTRmNjBjNWUxOA==":
+    blobstore_id: 46a9a656-a4f2-4b55-bbff-9205ba2bbebc
+    version: 1
+    sha1: !binary |-
+      M2NkMTIzYzkwZTE3MzI0Mjk1ODJhMDhlZjRiYTkwYzczYzI2NjY1Zg==
+  !binary "NGJmMjlmMGYxM2EzYWEzYTMyNmE3N2FmYmJhYzk2ZDU2YTAzODhhNg==":
+    blobstore_id: 73e288c5-8371-41fb-a356-4a36dc75bab2
+    version: 2
+    sha1: !binary |-
+      ZWM3ODI2ZWQwZjA0NjYyNGFmNDdlZmJhMDZmMGZhN2I5ZDk0NWMwNw==
