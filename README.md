@@ -190,10 +190,11 @@ To package the latest "final release" of the Cloud Foundry bosh release into thi
 ```
 $ cd /path/to/releases
 $ git clone https://github.com/cloudfoundry/cf-release.git
+$ export CF_RELEASE=$(pwd)/cf-release
 $ cd -
-$ rake bosh:release:import[/path/to/releases/cf-release]
+$ rake bosh:release:import[$CF_RELEASE]
 # for zsh shell quotes are required around rake arguments:
-$ rake bosh:release:import'[/path/to/releases/cf-release]'
+$ rake bosh:release:import"[$CF_RELEASE]"
 ```
 
 Note: only the latest "final release" will be packaged.
