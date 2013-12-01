@@ -211,6 +211,8 @@ properties:
 
   nats:
     address: 0.nats.default.<%= name %>.microbosh
+    machines:
+    - 0.nats.default.<%= name %>.microbosh
     port: 4222
     user: nats
     password: <%= common_password %>
