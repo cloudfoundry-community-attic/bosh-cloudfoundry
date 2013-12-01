@@ -178,7 +178,7 @@ If you have already deployed Cloud Foundry using the default xip.io DNS service,
 $ bosh change cf attributes dns=cf.mycloud.com
 ```
 
-## Releasing new plugin gem versions
+## Adding new cf-release versions
 
 There are two reasons to release new versions of this plugin.
 
@@ -188,15 +188,41 @@ There are two reasons to release new versions of this plugin.
 To package the latest "final release" of the Cloud Foundry bosh release into this source repository, run the following command:
 
 ```
-$ cd /path/to/releases
-$ git clone https://github.com/cloudfoundry/cf-release.git
-$ cd -
-$ rake bosh:release:import[/path/to/releases/cf-release]
+cd /path/to/releases
+git clone https://github.com/cloudfoundry/cf-release.git
+export CF_RELEASE=$(pwd)/cf-release
+cd -
+rake bosh:release:import[$CF_RELEASE]
 # for zsh shell quotes are required around rake arguments:
-$ rake bosh:release:import'[/path/to/releases/cf-release]'
+rake bosh:release:import"[$CF_RELEASE]"
 ```
 
-Note: only the latest "final release" will be packaged.
+Note: only the "final releases" will be packaged.
+
+Now, you need to add templates that work for the versions you've added. Look in `templates/` for the most recent version folder (such as `v146`), and copy it and rename to the version you're adding support (such as `v149`).
+
+Then you replace all `version: 146` with `version: 149`.
+
+```
+export PREV_VERSION=$(ls templates | sort -nr | head -n1 | sed 's/v//')
+export NEXT_VERSION=$(ls bosh_release/releases/cf-1*.yml | sort -nr | head -n1 | xargs basename | sed 's/cf-//' | sed 's/\.yml//')
+cp -R templates/v$PREV_VERSION templates/v$NEXT_VERSION
+find templates/v$NEXT_VERSION -type f -exec sed -E -i '' "s/version: $PREV_VERSION/version: $NEXT_VERSION/g" {} \;
+sed -E -i '' "s/latest_cf_release_version; $PREV_VERSION; end/latest_cf_release_version; $NEXT_VERSION; end/" spec/spec_helper.rb
+sed -E -i '' "s/$PREV_VERSION]/$PREV_VERSION, $NEXT_VERSION]/" spec/release_version_spec.rb
+```
+
+NOTE: the `sed -i ''` flag is required for OS/X version of sed. May not be required on other versions of sed.
+
+Now run the tests. The above commands should patch the tests and there shouldn't be any failures.
+
+```
+$ rake
+```
+
+Now, update the v149 templates for any new jobs or required properties or other changes that are required to make the new cf-release version work.
+
+For example, with v149, it was required that `properties.nats.machines` was added, even if there was only a single nats VM.
 
 To locally test the plugin (`bosh` cli loads plugins from its local path automatically):
 

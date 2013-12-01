@@ -10,3 +10,13 @@ builds:
     version: 2
     sha1: !binary |-
       OGQ3NjgzM2MyOTMxNTgwYjlmYTZjMjFmY2ZlNmY4YmRkMDQzYWYxYQ==
+  !binary "OWVjNDRhYzkyYWJmOGI4NGRlMGRlYzdjNDc1OTZlMzUyZDJlOWZlNw==":
+    blobstore_id: 72786c3f-683c-4f35-96ca-58259e0e8fe0
+    version: 3
+    sha1: !binary |-
+      MWIzNmVlZTAzZDdiZjRkNjgyNzE5MTM0YjdjMmY5YzAyNmQ1Y2FjYw==
+  !binary "MmZhNGRmZWNiZGJmZmU2OTYyOTJmOTQ1NWZjNTIyNjRlZDQ0Y2QxNg==":
+    blobstore_id: c5e4caaa-bb90-4ccc-9607-34bc3cf7043e
+    version: 4
+    sha1: !binary |-
+      YWU3NTg0YjY4NjgxOTNjMTBmNzUzMjZiNGNkOWUyZTFiOWJmMjE2Nw==
