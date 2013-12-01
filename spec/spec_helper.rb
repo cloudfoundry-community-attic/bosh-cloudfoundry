@@ -8,9 +8,7 @@ Bundler.setup(:default, :test)
 
 $:.unshift(File.expand_path("../../lib", __FILE__))
 
-def latest_cf_release_version
-  146
-end
+def latest_cf_release_version; 146; end
 
 require "rspec/core"
 require 'rspec/fire'
