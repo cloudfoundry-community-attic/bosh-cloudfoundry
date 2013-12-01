@@ -24,5 +24,6 @@ The rewrite introduces some new implementation/feature concepts:
 * cc.external_host is assumed to be 'api' [v0.7.3]
 * v146 cf release [v0.7.4]
 * v146 fix - do not explicitly specify (wrong) NFS path [v0.7.5; thx Troy Astle]
+* v149 added, includes required nats.machines property [v0.7.6]
 
 The latter means that new versions of this rubygem can be published that are backwards compatible with aging deployments of Cloud Foundry. There should not be any forced coupling of old `bosh-cloudfoundry` to old `cf-release` final releases.
