@@ -214,11 +214,15 @@ sed -E -i '' "s/$PREV_VERSION]/$PREV_VERSION, $NEXT_VERSION]/" spec/release_vers
 
 NOTE: the `sed -i ''` flag is required for OS/X version of sed. May not be required on other versions of sed.
 
-Now run and fix the tests (some assert what the latest version is, which will need to be updated to v149).
+Now run the tests. The above commands should patch the tests and there shouldn't be any failures.
 
 ```
 $ rake
 ```
+
+Now, update the v149 templates for any new jobs or required properties or other changes that are required to make the new cf-release version work.
+
+For example, with v149, it was required that `properties.nats.machines` was added, even if there was only a single nats VM.
 
 To locally test the plugin (`bosh` cli loads plugins from its local path automatically):
 
