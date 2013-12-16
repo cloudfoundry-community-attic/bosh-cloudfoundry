@@ -109,6 +109,7 @@ jobs:
       - health_manager_next
       - uaa
       - syslog_aggregator
+      - loggregator
     instances: 1
     resource_pool: small
     networks:
@@ -122,6 +123,7 @@ jobs:
     template:
       - cloud_controller_ng
       - gorouter
+      - loggregator_trafficcontroller
     instances: 1
     resource_pool: small
     networks:
@@ -136,16 +138,22 @@ jobs:
       <%- end -%>
     properties:
       db: databases
+      traffic_controller:
+        zone: z1
 
   - name: dea
     release: cf
     template:
       - dea_next
+      - dea_logging_agent
     instances: 1
     resource_pool: small
     networks:
       - name: default
         default: [dns, gateway]
+    properties:
+      loggregator_endpoint:
+        host: 0.api.default.<%= name %>.microbosh 
 
 properties:
   cf:
@@ -160,7 +168,7 @@ properties:
     dea_container_depot_disk: <%= dea_container_depot_disk %>
 
   domain: <%= dns %>
-  system_domain: <%= dns %>.com
+  system_domain: <%= dns %>
   system_domain_organization: system_domain
   app_domains:
     - <%= dns %>
@@ -184,6 +192,20 @@ properties:
       port: 8080
       user: gorouter
       password: <%= common_password %>
+ 
+  loggregator:
+    debug: true
+    servers:
+      z1:
+      - 0.core.default.<%= name %>.microbosh 
+    incoming_port: 3456
+    outgoing_port: 3457 
+
+  loggregator_endpoint:
+    debug: true
+    shared_secret: <%= common_password %>
+    host: 0.api.default.<%= name %>.microbosh
+    port: 3456
 
   dea: &dea
     memory_mb: <%= dea_server_ram %>
