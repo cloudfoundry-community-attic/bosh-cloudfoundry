@@ -108,6 +108,7 @@ jobs:
       - nats
       - health_manager_next
       - uaa
+      - syslog_aggregator
     instances: 1
     resource_pool: small
     networks:
@@ -192,7 +193,7 @@ properties:
   dea_next: *dea
 
   syslog_aggregator:
-    address: 0.syslog-aggregator.default.<%= name %>.microbosh
+    address: 0.core.default.<%= name %>.microbosh
     port: 54321
 
   nfs_server:
