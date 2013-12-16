@@ -194,7 +194,6 @@ properties:
       password: <%= common_password %>
  
   loggregator:
-    debug: true
     servers:
       z1:
       - 0.core.default.<%= name %>.microbosh 
@@ -202,7 +201,6 @@ properties:
     outgoing_port: 3457 
 
   loggregator_endpoint:
-    debug: true
     shared_secret: <%= common_password %>
     host: 0.api.default.<%= name %>.microbosh
     port: 3456
