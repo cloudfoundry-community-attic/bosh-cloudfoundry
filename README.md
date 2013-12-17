@@ -212,7 +212,7 @@ sed -E -i '' "s/latest_cf_release_version; $PREV_VERSION; end/latest_cf_release_
 sed -E -i '' "s/$PREV_VERSION]/$PREV_VERSION, $NEXT_VERSION]/" spec/release_version_spec.rb
 ```
 
-NOTE: the `sed -i ''` flag is required for OS/X version of sed. May not be required on other versions of sed.
+NOTE: the `sed -i ''` flag is required for OS/X version of sed.  On Ubuntu 12.04, use `sed -i` (drop the `''`).  Other OS/distro's may differ.
 
 Now run the tests. The above commands should patch the tests and there shouldn't be any failures.
 
