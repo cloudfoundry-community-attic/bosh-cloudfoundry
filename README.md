@@ -62,7 +62,9 @@ $ bosh vms --vitals
 
 ## Requirements
 
-You will also need an IP address, and a wildcard DNS A record that points to the IP address.
+Ruby <= 2.0 (Ruby 2.1 does not work with the bosh deploy)
+
+You will need an IP address, and a wildcard DNS A record that points to the IP address.
 
 It is also required that you have login access to a BOSH on AWS EC2 or OpenStack (please help with vSphere support).
 
@@ -129,6 +131,7 @@ You will be prompted to confirm that your chosen/default security group has port
 ```
 $ bosh create cf --security-group cf-core
 ```
+If a "Usage" warning shows up when it is "Compiling deployment manifest..." then make sure you have the correct Ruby version.
 
 * TODO - how to show available instance sizes
 * TODO - how to update Cloud Foundry servers to a different instance size/flavor
