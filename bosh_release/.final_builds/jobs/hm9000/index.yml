@@ -30,3 +30,48 @@ builds:
     version: 6
     sha1: !binary |-
       MDk4NzQ4MThiNTdjNTYyNjEyYzI5ZTk1YTlmNTE0NzMxYWQxMzNjOQ==
+  !binary "MjkyNmM3NWY1Mjk3MTEzNDU3NTk4MjY1YTFmYTU3OTZlYTA1NGNiZg==":
+    blobstore_id: 7bc17254-fe45-4405-8d23-54588e11b334
+    version: 7
+    sha1: !binary |-
+      MTc3NmZhNzc2MzFkNTg3Y2YyOGY4MzY0NjRmYjYyYjgzZTU5OGRkMQ==
+  !binary "NTIyMzQxNThkNzZmYzZlZTNkMDc2YTRiNjk4ZmM2YTc5NmI2OTk0OQ==":
+    blobstore_id: a92fc85e-e5b0-4823-8be8-81ef4a527ea4
+    version: 8
+    sha1: !binary |-
+      YTQ3NjcyZGY0NGVmNjI4ZDNiNDY2ZmY0NTQ5NDIyMjU4NTEyNThmZA==
+  !binary "NWEyY2EzMTU0MzFhMGMwMzU3MzI1NDVjYTk4NDYwYTNkNGI1ZTNhOQ==":
+    blobstore_id: 83a80dba-a868-425f-aad4-4d4e51d1daaa
+    version: 9
+    sha1: !binary |-
+      M2EwY2UwNTRmNGVjMTZlMjhmZGQ5ZmI5MjUzZTdmYTQzODNkNTc0OQ==
+  !binary "NTk4ZWUyMjBhYzIzZjQ0YjNlZWM0NDcyZjc4MGYwMmQ0NGMxYjNhZQ==":
+    blobstore_id: 3e1f9075-7171-4c07-a676-1a923027176b
+    version: 10
+    sha1: !binary |-
+      ZWZiODc1NGU1OWM0YWRmOGM4NWJkZTNlYmFjNzA5NmI5YjU1YTVmMA==
+  !binary "OTJmYzcxN2Y2ZmUzZDdmMzk1M2U2NWQ3ZmExYTA5MmRiOTU5NzRiMw==":
+    blobstore_id: a325b125-080e-4541-ac94-3067b7d58264
+    version: 11
+    sha1: !binary |-
+      MTk3ZjQ1OWNkZDQ0ZDhhZTJlMjJkOTZhY2ZjNGJkMGFiMGIwMGFjZQ==
+  !binary "ZDNhN2UzZmRjMjJjNGMzZTQxNTcyNTI4NDI5YmU4NTgwZmQ5OTg2NQ==":
+    blobstore_id: b0659a77-f10f-45f7-8fa2-758d8b38327d
+    version: 12
+    sha1: !binary |-
+      OGRhNTQxNmRmOTYzNTFlZTVkMjRhNzM0OGQ1OTY3ZGQ0NGJjNTIzZQ==
+  !binary "ZGFmNWU2NDhlMzkxY2NkOGMyYjU5Y2NlMDk4MTJmNzU1NzA5M2U2OQ==":
+    blobstore_id: 2ed7b84e-164b-4213-8f0d-f21cf517bc56
+    version: 13
+    sha1: !binary |-
+      NDM1N2JkMGQ5NGExZTJjNjY3YmFkMWU2NjMwZDIyOWY4ZjFjNWViMA==
+  !binary "OWQzMDZhN2UzZDQ3OWMxZTU0MGFlZTkyZmE4MzgxNjgyNGQxYmJiNQ==":
+    blobstore_id: 7c9bd6c0-9692-4a04-a5a7-44dbb603b29b
+    version: 14
+    sha1: !binary |-
+      ZGU4Nzc2Yzk0ZjMyNDVjM2EyZTlmZmEyNWQ3N2JhMzhmMGUxMTQ5NA==
+  !binary "ODY1YzM2YjJjOTc3NGEwM2E0MjllZmFlYmYxZGU3M2JmNWNkMTk1NQ==":
+    blobstore_id: b4857558-381c-4db3-8709-9d67bd22723a
+    version: 15
+    sha1: !binary |-
+      YzlkM2RmOTU0OTI1ZGFmZjQ3MDc5NGVhOTUxMDgxYzMwZTc1NjBlMg==

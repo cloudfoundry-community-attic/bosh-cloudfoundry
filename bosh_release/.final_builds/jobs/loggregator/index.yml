@@ -50,3 +50,48 @@ builds:
     version: 10
     sha1: !binary |-
       YjRiYjJhMjNhZGEzMGUwODhkYzQzNmJhMDFhNDcwNjZjZGM5MjY3Yg==
+  !binary "ZGE0YjBlOWU3MmUzN2ExOTA3ODJjOTE2ZTdlMTk5NmRmM2EwOWZmNQ==":
+    blobstore_id: 6705422e-3679-417f-9567-2d2b44559f3b
+    version: 11
+    sha1: !binary |-
+      MjMyN2ExNmU4ZTcwYjAyNjcwMmZmZWU0NzYyMWZjZDQxZWEzODE2Nw==
+  !binary "N2E4YzJjZGRjMDgzYmViOWNmNzczYThhMGVhMDUwMmEwMzQ5NGE0Mw==":
+    blobstore_id: 0eec0a3f-d896-4f9d-9d51-71767930eb67
+    version: 12
+    sha1: !binary |-
+      MGZhMGQxMmFhNWIyNGY5OWJjY2JmZGMwY2E4ZGMwNjMwMDM1ZGZmNQ==
+  !binary "OGJjNzQ2NmRhMTA3ZmE0OTIxNzUxMjI5YTMxYWM2M2RjMDUwMzJmYQ==":
+    blobstore_id: 86261fa6-d310-41ad-bccf-5d8825731f1c
+    version: 13
+    sha1: !binary |-
+      MzIxYmYxNzkwNDRlZDNiZDQyOGExNzkxZTc1OGYwN2UxMDFkZDUwMA==
+  !binary "NjBiMjhiYWNiYzE4NDM0MWVhOGE4YjAxMjUwNzhhNTA4YzdkNTA4NQ==":
+    blobstore_id: ccef6781-650c-4ed3-9fa5-fcc34d2ad53d
+    version: 14
+    sha1: !binary |-
+      YWNlOWE4ZjBjZjQwODkzYmMwN2NhZmFiYmFjZjA4MzBjOWVjM2YxMQ==
+  !binary "MDBhNjMxOThkM2M5YjlkMTc3OWE0ZjI1ZGMxOTdjMjFiZjI1NDdhZg==":
+    blobstore_id: 4f44514f-aeb5-44fa-9871-aedf3bf525d6
+    version: 15
+    sha1: !binary |-
+      YmQwMzVjNTgwMDg5NTI4YmFjYzAzZmI2ZDNmOWQwZWYyMTM2YzBmYw==
+  !binary "NDJhOWJjYWQyNzgyYTBmMGUyODUyOTljNzZkZTlmN2IzMGQ1MDE3Mg==":
+    blobstore_id: 38e0abac-4c72-4525-84d1-0a0e110bec64
+    version: 16
+    sha1: !binary |-
+      ZjJlNGRhNjY5NWM4ZDJhZGU1YTY5OTlhZjk4ODI0MzI1YmZhM2U1MQ==
+  !binary "ZWJhMDQ0M2VmYTdiOWFlZmUwZmIzMTQ1NDNhMGE4NDAxYTZlM2MzNQ==":
+    blobstore_id: 4021f34e-9bca-439a-b886-5490196f965b
+    version: 17
+    sha1: !binary |-
+      ODU1MTZlMjYzZjFmMThlOGZjYzgwYjZjMjRmOGI4NmRlYjhlYzlmYQ==
+  !binary "ODE2YTZjN2UyNDE2ZTNhYTNiMzA4YjRmODkyNzdjZmM5NjI3Y2YwOQ==":
+    blobstore_id: e9455ce2-03c6-4d2d-8122-d4d606c8bf6e
+    version: 18
+    sha1: !binary |-
+      ZTRiMWM3ZmE3NjQyZGMwMTU3NjkwMDQxMTEyMDczOTQwZjdlYTExNQ==
+  !binary "NmJkMmE0N2NhOWM2MzU4ZGUyMzZmYzY2YzdjNmFlZGM5ODUyZmVhOA==":
+    blobstore_id: 67ce0696-b0cf-4f4b-b769-42543cd9f3e7
+    version: 19
+    sha1: !binary |-
+      M2RlMDMxNjk5MzhkNWIxMGJiYWM0YTQwMDdkYzk2NzYxYzRiY2JkOQ==
