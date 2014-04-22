@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_runtime_dependency "bosh_cli", "~> 1.5.0.pre"
+  spec.add_runtime_dependency "bosh_cli", "~> 1.2200.0"
   spec.add_dependency "net-dns"
 
   spec.add_development_dependency "rake"
