@@ -40,7 +40,7 @@ describe Bosh::Cloudfoundry::DeploymentFile do
   # medium & large
 
   # %w[medium large].each do |deployment_size|
-  %w[large].each do |deployment_size|
+  %w[medium large].each do |deployment_size|
     context "generates deployment (aws)" do
       let(:bosh_cpi) { "aws" }
       let(:bosh_status) { {"cpi" => bosh_cpi, "uuid" => "UUID"} }

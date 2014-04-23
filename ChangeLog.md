@@ -7,6 +7,8 @@
 * [medium] Various Cloud Controller job templates running on different VMs due to each one demanding it perform NFS mounting
 * [large] Now 15 VMs instead of 9 due to additional jobs - cc worker & clock, etcd, hm9000 and haproxy.
 
+Note: only one CC worker process is running due to conflict with NFS mounting. To be resolved.
+
 ## v0.7 - now supporting Cloud Foundry v2!
 
 `bosh-cloudfoundry` is back, rewritten, and supporting Cloud Foundry v2.

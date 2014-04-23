@@ -415,7 +415,7 @@ jobs:
       - name: cf1
     properties:
       etcd_ips:
-        - 0.etcd-z1.cf1.demo.microbosh
+        - 0.etcd-leader-z1.cf1.demo.microbosh
 
   - name: loggregator_trafficcontroller_z1
     templates:
