@@ -210,7 +210,7 @@ module Bosh::Cloudfoundry
 
     # Chosen to be small enough to fit within EC2 m1.small (1.7G)
     def default_dea_server_ram
-      1500
+      10000
     end
 
     def default_dea_container_depot_disk

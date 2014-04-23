@@ -17,6 +17,7 @@ module Bosh::Cli::Command
     option "--security-group default", String, "Security group to assign to provisioned VMs"
     option "--deployment-size medium", String, "Size of deployment - medium or large"
     option "--skip-dns-validation", "Skip DNS validation"
+    option "--common-password PASSWORD", String, "Dictate the common internal password"
     def create_cf
       auth_required
       bosh_status # preload
@@ -37,7 +38,7 @@ module Bosh::Cli::Command
       attrs.set_unless_nil(:skip_dns_validation, options[:skip_dns_validation])
 
       release_version = ReleaseVersion.latest_version_number
-      @release_version_cpi_size = 
+      @release_version_cpi_size =
         ReleaseVersionCpiSize.new(@release_version_cpi, attrs.deployment_size)
 
       nl

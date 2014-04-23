@@ -1,0 +1,293 @@
+---
+name: demo
+director_uuid: UUID
+
+releases:
+ - name: cf
+   version: 141
+
+networks:
+- name: floating
+  type: vip
+  cloud_properties: {}
+- name: default
+  type: dynamic
+  cloud_properties:
+    security_groups:
+    - default
+
+update:
+  canaries: 1
+  canary_watch_time: 30000-60000
+  update_watch_time: 30000-60000
+  max_in_flight: 4
+
+compilation:
+  workers: 6
+  network: default
+  reuse_compilation_vms: true
+  cloud_properties:
+    instance_type: m1.medium
+
+resource_pools:
+  - name: small
+    network: default
+    size: 4
+    stemcell:
+      name: bosh-aws-xen-ubuntu
+      version: latest
+    cloud_properties:
+      instance_type: m1.small
+
+  - name: medium
+    network: default
+    size: 0
+    stemcell:
+      name: bosh-aws-xen-ubuntu
+      version: latest
+    cloud_properties:
+      instance_type: m1.medium
+
+jobs:
+  - name: data
+    release: cf
+    template:
+      - postgres
+      - debian_nfs_server
+    instances: 1
+    resource_pool: small
+    persistent_disk: 4096
+    networks:
+    - name: default
+      default:
+      - dns
+      - gateway
+    properties:
+      db: databases
+
+  - name: core
+    release: cf
+    template:
+      - nats
+      - health_manager_next
+      - uaa
+    instances: 1
+    resource_pool: small
+    networks:
+    - name: default
+      default:
+      - dns
+      - gateway
+
+  - name: api
+    release: cf
+    template:
+      - cloud_controller_ng
+      - gorouter
+    instances: 1
+    resource_pool: small
+    networks:
+    - name: default
+      default:
+      - dns
+      - gateway
+    - name: floating
+      static_ips:
+      - 1.2.3.4
+    properties:
+      db: databases
+
+  - name: dea
+    release: cf
+    template:
+      - dea_next
+    instances: 1
+    resource_pool: small
+    networks:
+      - name: default
+        default: [dns, gateway]
+
+properties:
+  cf:
+    name: demo
+    dns: mycloud.com
+    ip_addresses: ["1.2.3.4"]
+    deployment_size: medium
+    security_group: default
+    persistent_disk: 4096
+    common_password: qwertyasdfgh
+    dea_server_ram: 1500
+    dea_container_depot_disk: 10240
+
+  domain: mycloud.com
+  system_domain: mycloud.com.com
+  system_domain_organization: system_domain
+  app_domains:
+    - mycloud.com
+
+  networks:
+    apps: default
+    management: default
+
+  nats:
+    address: 0.core.default.demo.microbosh
+    port: 4222
+    user: nats
+    password: qwertyasdfgh
+    authorization_timeout: 5
+
+  router:
+    port: 8081
+    status:
+      port: 8080
+      user: gorouter
+      password: qwertyasdfgh
+
+  dea: &dea
+    memory_mb: 1500
+    disk_mb: 10240
+    directory_server_protocol: http
+
+  dea_next: *dea
+
+  syslog_aggregator:
+    address: 0.syslog-aggregator.default.demo.microbosh
+    port: 54321
+
+  nfs_server:
+    address: 0.data.default.demo.microbosh
+    network: "*.demo.microbosh"
+    idmapd_domain: mycloud.com
+
+  debian_nfs_server:
+    no_root_squash: true
+
+  databases: &databases
+    db_scheme: postgres
+    address: 0.data.default.demo.microbosh
+    port: 5524
+    roles:
+      - tag: admin
+        name: ccadmin
+        password: qwertyasdfgh
+      - tag: admin
+        name: uaaadmin
+        password: qwertyasdfgh
+    databases:
+      - tag: cc
+        name: ccdb
+        citext: true
+      - tag: uaa
+        name: uaadb
+        citext: true
+
+  ccdb: &ccdb
+    db_scheme: postgres
+    address: 0.data.default.demo.microbosh
+    port: 5524
+    roles:
+      - tag: admin
+        name: ccadmin
+        password: qwertyasdfgh
+    databases:
+      - tag: cc
+        name: ccdb
+        citext: true
+
+  ccdb_ng: *ccdb
+
+  uaadb: 
+    db_scheme: postgresql
+    address: 0.data.default.demo.microbosh
+    port: 5524
+    roles:
+      - tag: admin
+        name: uaaadmin
+        password: qwertyasdfgh
+    databases:
+      - tag: uaa
+        name: uaadb
+        citext: true
+
+  cc_api_version: v2
+
+  cc: &cc
+    logging_level: debug
+    external_host: api
+    srv_api_uri: http://api.mycloud.com
+    cc_partition: default
+    db_encryption_key: qwertyasdfgh
+    bootstrap_admin_email: admin@mycloud.com
+    bulk_api_password: qwertyasdfgh
+    uaa_resource_id: cloud_controller
+    staging_upload_user: uploaduser
+    staging_upload_password: qwertyasdfgh
+    resource_pool:
+      resource_directory_key: cc-resources
+      # Local provider when using NFS
+      fog_connection:
+        provider: Local
+        local_root: /var/vcap/shared
+    packages:
+      app_package_directory_key: cc-packages
+    droplets:
+      droplet_directory_key: cc-droplets
+    default_quota_definition: runaway
+
+  ccng: *cc
+
+  login:
+    enabled: false
+
+  uaa:
+    url: http://uaa.mycloud.com
+    spring_profiles: postgresql
+    no_ssl: true
+    catalina_opts: -Xmx768m -XX:MaxPermSize=256m
+    resource_id: account_manager
+    jwt:
+      signing_key: |
+        -----BEGIN RSA PRIVATE KEY-----
+        MIICXAIBAAKBgQDHFr+KICms+tuT1OXJwhCUmR2dKVy7psa8xzElSyzqx7oJyfJ1
+        JZyOzToj9T5SfTIq396agbHJWVfYphNahvZ/7uMXqHxf+ZH9BL1gk9Y6kCnbM5R6
+        0gfwjyW1/dQPjOzn9N394zd2FJoFHwdq9Qs0wBugspULZVNRxq7veq/fzwIDAQAB
+        AoGBAJ8dRTQFhIllbHx4GLbpTQsWXJ6w4hZvskJKCLM/o8R4n+0W45pQ1xEiYKdA
+        Z/DRcnjltylRImBD8XuLL8iYOQSZXNMb1h3g5/UGbUXLmCgQLOUUlnYt34QOQm+0
+        KvUqfMSFBbKMsYBAoQmNdTHBaz3dZa8ON9hh/f5TT8u0OWNRAkEA5opzsIXv+52J
+        duc1VGyX3SwlxiE2dStW8wZqGiuLH142n6MKnkLU4ctNLiclw6BZePXFZYIK+AkE
+        xQ+k16je5QJBAN0TIKMPWIbbHVr5rkdUqOyezlFFWYOwnMmw/BKa1d3zp54VP/P8
+        +5aQ2d4sMoKEOfdWH7UqMe3FszfYFvSu5KMCQFMYeFaaEEP7Jn8rGzfQ5HQd44ek
+        lQJqmq6CE2BXbY/i34FuvPcKU70HEEygY6Y9d8J3o6zQ0K9SYNu+pcXt4lkCQA3h
+        jJQQe5uEGJTExqed7jllQ0khFJzLMx0K6tj0NeeIzAaGCQz13oo2sCdeGRHO4aDh
+        HH6Qlq/6UOV5wP8+GAcCQFgRCcB+hrje8hfEEefHcFpyKH+5g1Eu1k0mLrxK2zd+
+        4SlotYRHgPCEubokb2S1zfZDWIXW3HmggnGgM949TlY=
+        -----END RSA PRIVATE KEY-----
+      verification_key: |
+        -----BEGIN PUBLIC KEY-----
+        MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDHFr+KICms+tuT1OXJwhCUmR2d
+        KVy7psa8xzElSyzqx7oJyfJ1JZyOzToj9T5SfTIq396agbHJWVfYphNahvZ/7uMX
+        qHxf+ZH9BL1gk9Y6kCnbM5R60gfwjyW1/dQPjOzn9N394zd2FJoFHwdq9Qs0wBug
+        spULZVNRxq7veq/fzwIDAQAB
+        -----END PUBLIC KEY-----
+    cc:
+      client_secret: qwertyasdfgh
+    admin:
+      client_secret: qwertyasdfgh
+    batch:
+      username: batchuser
+      password: qwertyasdfgh
+    client:
+      autoapprove:
+        - cf
+    clients:
+      cf:
+        override: true
+        authorized-grant-types: password,implicit,refresh_token
+        authorities: uaa.none
+        scope: cloud_controller.read,cloud_controller.write,openid,password.write,cloud_controller.admin,scim.read,scim.write
+        access-token-validity: 7200
+        refresh-token-validity: 1209600
+    scim:
+      users:
+      - admin|qwertyasdfgh|scim.write,scim.read,openid,cloud_controller.admin
+      - services|qwertyasdfgh|scim.write,scim.read,openid,cloud_controller.admin

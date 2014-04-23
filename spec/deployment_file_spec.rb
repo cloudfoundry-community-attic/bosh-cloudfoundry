@@ -39,7 +39,8 @@ describe Bosh::Cloudfoundry::DeploymentFile do
   # v132 & v133
   # medium & large
 
-  %w[medium large].each do |deployment_size|
+  # %w[medium large].each do |deployment_size|
+  %w[large].each do |deployment_size|
     context "generates deployment (aws)" do
       let(:bosh_cpi) { "aws" }
       let(:bosh_status) { {"cpi" => bosh_cpi, "uuid" => "UUID"} }
@@ -51,7 +52,7 @@ describe Bosh::Cloudfoundry::DeploymentFile do
         deployment_size: deployment_size
       } }
       # [133, 141].each do |release_version|
-      [141].each do |release_version|
+      [169].each do |release_version|
         let(:release_version_cpi) { Bosh::Cloudfoundry::ReleaseVersionCpi.for_cpi(release_version, bosh_cpi) }
         let(:release_version_cpi_size) { Bosh::Cloudfoundry::ReleaseVersionCpiSize.new(release_version_cpi, deployment_size) }
         let(:deployment_attributes) do
@@ -82,15 +83,15 @@ describe Bosh::Cloudfoundry::DeploymentFile do
     # it "large size" do
     #   in_home_dir do
     #     command.add_option(:deployment_size, "large")
-    # 
+    #
     #     command.create_cf
     #     files_match(spec_asset("v133/aws/large.yml"), command.deployment_file)
-    # 
+    #
     #     manifest = YAML.load_file(command.deployment_file)
     #     Bosh::Cli::DeploymentManifest.new(manifest).normalize
     #   end
     # end
-  # 
+  #
   # it "specifies core size" do
   #   in_home_dir do
   #     command.add_option(:size, "xlarge")

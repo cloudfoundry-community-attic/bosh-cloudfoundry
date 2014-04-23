@@ -1,5 +1,11 @@
 # Change Log
 
+## v0.8
+
+* Cloud Foundry v169, assumes BOSH 1.2200.0+
+* Now includes loggregator & hm9000
+* [medium] Various Cloud Controller job templates running on different VMs due to each one demanding it perform NFS mounting
+
 ## v0.7 - now supporting Cloud Foundry v2!
 
 `bosh-cloudfoundry` is back, rewritten, and supporting Cloud Foundry v2.

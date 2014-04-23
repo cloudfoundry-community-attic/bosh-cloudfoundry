@@ -11,7 +11,7 @@ describe Bosh::Cloudfoundry::DeploymentAttributes do
     it { subject.persistent_disk.should == 4096 }
     it { subject.security_group.should == "default" }
     it { subject.common_password.should == "qwertyqwerty" }
-    it { subject.dea_server_ram.should == 1500 }
+    it { subject.dea_server_ram.should == 10000 }
     it { subject.dea_container_depot_disk.should == 10240 }
   end
 
