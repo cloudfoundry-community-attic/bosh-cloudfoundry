@@ -62,8 +62,8 @@ compilation:
 
 update:
   canaries: 1
-  canary_watch_time: 30000-60000
-  update_watch_time: 30000-60000
+  canary_watch_time: 30000-100000
+  update_watch_time: 30000-100000
   max_in_flight: 4
   serial: false
 
@@ -117,6 +117,13 @@ properties:
     username: nats
     password: <%= common_password %>
     authorization_timeout: 5
+
+  etcd:
+    machines:
+      - 0.etcd-z1.cf1.<%= name %>.microbosh
+
+  etcd_metrics_server:
+    nats: *nats
 
   router:
     port: 8081
@@ -268,7 +275,7 @@ properties:
 
   loggregator_endpoint:
     shared_secret: <%= common_password %>
-    host: 0.loggregator-trafficcontroller-z1.cf1.demo.microbosh
+    host: 0.loggregator-trafficcontroller-z1.cf1.<%= name %>.microbosh
 
   login:
     enabled: false
@@ -382,7 +389,7 @@ jobs:
     networks:
       - name: cf1
 
-  - name: etcd_leader_z1
+  - name: etcd_z1
     templates:
       - name: etcd
         release: cf
@@ -392,9 +399,6 @@ jobs:
     resource_pool: small
     networks:
       - name: cf1
-    properties:
-      etcd_metrics_server:
-        nats: *nats
 
   - name: cloud_controller_api_z1
     templates:
@@ -450,9 +454,6 @@ jobs:
     resource_pool: small
     networks:
       - name: cf1
-    properties:
-      etcd_ips:
-        - 0.etcd-leader-z1.cf1.<%= name %>.microbosh
 
   - name: loggregator_trafficcontroller_z1
     templates:
@@ -477,8 +478,6 @@ jobs:
     properties:
       loggregator_endpoint:
         host: 0.loggregator-trafficcontroller-z1.cf1.<%= name %>.microbosh
-      etcd_ips:
-        - 0.etcd-leader-z1.cf1.<%= name %>.microbosh
 
   - name: runner_z1
     templates:
