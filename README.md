@@ -86,7 +86,7 @@ $ bosh-bootstrap deploy
 Install via RubyGems:
 
 ```
-$ gem install bosh_cli -v "~> 1.5.0.pre" --source https://s3.amazonaws.com/bosh-jenkins-gems/ 
+$ gem install bosh_cli -v "~> 1.5.0.pre" --source https://s3.amazonaws.com/bosh-jenkins-gems/
 $ gem install bosh-cloudfoundry
 ```
 
@@ -193,11 +193,11 @@ To package the latest "final release" of the Cloud Foundry bosh release into thi
 ```
 cd /path/to/releases
 git clone https://github.com/cloudfoundry/cf-release.git
-export CF_RELEASE=$(pwd)/cf-release
+export CF_RELEASE_DIR=$(pwd)/cf-release
 cd -
-rake bosh:release:import[$CF_RELEASE]
+rake bosh:release:import[$CF_RELEASE_DIR]
 # for zsh shell quotes are required around rake arguments:
-rake bosh:release:import"[$CF_RELEASE]"
+rake bosh:release:import"[$CF_RELEASE_DIR]"
 ```
 
 Note: only the "final releases" will be packaged.

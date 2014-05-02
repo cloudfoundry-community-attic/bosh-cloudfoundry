@@ -6,7 +6,7 @@
 # director_uuid: 4ae3a0f0-70a5-4c0d-95f2-7fafaefe8b9e
 # releases:
 #  - name: cf
-#    version: 169
+#    version: 170
 # networks: {}
 # properties:
 #   cf:
@@ -41,7 +41,7 @@ director_uuid: <%= find("director_uuid") %>
 
 releases:
  - name: cf
-   version: 169
+   version: 170
 
 networks:
 - name: floating
@@ -70,14 +70,14 @@ update:
 resource_pools:
   - name: small
     network: cf1
-    size: 10
+    size: 14
     stemcell:
       name: bosh-aws-xen-ubuntu
       version: latest
     cloud_properties:
       instance_type: m1.small
 
-  - name: runner
+  - name: large
     network: cf1
     size: 1
     stemcell:
@@ -132,8 +132,12 @@ properties:
 
   dea_next: *dea
 
+  syslog_aggregator:
+    address: 0.syslog-aggregator-z1.cf1.<%= name %>.microbosh
+    port: 54321
+
   nfs_server:
-    address: 0.data-z1.cf1.<%= name %>.microbosh
+    address: 0.nfs-server-z1.cf1.<%= name %>.microbosh
     network: "*.<%= name %>.microbosh"
     idmapd_domain: <%= dns %>
 
@@ -264,7 +268,7 @@ properties:
 
   loggregator_endpoint:
     shared_secret: <%= common_password %>
-    host: 0.loggregator-trafficcontroller-z1.cf1.<%= name %>.microbosh
+    host: 0.loggregator-trafficcontroller-z1.cf1.demo.microbosh
 
   login:
     enabled: false
@@ -337,6 +341,16 @@ jobs:
       nats:
         use_gnatsd: true
 
+  - name: syslog_aggregator_z1
+    templates:
+      - name: syslog_aggregator
+        release: cf
+    instances: 1
+    resource_pool: small
+    persistent_disk: <%= persistent_disk %>
+    networks:
+      - name: cf1
+
   - name: postgres_z1
     templates:
       - name: postgres
@@ -349,30 +363,42 @@ jobs:
     properties:
       db: databases
 
-  - name: data_z1
+  - name: nfs_server_z1
     templates:
       - name: debian_nfs_server
-        release: cf
-      - name: etcd
-        release: cf
-      - name: etcd_metrics_server
         release: cf
     instances: 1
     resource_pool: small
     persistent_disk: <%= persistent_disk %>
     networks:
       - name: cf1
+
+  - name: uaa_z1
+    templates:
+      - name: uaa
+        release: cf
+    instances: 1
+    resource_pool: small
+    networks:
+      - name: cf1
+
+  - name: etcd_leader_z1
+    templates:
+      - name: etcd
+        release: cf
+      - name: etcd_metrics_server
+        release: cf
+    instances: 1
+    resource_pool: small
+    networks:
+      - name: cf1
     properties:
       etcd_metrics_server:
         nats: *nats
 
-  - name: api_z1
+  - name: cloud_controller_api_z1
     templates:
       - name: cloud_controller_ng
-        release: cf
-      - name: gorouter
-        release: cf
-      - name: uaa
         release: cf
     instances: 1
     resource_pool: small
@@ -407,6 +433,15 @@ jobs:
     properties:
       ccdb: ccdb
 
+  - name: router_z1
+    templates:
+      - name: gorouter
+        release: cf
+    instances: 1
+    resource_pool: small
+    networks:
+      - name: cf1
+
   - name: loggregator_z1
     templates:
       - name: loggregator
@@ -417,7 +452,7 @@ jobs:
       - name: cf1
     properties:
       etcd_ips:
-        - 0.data-z1.cf1.<%= name %>.microbosh
+        - 0.etcd-leader-z1.cf1.<%= name %>.microbosh
 
   - name: loggregator_trafficcontroller_z1
     templates:
@@ -443,14 +478,14 @@ jobs:
       loggregator_endpoint:
         host: 0.loggregator-trafficcontroller-z1.cf1.<%= name %>.microbosh
       etcd_ips:
-        - 0.data-z1.cf1.<%= name %>.microbosh
+        - 0.etcd-leader-z1.cf1.<%= name %>.microbosh
 
   - name: runner_z1
     templates:
       - name: dea_next
         release: cf
     instances: 1
-    resource_pool: runner
+    resource_pool: large
     networks:
       - name: cf1
 
@@ -474,5 +509,5 @@ jobs:
       router:
         servers:
           z1:
-          - 0.api-z1.cf1.<%= name %>.microbosh
+          - 0.router-z1.cf1.<%= name %>.microbosh
           z2: []

@@ -62,22 +62,22 @@ compilation:
 
 update:
   canaries: 1
-  canary_watch_time: 30000-60000
-  update_watch_time: 30000-60000
+  canary_watch_time: 15000-120000
+  update_watch_time: 15000-120000
   max_in_flight: 4
   serial: false
 
 resource_pools:
   - name: small
     network: cf1
-    size: 14
+    size: 5
     stemcell:
       name: bosh-aws-xen-ubuntu
       version: latest
     cloud_properties:
       instance_type: m1.small
 
-  - name: large
+  - name: runner
     network: cf1
     size: 1
     stemcell:
@@ -109,9 +109,9 @@ properties:
     management: cf1
 
   nats: &nats
-    address: 0.nats-z1.cf1.<%= name %>.microbosh
+    address: 0.data-z1.cf1.<%= name %>.microbosh
     machines:
-      - 0.nats-z1.cf1.<%= name %>.microbosh
+      - 0.data-z1.cf1.<%= name %>.microbosh
     port: 4222
     user: nats
     username: nats
@@ -131,18 +131,6 @@ properties:
     directory_server_protocol: <%= protocol %>
 
   dea_next: *dea
-
-  syslog_aggregator:
-    address: 0.syslog-aggregator-z1.cf1.<%= name %>.microbosh
-    port: 54321
-
-  nfs_server:
-    address: 0.nfs-server-z1.cf1.<%= name %>.microbosh
-    network: "*.<%= name %>.microbosh"
-    idmapd_domain: <%= dns %>
-
-  debian_nfs_server:
-    no_root_squash: true
 
   databases: &databases
     db_scheme: postgres
@@ -193,6 +181,11 @@ properties:
 
   cc_api_version: v2
 
+  fog_config: &fog_config
+    provider: Local
+    local_root: /var/vcap/store
+
+
   cc: &cc
     app_events:
       cutoff_age_in_days: 31
@@ -203,6 +196,8 @@ properties:
     billing_event_writing_enabled: true
     broker_client_timeout_seconds: 70
     bulk_api_password: <%= common_password %>
+    buildpacks:
+      fog_connection: *fog_config
     client_max_body_size: 1280M
     db_encryption_key: <%= common_password %>
     default_app_memory: 1024
@@ -218,7 +213,7 @@ properties:
     diego: false
     disable_custom_buildpacks: false
     droplets:
-      cdn: null
+      fog_connection: *fog_config
       droplet_directory_key: <%= dns %>-cc-droplets
     hm9000_noop: false
     install_buildpacks:
@@ -232,6 +227,7 @@ properties:
     packages:
       app_package_directory_key: <%= dns %>-cc-packages
       max_package_size: 1073741824
+      fog_connection: *fog_config
     quota_definitions:
       default:
         memory_limit: 10240
@@ -240,9 +236,7 @@ properties:
         total_services: 100
     resource_pool:
       resource_directory_key: <%= dns %>-cc-resources
-      # Local provider when using NFS
-      fog_connection:
-        provider: Local
+      fog_connection: *fog_config
     srv_api_uri: <%= protocol %>://api.<%= dns %>
     staging_upload_password: <%= common_password %>
     staging_upload_user: <%= common_password %>
@@ -263,12 +257,12 @@ properties:
     maxRetainedLogMessages: 100
     servers:
       z1:
-      - 0.loggregator-z1.cf1.<%= name %>.microbosh
+      - 0.core-z1.cf1.<%= name %>.microbosh
       z2: []
 
   loggregator_endpoint:
     shared_secret: <%= common_password %>
-    host: 0.loggregator-trafficcontroller-z1.cf1.demo.microbosh
+    host: 0.api-z1.cf1.<%= name %>.microbosh
 
   login:
     enabled: false
@@ -327,30 +321,6 @@ properties:
       - services|<%= common_password %>|scim.write,scim.read,openid,cloud_controller.admin
 
 jobs:
-  - name: nats_z1
-    templates:
-      - name: nats
-        release: cf
-      - name: nats_stream_forwarder
-        release: cf
-    instances: 1
-    resource_pool: small
-    networks:
-      - name: cf1
-    properties:
-      nats:
-        use_gnatsd: true
-
-  - name: syslog_aggregator_z1
-    templates:
-      - name: syslog_aggregator
-        release: cf
-    instances: 1
-    resource_pool: small
-    persistent_disk: <%= persistent_disk %>
-    networks:
-      - name: cf1
-
   - name: postgres_z1
     templates:
       - name: postgres
@@ -363,134 +333,37 @@ jobs:
     properties:
       db: databases
 
-  - name: nfs_server_z1
+  - name: data_z1
     templates:
-      - name: debian_nfs_server
+      - name: nats
         release: cf
-    instances: 1
-    resource_pool: small
-    persistent_disk: <%= persistent_disk %>
-    networks:
-      - name: cf1
-
-  - name: uaa_z1
-    templates:
-      - name: uaa
+      - name: nats_stream_forwarder
         release: cf
-    instances: 1
-    resource_pool: small
-    networks:
-      - name: cf1
-
-  - name: etcd_leader_z1
-    templates:
       - name: etcd
         release: cf
       - name: etcd_metrics_server
         release: cf
     instances: 1
     resource_pool: small
+    persistent_disk: <%= persistent_disk %>
     networks:
       - name: cf1
     properties:
+      nats:
+        use_gnatsd: true
       etcd_metrics_server:
         nats: *nats
 
-  - name: cloud_controller_api_z1
+  - name: api_z1
     templates:
       - name: cloud_controller_ng
         release: cf
-    instances: 1
-    resource_pool: small
-    networks:
-      - name: cf1
-    properties:
-      ccdb: ccdb
-      ccng:
-        jobs:
-          local:
-            number_of_workers: 0
-
-  - name: cloud_controller_worker_z1
-    templates:
-      - name: cloud_controller_worker
-        release: cf
-    instances: 1
-    resource_pool: small
-    networks:
-      - name: cf1
-    properties:
-      ccdb: ccdb
-
-  - name: cloud_controller_clock_z1
-    templates:
       - name: cloud_controller_clock
         release: cf
-    instances: 1
-    resource_pool: small
-    networks:
-      - name: cf1
-    properties:
-      ccdb: ccdb
-
-  - name: router_z1
-    templates:
       - name: gorouter
         release: cf
-    instances: 1
-    resource_pool: small
-    networks:
-      - name: cf1
-
-  - name: loggregator_z1
-    templates:
-      - name: loggregator
-        release: cf
-    instances: 1
-    resource_pool: small
-    networks:
-      - name: cf1
-    properties:
-      etcd_ips:
-        - 0.etcd-leader-z1.cf1.<%= name %>.microbosh
-
-  - name: loggregator_trafficcontroller_z1
-    templates:
       - name: loggregator_trafficcontroller
         release: cf
-    instances: 1
-    resource_pool: small
-    networks:
-      - name: cf1
-    properties:
-      traffic_controller:
-        zone: z1
-
-  - name: health_manager_z1
-    templates:
-      - name: hm9000
-        release: cf
-    instances: 1
-    resource_pool: small
-    networks:
-      - name: cf1
-    properties:
-      loggregator_endpoint:
-        host: 0.loggregator-trafficcontroller-z1.cf1.<%= name %>.microbosh
-      etcd_ips:
-        - 0.etcd-leader-z1.cf1.<%= name %>.microbosh
-
-  - name: runner_z1
-    templates:
-      - name: dea_next
-        release: cf
-    instances: 1
-    resource_pool: large
-    networks:
-      - name: cf1
-
-  - name: ha_proxy
-    templates:
       - name: haproxy
         release: cf
     instances: 1
@@ -504,10 +377,50 @@ jobs:
         - <%= ip %>
         <%- end -%>
     properties:
+      ccdb: ccdb
+      traffic_controller:
+        zone: z1
       ha_proxy:
         ssl_pem: null
       router:
         servers:
           z1:
-          - 0.router-z1.cf1.<%= name %>.microbosh
+          - 0.api-z1.cf1.<%= name %>.microbosh
           z2: []
+
+  - name: core_z1
+    templates:
+      - name: uaa
+        release: cf
+      - name: loggregator
+        release: cf
+    instances: 1
+    resource_pool: small
+    networks:
+      - name: cf1
+    properties:
+      etcd_ips:
+        - 0.data-z1.cf1.<%= name %>.microbosh
+
+  - name: health_manager_z1
+    templates:
+      - name: hm9000
+        release: cf
+    instances: 1
+    resource_pool: small
+    networks:
+      - name: cf1
+    properties:
+      loggregator_endpoint:
+        host: 0.health-manager-z1.cf1.<%= name %>.microbosh
+      etcd_ips:
+        - 0.data-z1.cf1.<%= name %>.microbosh
+
+  - name: runner_z1
+    templates:
+      - name: dea_next
+        release: cf
+    instances: 1
+    resource_pool: runner
+    networks:
+      - name: cf1

@@ -52,7 +52,7 @@ describe Bosh::Cloudfoundry::DeploymentFile do
         deployment_size: deployment_size
       } }
       # [133, 141].each do |release_version|
-      [169].each do |release_version|
+      [170].each do |release_version|
         let(:release_version_cpi) { Bosh::Cloudfoundry::ReleaseVersionCpi.for_cpi(release_version, bosh_cpi) }
         let(:release_version_cpi_size) { Bosh::Cloudfoundry::ReleaseVersionCpiSize.new(release_version_cpi, deployment_size) }
         let(:deployment_attributes) do

@@ -2,10 +2,11 @@
 
 ## v0.8
 
-* Cloud Foundry v169, assumes BOSH 1.2200.0+
+* Cloud Foundry v170, assumes BOSH 1.2200.0+
 * Now includes loggregator, hm9000 and haproxy
 * [medium] Various Cloud Controller job templates running on different VMs due to each one demanding it perform NFS mounting
 * [large] Now 15 VMs instead of 9 due to additional jobs - cc worker & clock, etcd, hm9000 and haproxy.
+* using job names & network names that match the spiff templates from cf-release (jobs have _z1 suffix and cf1 for network name)
 
 Note: only one CC worker process is running due to conflict with NFS mounting. To be resolved.
 
